@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:mariadb://schedch-mvp-rds.cmac4zjegrsk.ap-northeast-2.rds.amazonaws.com:3306/schedch
+    username: admin
+    password: qpsxmffl1!
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+logging:
+  level:
+    root: info
