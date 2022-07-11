@@ -27,4 +27,8 @@ public class RoomDate {
     public RoomDate(LocalDate scheduledDate) {
         this.scheduledDate = scheduledDate;
     }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
 }
