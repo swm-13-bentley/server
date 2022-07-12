@@ -1,10 +1,9 @@
 package com.schedch.mvp.controller;
 
 import com.schedch.mvp.dto.RoomRequestDto;
+import com.schedch.mvp.dto.RoomResponseDto;
 import com.schedch.mvp.service.RoomService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -13,9 +12,12 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,13 +34,13 @@ class RoomControllerTest {
         RoomRequestDto roomRequestDto = getRoomRequestDto();
 
         //when
-
-        //then
         mockMvc.perform(post("/room")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(roomRequestDto.toString())
             )
-                .andExpect(status().isOk());
+        //then
+                .andExpect(status().isOk()
+            );
     }
 
     @Test
@@ -47,25 +49,46 @@ class RoomControllerTest {
         RoomRequestDto invalidRoomRequestDto = getInvalidRoomRequestDto();
 
         //when
-
-        //then
         mockMvc.perform(post("/room")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRoomRequestDto.toString())
-                )
+                        .content(invalidRoomRequestDto.toString()))
+        //then
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("message").value("Room title cannot be empty")
-                );
-
-
-
-
+                .andExpect(jsonPath("message").value("Room title cannot be empty"));
     }
 
-//    @Test
-//    void room_get_test() throws Exception {
-//        //given
-//    }
+    @Test
+    void get_room_info_test() throws Exception {
+        //given
+        RoomResponseDto roomResponseDto = RoomResponseDto.builder()
+                .title("sample title")
+                .dates(Arrays.asList(LocalDate.of(2022, 4, 1), LocalDate.of(2022, 4, 2)))
+                .startTime(LocalTime.of(4, 30, 0))
+                .endTime(LocalTime.of(20, 0, 0))
+                .build();
+        when(roomService.getRoomInfo("testRoomUuid")).thenReturn(roomResponseDto);
+
+        //when
+        mockMvc.perform(get("/room/testRoomUuid"))
+        //then
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void get_room_info_failure_test() throws Exception {
+        //given
+        String errorMessage = "Room for uuid: testRoomUuid not found";
+        when(roomService.getRoomInfo("testRoomUuid"))
+                .thenThrow(new NoSuchElementException(errorMessage));
+
+        //when
+        mockMvc.perform(get("/room/testRoomUuid"))
+        //then
+                .andExpect(status().isNotFound()) //404 not found
+                .andExpect(jsonPath("message").value(errorMessage)
+                );
+
+    }
 
     private RoomRequestDto getRoomRequestDto() {
         String title = "test title";
