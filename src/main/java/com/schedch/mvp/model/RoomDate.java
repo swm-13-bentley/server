@@ -1,12 +1,12 @@
 package com.schedch.mvp.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Entity
@@ -21,7 +21,7 @@ public class RoomDate {
     @JsonIgnore
     private Room room;
 
-    @NotNull
+    @NotNull(message = "날짜는 비어있을 수 없습니다")
     private LocalDate scheduledDate;
 
     public RoomDate(LocalDate scheduledDate) {
