@@ -17,18 +17,11 @@ public class User {
     @NotNull
     private String username;
 
-    private String password;
-
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
     private List<Participant> participantList = new ArrayList<>();
 
     public User(String username, String password) {
         this.username = username;
-        this.password = password;
-    }
-
-    public Boolean checkPassword(String inputPassword) {
-        return this.password.equals(inputPassword);
     }
 
     public void addParticipant(Participant participant) {
