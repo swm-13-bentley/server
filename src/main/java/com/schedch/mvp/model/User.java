@@ -20,7 +20,7 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
     private List<Participant> participantList = new ArrayList<>();
 
-    public User(String username, String password) {
+    public User(String username) {
         this.username = username;
     }
 
