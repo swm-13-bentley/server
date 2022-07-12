@@ -1,5 +1,7 @@
 package com.schedch.mvp.model;
 
+import com.schedch.mvp.dto.RoomRequestDto;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -7,9 +9,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.map;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoomTest {
@@ -19,15 +23,9 @@ class RoomTest {
         //given
         String title = "testTitle";
         List<RoomDate> roomDates = new ArrayList<>();
-        LocalDate testDate1 = LocalDate.of(2022, 06, 01);
-        LocalDate testDate2 = LocalDate.of(2022, 06, 01);
-        LocalDate testDate3 = LocalDate.of(2022, 06, 01);
-        RoomDate roomDate1 = new RoomDate(testDate1);
-        RoomDate roomDate2 = new RoomDate(testDate2);
-        RoomDate roomDate3 = new RoomDate(testDate3);
-        roomDates.add(roomDate1);
-        roomDates.add(roomDate2);
-        roomDates.add(roomDate3);
+        roomDates.add(new RoomDate(LocalDate.of(2022, 06, 01)));
+        roomDates.add(new RoomDate(LocalDate.of(2022, 06, 01)));
+        roomDates.add(new RoomDate(LocalDate.of(2022, 06, 01)));
 
         LocalTime startTime = LocalTime.of(16, 00);
         LocalTime endTime   = LocalTime.of(23, 00);
@@ -37,6 +35,36 @@ class RoomTest {
 
         //then
         assertThat(room.getUuid()).isNotNull();
+    }
+
+    @Test
+    public void create_room_from_dto() {
+        //given
+        String title = "testTitle";
+        List<LocalDate> roomDates = new ArrayList<>();
+        roomDates.add(LocalDate.of(2022, 06, 01));
+        roomDates.add(LocalDate.of(2022, 06, 01));
+        roomDates.add(LocalDate.of(2022, 06, 01));
+
+        LocalTime startTime = LocalTime.of(16, 00);
+        LocalTime endTime   = LocalTime.of(23, 00);
+
+        //when
+        RoomRequestDto dto = RoomRequestDto.builder()
+                .title(title)
+                .dates(roomDates)
+                .startTime(startTime)
+                .endTime(endTime)
+                .build();
+
+
+        //then
+        try {
+            Room room = new Room(dto);
+        } catch (Exception e) {
+            Assertions.fail();
+        }
+
     }
 
 }
