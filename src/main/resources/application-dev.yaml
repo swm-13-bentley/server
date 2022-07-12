@@ -11,4 +11,4 @@ spring:
 
 logging:
   level:
-    root: info
+    com.schedch.mvp: info
