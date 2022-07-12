@@ -1,6 +1,7 @@
 package com.schedch.mvp.model;
 
 import com.schedch.mvp.dto.RoomRequestDto;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
