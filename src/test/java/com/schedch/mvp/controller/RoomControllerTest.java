@@ -1,39 +1,73 @@
 package com.schedch.mvp.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import com.schedch.mvp.dto.RoomRequestDto;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.schedch.mvp.service.RoomService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(RoomController.class)
 class RoomControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired private MockMvc mockMvc;
+    @MockBean RoomService roomService;
 
     @Test
-    void room_post_test() throws Exception {
+    void create_room_test() throws Exception {
         //given
+        RoomRequestDto roomRequestDto = getRoomRequestDto();
+
+        //when
+
+        //then
+        mockMvc.perform(post("/room")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(roomRequestDto.toString())
+            )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void create_room_invalid_argument_test() throws Exception {
+        //given
+        RoomRequestDto invalidRoomRequestDto = getInvalidRoomRequestDto();
+
+        //when
+
+        //then
+        mockMvc.perform(post("/room")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidRoomRequestDto.toString())
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message").value("Room title cannot be empty")
+                );
+
+
+
+
+    }
+
+//    @Test
+//    void room_get_test() throws Exception {
+//        //given
+//    }
+
+    private RoomRequestDto getRoomRequestDto() {
         String title = "test title";
         LocalDate date1 = LocalDate.of(2022, 04, 01);
         LocalDate date2 = LocalDate.of(2022, 04, 02);
@@ -47,11 +81,12 @@ class RoomControllerTest {
                 .startTime(startTime)
                 .endTime(endTime)
                 .build();
+        return roomRequestDto;
+    }
 
-        mockMvc.perform(post("/room")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(roomRequestDto.toString())
-            )
-                .andExpect(status().isOk());
+    private RoomRequestDto getInvalidRoomRequestDto() {
+        RoomRequestDto roomRequestDto = getRoomRequestDto();
+        roomRequestDto.setTitle(null);
+        return roomRequestDto;
     }
 }
