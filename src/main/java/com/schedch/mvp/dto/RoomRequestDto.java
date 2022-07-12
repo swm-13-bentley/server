@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -16,9 +17,16 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class RoomRequestDto {
+
+    @NotNull(message = "Room title cannot be empty")
     String title;
+
     List<LocalDate> dates = new ArrayList<>();
+
+    @NotNull(message = "room startTime cannot be empty")
     LocalTime startTime;
+
+    @NotNull(message = "room endTime cannot be empty")
     LocalTime endTime;
 
     @Builder
