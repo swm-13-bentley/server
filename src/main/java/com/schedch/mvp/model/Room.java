@@ -1,18 +1,16 @@
 package com.schedch.mvp.model;
 
 import com.schedch.mvp.dto.RoomRequestDto;
-import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -24,16 +22,16 @@ public class Room {
     @NotNull
     private String uuid;
 
-    @NotNull
+    @NotNull(message = "title is empty")
     private String title;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "room")
     private List<RoomDate> roomDates = new ArrayList<>();
 
-    @NotNull
+    @NotNull(message = "start time is empty")
     private LocalTime startTime;
 
-    @NotNull
+    @NotNull(message = "end time is empty")
     private LocalTime endTime;
 
     //연관관계 편의 메서드
@@ -55,8 +53,8 @@ public class Room {
         this.uuid = UUID.randomUUID().toString();
         this.title = roomRequestDto.getTitle();
         roomRequestDto.getDates().stream()
-                .map(localDate -> new RoomDate(localDate))
-                .forEach(roomDate -> addRoomDate(roomDate));
+                .map(RoomDate::new)
+                .forEach(this::addRoomDate);
         this.startTime = roomRequestDto.getStartTime();
         this.endTime = roomRequestDto.getEndTime();
 
