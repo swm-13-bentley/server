@@ -19,19 +19,19 @@ public class Room {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @NotNull
+    @Column(nullable = false)
     private String uuid;
 
-    @NotNull(message = "title is empty")
+    @NotNull(message = "Room title is empty")
     private String title;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "room")
     private List<RoomDate> roomDates = new ArrayList<>();
 
-    @NotNull(message = "start time is empty")
+    @NotNull(message = "Room startTime is empty")
     private LocalTime startTime;
 
-    @NotNull(message = "end time is empty")
+    @NotNull(message = "Room endTime is empty")
     private LocalTime endTime;
 
     //연관관계 편의 메서드
