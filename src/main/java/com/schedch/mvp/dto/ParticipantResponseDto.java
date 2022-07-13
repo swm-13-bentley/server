@@ -2,6 +2,7 @@ package com.schedch.mvp.dto;
 
 import com.schedch.mvp.model.Participant;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
