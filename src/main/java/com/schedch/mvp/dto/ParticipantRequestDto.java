@@ -5,11 +5,11 @@ import lombok.Data;
 
 @Data
 public class ParticipantRequestDto {
-    private String username;
+    private String participantName;
     private String password;
 
-    public ParticipantRequestDto(String username, String password) {
-        this.username = username;
+    public ParticipantRequestDto(String participantName, String password) {
+        this.participantName = participantName;
         this.password = password;
     }
 
