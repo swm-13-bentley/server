@@ -20,7 +20,7 @@ public class ParticipantService {
     private final RoomRepository roomRepository;
 
     public ParticipantResponseDto findUnSignedParticipantAndValidate(
-            String roomUuid, String participantName, String password) throws Exception {
+            String roomUuid, String participantName, String password) throws IllegalAccessException, NoSuchElementException {
 
         //방에 참여하는 참여자 정보 다 가져옴
         Optional<Room> roomOptional = roomRepository.findByUuid(roomUuid);
