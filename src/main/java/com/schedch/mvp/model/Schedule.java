@@ -58,4 +58,8 @@ public class Schedule {
 
         return IntStream.range(start, end+1).boxed().collect(Collectors.toList());
     }
+    public void setParticipant(Participant participant) {
+        this.participant = participant;
+    }
+
 }
