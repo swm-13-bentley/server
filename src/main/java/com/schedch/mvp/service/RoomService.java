@@ -12,8 +12,8 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional
 public class RoomService {
 
     private final RoomRepository roomRepository;
