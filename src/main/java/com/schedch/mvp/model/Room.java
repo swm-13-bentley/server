@@ -35,10 +35,18 @@ public class Room {
     @NotNull(message = "Room endTime is empty")
     private LocalTime endTime;
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "room")
+    private List<Participant> participantList = new ArrayList<>();
+
     //연관관계 편의 메서드
     public void addRoomDate(RoomDate roomDate) {
         roomDates.add(roomDate);
         roomDate.setRoom(this);
+    }
+
+    public void addParticipant(Participant participant) {
+        participantList.add(participant);
+        participant.setRoom(this);
     }
 
     @Builder
