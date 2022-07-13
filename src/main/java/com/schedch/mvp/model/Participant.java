@@ -34,6 +34,7 @@ public class Participant {
     private String password;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "participant")
+    @OrderBy(value = "availableDate ASC")
     private List<Schedule> scheduleList = new ArrayList<>();
 
     public void setUser(User user) {
