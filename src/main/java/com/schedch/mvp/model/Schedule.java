@@ -41,6 +41,12 @@ public class Schedule {
         this.endTime = endTime;
     }
 
+    public Schedule(LocalDate availableDate, int startTimeInt, int endTimeInt) {
+        this.availableDate = availableDate;
+        this.startTime = toLocalTime(startTimeInt, 30);
+        this.endTime = toLocalTime(endTimeInt, 30);
+    }
+
     public TimeBlockDto toTimeBlockDto(int unit) {
         return TimeBlockDto.builder()
                 .availableDate(this.availableDate)
@@ -57,6 +63,11 @@ public class Schedule {
 
         return IntStream.range(start, end+1).boxed().collect(Collectors.toList());
     }
+
+    public LocalTime toLocalTime(int timeInteger, int unit) {
+        return LocalTime.of(timeInteger / (60/unit), unit * (timeInteger % (60/unit)), 0);
+    }
+
     public void setParticipant(Participant participant) {
         this.participant = participant;
     }
