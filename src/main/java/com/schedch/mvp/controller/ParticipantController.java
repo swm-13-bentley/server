@@ -1,8 +1,8 @@
 package com.schedch.mvp.controller;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.schedch.mvp.dto.AvailableRequestDto;
 import com.schedch.mvp.dto.ParticipantRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.service.ParticipantService;
@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 
@@ -53,6 +50,24 @@ public class ParticipantController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(gson.toJson(errorJsonObject));
         }
-
     }
+
+    @PostMapping("/room/{roomUuid}/participant/available")
+    public ResponseEntity participantAvailablePost(@PathVariable String roomUuid,
+                                                   @RequestBody AvailableRequestDto availableRequestDto) {
+        Gson gson = new Gson();
+
+        try {
+            participantService.saveParticipantAvailable(roomUuid, availableRequestDto);
+
+            return ResponseEntity.status(HttpStatus.OK).build();
+
+        } catch (NoSuchElementException e) {//해당 roomUuid에 대한 방 없음
+            JsonObject errorJsonObject = new JsonObject();
+            errorJsonObject.addProperty("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(gson.toJson(errorJsonObject));
+        }
+    }
+
 }
