@@ -46,7 +46,6 @@ public class Schedule {
                 .availableDate(this.availableDate)
                 .availableTimeList(cutTime(unit))
                 .build();
-
     }
 
     public List<Integer> cutTime(int unit) {
