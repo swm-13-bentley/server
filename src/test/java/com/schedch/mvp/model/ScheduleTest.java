@@ -35,9 +35,9 @@ class ScheduleTest {
         List<Integer> list = schedule.cutTime(30);
 
         //then
-        assertThat(list.size()).isEqualTo(6);
-        assertThat(list.get(0)).isEqualTo(13);
-        assertThat(list.get(list.size() - 1)).isEqualTo(18);
+        assertThat(list.size()).isEqualTo(32);
+        assertThat(list.get(0)).isEqualTo(9);
+        assertThat(list.get(list.size() - 1)).isEqualTo(40);
 
     }
 
@@ -52,9 +52,9 @@ class ScheduleTest {
         //then
         int listSize = timeBlockDto.getAvailableTimeList().size();
         assertThat(timeBlockDto.getAvailableDate()).isEqualTo(availableDate);
-        assertThat(listSize).isEqualTo(12);
-        assertThat(timeBlockDto.getAvailableTimeList().get(0)).isEqualTo(12);
-        assertThat(timeBlockDto.getAvailableTimeList().get(listSize-1)).isEqualTo(23);
+        assertThat(listSize).isEqualTo(32);
+        assertThat(timeBlockDto.getAvailableTimeList().get(0)).isEqualTo(9);
+        assertThat(timeBlockDto.getAvailableTimeList().get(listSize-1)).isEqualTo(40);
 
 
     }
