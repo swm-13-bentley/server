@@ -51,6 +51,10 @@ public class Participant {
         schedule.setParticipant(this);
     }
 
+    public void emptySchedules() {
+        this.scheduleList.clear();
+    }
+
     public Participant(String participantName, String password, boolean isSignedIn) {
         this.participantName = participantName;
         this.password = password;
