@@ -87,7 +87,6 @@ class RoomControllerTest {
                 .andExpect(status().isNotFound()) //404 not found
                 .andExpect(jsonPath("message").value(errorMessage)
                 );
-
     }
 
     private RoomRequestDto getRoomRequestDto() {
