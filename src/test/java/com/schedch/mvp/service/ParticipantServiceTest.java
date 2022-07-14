@@ -2,9 +2,11 @@ package com.schedch.mvp.service;
 
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.RoomRequestDto;
+import com.schedch.mvp.dto.TimeBlockDto;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.Schedule;
+import com.schedch.mvp.repository.ParticipantRepository;
 import com.schedch.mvp.repository.RoomRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,7 @@ class ParticipantServiceTest {
 
     @Autowired ParticipantService participantService;
     @MockBean RoomRepository roomRepository;
+    @MockBean ParticipantRepository participantRepository;
     String roomUuid = "testRoomUuid";
     String participantName = "testName";
     String password = "testPwd";
@@ -102,6 +105,36 @@ class ParticipantServiceTest {
         //then
         assertThat(participantResponseDto.getParticipantName()).isEqualTo(participantName);
         assertThat(participantResponseDto.getTimeBlockDtoList().size()).isGreaterThan(0);
+
+    }
+
+    @Test
+    public void 유저_입력_시간_스케쥴_변환_테스트() throws Exception {
+        //given
+        TimeBlockDto timeBlockDto1 = new TimeBlockDto(
+                LocalDate.of(2022, 4, 1),
+                Arrays.asList(1, 2, 3, 10, 11, 12, 20)
+        );
+
+        TimeBlockDto timeBlockDto2 = new TimeBlockDto(
+                LocalDate.of(2022, 4, 1),
+                Arrays.asList(1)
+        );
+
+        TimeBlockDto timeBlockDto3 = new TimeBlockDto(
+                LocalDate.of(2022, 4, 1),
+                Arrays.asList()
+        );
+
+        //when
+        List<Schedule> scheduleList1 = participantService.changeTimeBlockDtoToSchedule(timeBlockDto1);
+        List<Schedule> scheduleList2 = participantService.changeTimeBlockDtoToSchedule(timeBlockDto2);
+        List<Schedule> scheduleList3 = participantService.changeTimeBlockDtoToSchedule(timeBlockDto3);
+
+        //then
+        assertThat(scheduleList1.size()).isEqualTo(3);
+        assertThat(scheduleList2.size()).isEqualTo(1);
+        assertThat(scheduleList3.size()).isEqualTo(0);
 
     }
 
