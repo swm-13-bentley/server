@@ -43,7 +43,9 @@ class ParticipantControllerTest {
         )
         //then
                 .andExpect(status().isOk())
-                .andExpect(jsonPath(participantName).hasJsonPath());
+                .andExpect(jsonPath("username").hasJsonPath())
+                .andExpect(jsonPath("available").hasJsonPath());
+
     }
 
     @Test
