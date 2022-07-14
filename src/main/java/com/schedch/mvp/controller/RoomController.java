@@ -25,7 +25,8 @@ public class RoomController {
         String roomUuid = roomService.createRoom(roomRequestDto);
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("roomUuid", roomUuid);
-        return ResponseEntity.ok().body(new Gson().toJson(jsonObject));
+
+        return ResponseEntity.status(HttpStatus.OK).body(new Gson().toJson(jsonObject));
     }
 
     @GetMapping("/room/{roomUuid}")
