@@ -1,6 +1,7 @@
 package com.schedch.mvp.controller;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.schedch.mvp.dto.ParticipantRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
@@ -34,7 +35,8 @@ public class ParticipantController {
             ParticipantResponseDto participantResponseDto
                     = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
             JsonObject responseJsonObject = new JsonObject();
-            responseJsonObject.addProperty(participantName, participantResponseDto.toString());
+            responseJsonObject.addProperty("username", participantResponseDto.getParticipantName());
+            responseJsonObject.addProperty("available", participantResponseDto.getTimeBlockDtoList().toString());
 
             return ResponseEntity.status(HttpStatus.OK)
                     .body(gson.toJson(responseJsonObject));
