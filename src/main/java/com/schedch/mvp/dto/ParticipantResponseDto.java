@@ -19,13 +19,11 @@ public class ParticipantResponseDto {
 
     public ParticipantResponseDto(Participant participant) {
         this.participantName = participant.getParticipantName();
-//        Map<LocalDate, List<Schedule>> map = participant.getScheduleList().stream()
-//                .collect(Collectors.groupingBy(Schedule::getAvailableDate));
 
         participant.getScheduleList().stream()
                 .collect(Collectors.groupingBy(Schedule::getAvailableDate))
                 .entrySet().stream()
-                .sorted((a, b) -> a.getKey().compareTo(b.getKey()))
+                .sorted(Comparator.comparing(Map.Entry::getKey))
                 .forEach(entry -> {
                     LocalDate availableDate = entry.getKey();
                     List<Schedule> scheduleList = entry.getValue();
