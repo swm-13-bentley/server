@@ -10,16 +10,16 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ScheduleTest {
+    LocalDate availableDate = LocalDate.of(2022, 4, 2);
+    LocalTime startTime = LocalTime.of(4, 30, 0);
+    LocalTime endTime = LocalTime.of(20, 0, 0);
 
     @Test
     public void create_schedule_success_test() throws Exception {
         //given
-        LocalDate scheduledDate = LocalDate.of(2022, 4, 2);
-        LocalTime startTime = LocalTime.of(4, 30, 0);
-        LocalTime endTime = LocalTime.of(20, 0, 0);
 
         //when
-        Schedule schedule = new Schedule(scheduledDate, startTime, endTime);
+        Schedule schedule = new Schedule(availableDate, startTime, endTime);
 
         //then
         assertThat(schedule.getStartTime()).isEqualTo(startTime);
@@ -29,9 +29,6 @@ class ScheduleTest {
     @Test
     public void cutTimeTest() {
         //given
-        LocalDate availableDate = LocalDate.of(2022, 4, 20);
-        LocalTime startTime = LocalTime.of(6, 30, 0);
-        LocalTime endTime = LocalTime.of(9, 0, 0);
         Schedule schedule = new Schedule(availableDate, startTime, endTime);
 
         //when
@@ -47,9 +44,6 @@ class ScheduleTest {
     @Test
     void create_timeBlockDto_test() {
         //given
-        LocalDate availableDate = LocalDate.of(2022, 4, 20);
-        LocalTime startTime = LocalTime.of(6, 0, 0);
-        LocalTime endTime = LocalTime.of(11, 30, 0);
         Schedule schedule = new Schedule(availableDate, startTime, endTime);
 
         //when
@@ -63,6 +57,20 @@ class ScheduleTest {
         assertThat(timeBlockDto.getAvailableTimeList().get(listSize-1)).isEqualTo(23);
 
 
+    }
+
+    @Test
+    void from_timeInt_to_localDate() {
+        //given
+        int startTimeInt = 1; //0시 30분
+        int endTimeInt = 11; //5시 30분
+
+        //when
+        Schedule schedule = new Schedule(availableDate, startTimeInt, endTimeInt);
+
+        //then
+        assertThat(schedule.getStartTime()).isEqualTo(LocalTime.of(0, 30, 0));
+        assertThat(schedule.getEndTime()).isEqualTo(LocalTime.of(5, 30, 0));
     }
 
 }
