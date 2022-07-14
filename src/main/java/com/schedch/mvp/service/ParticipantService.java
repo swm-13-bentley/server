@@ -1,12 +1,18 @@
 package com.schedch.mvp.service;
 
+import com.schedch.mvp.dto.AvailableRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
+import com.schedch.mvp.dto.TimeBlockDto;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
+import com.schedch.mvp.model.Schedule;
+import com.schedch.mvp.repository.ParticipantRepository;
 import com.schedch.mvp.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -18,6 +24,7 @@ import java.util.stream.Collectors;
 public class ParticipantService {
 
     private final RoomRepository roomRepository;
+    private final ParticipantRepository participantRepository;
 
     public ParticipantResponseDto findUnSignedParticipantAndValidate(
             String roomUuid, String participantName, String password) throws IllegalAccessException, NoSuchElementException {
@@ -50,4 +57,47 @@ public class ParticipantService {
             throw new IllegalAccessException("password is incorrect for participant: " + participantName);
        }
     }
+
+    public void saveParticipantAvailable(String roomUuid, AvailableRequestDto availableRequestDto) {
+        Room room = roomRepository.findByUuid(roomUuid).orElseThrow(
+                () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid)));
+
+        String participantName = availableRequestDto.getParticipantName();
+
+        Participant participant = participantRepository.findParticipantByParticipantNameAndRoom(participantName, room)
+                .orElseThrow(() -> new NoSuchElementException(String.format("Participant not found for name: %s", participantName)));
+
+        participant.emptySchedules();
+
+        availableRequestDto.getTimeBlockDtoList().stream()
+                .forEach(timeBlockDto -> {
+                    changeTimeBlockDtoToSchedule(timeBlockDto).stream()
+                            .forEach(schedule -> participant.addSchedule(schedule));
+
+                });
+    }
+
+    public List<Schedule> changeTimeBlockDtoToSchedule(TimeBlockDto timeBlockDto) {
+        List<Schedule> scheduleList = new ArrayList<>();
+        LocalDate availableDate = timeBlockDto.getAvailableDate();
+        List<Integer> availableTimeList = timeBlockDto.getAvailableTimeList();
+        if(!availableTimeList.isEmpty()) {
+            int start = availableTimeList.get(0);
+            int end = start;
+
+            for (int i = 1; i <= availableTimeList.size(); i++) {
+                if(i == availableTimeList.size()) {
+                    scheduleList.add(new Schedule(availableDate, start, end));
+                    return scheduleList;
+                }
+                if (availableTimeList.get(i) != end + 1) {//불연속 or 마지막
+                    scheduleList.add(new Schedule(availableDate, start, end));
+                    start = availableTimeList.get(i);
+                }
+                end = availableTimeList.get(i);
+            }
+        }
+        return scheduleList;
+    }
+
 }
