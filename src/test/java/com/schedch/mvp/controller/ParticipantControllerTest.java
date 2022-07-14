@@ -1,5 +1,6 @@
 package com.schedch.mvp.controller;
 
+import com.schedch.mvp.dto.AvailableRequestDto;
 import com.schedch.mvp.dto.ParticipantRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.model.Participant;
@@ -83,4 +84,21 @@ class ParticipantControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("message").hasJsonPath());
     }
+
+    @Test
+    public void 유저_시간_입력받기() throws Exception {
+        //given
+        AvailableRequestDto availableRequestDto = new AvailableRequestDto();
+
+        //when
+        mockMvc.perform(post("/room/testRoomUuid/participant/available")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(availableRequestDto.toString())
+                )
+        //then
+                .andExpect(status().isOk());
+
+
+    }
+
 }
