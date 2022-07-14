@@ -38,8 +38,8 @@ class RoomControllerTest {
                 .content(roomRequestDto.toString())
             )
         //then
-                .andExpect(status().isOk()
-            );
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("roomUuid").hasJsonPath());
     }
 
     @Test
