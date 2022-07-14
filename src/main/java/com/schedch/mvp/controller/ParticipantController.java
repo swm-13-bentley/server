@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -31,12 +32,8 @@ public class ParticipantController {
         try {
             ParticipantResponseDto participantResponseDto
                     = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
-            JsonObject responseJsonObject = new JsonObject();
-            responseJsonObject.addProperty("username", participantResponseDto.getParticipantName());
-            responseJsonObject.addProperty("available", participantResponseDto.getTimeBlockDtoList().toString());
-
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(gson.toJson(responseJsonObject));
+                    .body(gson.toJson(participantResponseDto));
 
         } catch (IllegalAccessException e1) {//이름 중복
             JsonObject errorJsonObject = new JsonObject();
@@ -68,6 +65,23 @@ public class ParticipantController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(gson.toJson(errorJsonObject));
         }
+    }
+
+    @GetMapping("/room/{roomUuid}/group")
+    public ResponseEntity groupSchedulesFind(@PathVariable String roomUuid) {
+        Gson gson = new Gson();
+
+        try {
+            List<ParticipantResponseDto> participantResponseDtoList = participantService.findAllParticipantsInRoom(roomUuid);
+            return ResponseEntity.status(HttpStatus.OK).body(participantResponseDtoList);
+        }
+        catch (NoSuchElementException e) {
+            JsonObject errorJsonObject = new JsonObject();
+            errorJsonObject.addProperty("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(gson.toJson(errorJsonObject));
+        }
+
     }
 
 }

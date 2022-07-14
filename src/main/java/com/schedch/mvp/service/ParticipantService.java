@@ -100,4 +100,14 @@ public class ParticipantService {
         return scheduleList;
     }
 
+    public List<ParticipantResponseDto> findAllParticipantsInRoom(String roomUuid) {
+        Room room = roomRepository.findByUuid(roomUuid).orElseThrow(
+                () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid)));
+
+        List<Participant> participantList = room.getParticipantList();
+
+        return participantList.stream()
+                .map(participant -> new ParticipantResponseDto(participant))
+                .collect(Collectors.toList());
+    }
 }

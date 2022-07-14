@@ -2,7 +2,6 @@ package com.schedch.mvp.dto;
 
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Schedule;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,11 +13,11 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class ParticipantResponseDto {
 
-    private String participantName;
-    private List<TimeBlockDto> timeBlockDtoList = new ArrayList<>();
+    private String username;
+    private List<TimeBlockDto> available = new ArrayList<>();
 
     public ParticipantResponseDto(Participant participant) {
-        this.participantName = participant.getParticipantName();
+        this.username = participant.getParticipantName();
 
         participant.getScheduleList().stream()
                 .collect(Collectors.groupingBy(Schedule::getAvailableDate))
@@ -33,7 +32,7 @@ public class ParticipantResponseDto {
                         cutTimeList.stream().forEach(i -> availableTimeSet.add(i));
                     }
 
-                    this.timeBlockDtoList.add(TimeBlockDto.builder()
+                    this.available.add(TimeBlockDto.builder()
                             .availableDate(availableDate)
                             .availableTimeList(availableTimeSet.stream().sorted(Comparator.comparing(Integer::intValue)).collect(Collectors.toList()))
                             .build());

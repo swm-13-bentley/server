@@ -2,20 +2,14 @@ package com.schedch.mvp.dto;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import com.schedch.mvp.adapter.LocalDateAdapter;
 import com.schedch.mvp.adapter.LocalTimeAdapter;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Schedule;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -34,9 +28,9 @@ class ParticipantResponseDtoTest {
         ParticipantResponseDto dto = new ParticipantResponseDto(participant);
 
         //then
-        assertThat(dto.getTimeBlockDtoList().size()).isEqualTo(2);
-        assertThat(dto.getTimeBlockDtoList().get(0).getAvailableDate())
-                .isBefore(dto.getTimeBlockDtoList().get(1).getAvailableDate());
+        assertThat(dto.getAvailable().size()).isEqualTo(2);
+        assertThat(dto.getAvailable().get(0).getAvailableDate())
+                .isBefore(dto.getAvailable().get(1).getAvailableDate());
 
     }
 
