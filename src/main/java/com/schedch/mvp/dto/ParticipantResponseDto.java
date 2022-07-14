@@ -1,14 +1,17 @@
 package com.schedch.mvp.dto;
 
 import com.schedch.mvp.model.Participant;
+import com.schedch.mvp.model.Schedule;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
 public class ParticipantResponseDto {
 
     private String participantName;
@@ -16,8 +19,28 @@ public class ParticipantResponseDto {
 
     public ParticipantResponseDto(Participant participant) {
         this.participantName = participant.getParticipantName();
-        this.timeBlockDtoList = participant.getScheduleList().stream()
-                .map(schedule -> schedule.toTimeBlockDto(30))
-                .collect(Collectors.toList());
+//        Map<LocalDate, List<Schedule>> map = participant.getScheduleList().stream()
+//                .collect(Collectors.groupingBy(Schedule::getAvailableDate));
+
+        participant.getScheduleList().stream()
+                .collect(Collectors.groupingBy(Schedule::getAvailableDate))
+                .entrySet().stream()
+                .sorted((a, b) -> a.getKey().compareTo(b.getKey()))
+                .forEach(entry -> {
+                    LocalDate availableDate = entry.getKey();
+                    List<Schedule> scheduleList = entry.getValue();
+                    HashSet<Integer> availableTimeSet = new HashSet<>();
+                    for (Schedule schedule : scheduleList) {
+                        List<Integer> cutTimeList = schedule.cutTime(30);
+                        cutTimeList.stream().forEach(i -> availableTimeSet.add(i));
+                    }
+
+                    this.timeBlockDtoList.add(TimeBlockDto.builder()
+                            .availableDate(availableDate)
+                            .availableTimeList(availableTimeSet.stream().sorted(Comparator.comparing(Integer::intValue)).collect(Collectors.toList()))
+                            .build());
+                });
     }
+
+
 }
