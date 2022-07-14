@@ -31,6 +31,7 @@ class RoomControllerTest {
     void create_room_test() throws Exception {
         //given
         RoomRequestDto roomRequestDto = getRoomRequestDto();
+        when(roomService.createRoom(roomRequestDto)).thenReturn("roomUuid");
 
         //when
         mockMvc.perform(post("/room")
@@ -39,7 +40,7 @@ class RoomControllerTest {
             )
         //then
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("roomUuid").hasJsonPath());
+                .andExpect(jsonPath(String.format("roomUuid")).hasJsonPath());
     }
 
     @Test
