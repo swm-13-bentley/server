@@ -27,6 +27,7 @@ public class Room {
     private String title;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "room")
+    @OrderBy(value = "scheduledDate ASC")
     private List<RoomDate> roomDates = new ArrayList<>();
 
     @NotNull(message = "Room startTime is empty")
