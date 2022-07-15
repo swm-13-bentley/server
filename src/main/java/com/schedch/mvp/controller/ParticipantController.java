@@ -81,7 +81,6 @@ public class ParticipantController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(gson.toJson(errorJsonObject));
         }
-
     }
 
 }
