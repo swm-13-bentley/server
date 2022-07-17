@@ -22,6 +22,33 @@ public class ParticipantController {
 
     private final ParticipantService participantService;
 
+    @PostMapping("/room/{roomUuid}/participant/available1")
+    public ResponseEntity test(@PathVariable String roomUuid,
+                                          @RequestBody ParticipantRequestDto participantRequestDto) {
+        String participantName = participantRequestDto.getUsername();
+        String password = participantRequestDto.getPassword();
+        Gson gson = new Gson();
+
+        try {
+            ParticipantResponseDto participantResponseDto
+                    = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(gson.toJson(participantResponseDto));
+
+        } catch (IllegalAccessException e1) {//이름 중복
+            JsonObject errorJsonObject = new JsonObject();
+            errorJsonObject.addProperty("message", e1.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(gson.toJson(errorJsonObject));
+
+        } catch (NoSuchElementException e2) {//해당 roomUuid에 대한 방 없음
+            JsonObject errorJsonObject = new JsonObject();
+            errorJsonObject.addProperty("message", e2.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(gson.toJson(errorJsonObject));
+        }
+    }
+
     @GetMapping("/room/{roomUuid}/participant/available")
     public ResponseEntity participantFind(@PathVariable String roomUuid,
                                           @RequestBody ParticipantRequestDto participantRequestDto) {
