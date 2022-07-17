@@ -25,7 +25,7 @@ public class ParticipantController {
     @GetMapping("/room/{roomUuid}/participant/available")
     public ResponseEntity participantFind(@PathVariable String roomUuid,
                                           @RequestBody ParticipantRequestDto participantRequestDto) {
-        String participantName = participantRequestDto.getParticipantName();
+        String participantName = participantRequestDto.getUsername();
         String password = participantRequestDto.getPassword();
         Gson gson = new Gson();
 
