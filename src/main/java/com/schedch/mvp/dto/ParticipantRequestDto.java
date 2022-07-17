@@ -7,11 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ParticipantRequestDto {
-    private String participantName;
+    private String username;
     private String password;
 
-    public ParticipantRequestDto(String participantName, String password) {
-        this.participantName = participantName;
+    public ParticipantRequestDto(String username, String password) {
+        this.username = username;
         this.password = password;
     }
 
