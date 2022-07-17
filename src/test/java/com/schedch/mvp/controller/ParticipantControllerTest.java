@@ -37,7 +37,7 @@ class ParticipantControllerTest {
                 .thenReturn(new ParticipantResponseDto(new Participant(participantName, password, false)));
 
         //when
-        mockMvc.perform(get("/room/testRoomUuid/participant/available")
+        mockMvc.perform(post("/room/testRoomUuid/participant/entry")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("roomUuid", roomUuid)
                 .content(participantRequestDto.toString())
@@ -57,7 +57,7 @@ class ParticipantControllerTest {
                 .thenThrow(new IllegalAccessException("password is wrong"));
 
         //when
-        mockMvc.perform(get("/room/testRoomUuid/participant/available")
+        mockMvc.perform(post("/room/testRoomUuid/participant/entry")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("roomUuid", roomUuid)
                 .content(participantRequestDto.toString())
@@ -75,7 +75,7 @@ class ParticipantControllerTest {
                 .thenThrow(new NoSuchElementException("no such element"));
 
         //when
-        mockMvc.perform(get("/room/testRoomUuid/participant/available")
+        mockMvc.perform(post("/room/testRoomUuid/participant/entry")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("roomUuid", roomUuid)
                         .content(participantRequestDto.toString())
