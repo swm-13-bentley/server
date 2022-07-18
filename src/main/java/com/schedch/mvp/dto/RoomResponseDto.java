@@ -6,6 +6,7 @@ import com.schedch.mvp.adapter.LocalDateAdapter;
 import com.schedch.mvp.adapter.LocalTimeAdapter;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.RoomDate;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
@@ -17,9 +18,17 @@ import java.util.stream.Collectors;
 
 @Data
 public class RoomResponseDto {
+
+    @Schema(description = "방 제목", example = "sample title")
     private String title;
+
+    @Schema(description = "방의 날짜들", type = "List", example = "[\"2022-07-15\", \"2022-07-16\", \"2022-08-01\"]")
     private List<LocalDate> dates = new ArrayList<>();
+
+    @Schema(description = "방의 시작 시간(HH:mm:ss)", type = "string", example = "11:30:00")
     private LocalTime startTime;
+
+    @Schema(description = "방의 끝 시간(HH:mm:ss)", type = "string", example = "23:00:00")
     private LocalTime endTime;
 
     public RoomResponseDto(Room room) {
