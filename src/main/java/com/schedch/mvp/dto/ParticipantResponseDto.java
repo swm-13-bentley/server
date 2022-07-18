@@ -2,6 +2,7 @@ package com.schedch.mvp.dto;
 
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Schedule;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,11 +14,14 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class ParticipantResponseDto {
 
-    private String username;
+    @Schema(description = "참가자 이름", example = "sample participantName")
+    private String participantName;
+
+    @Schema(description = "참가자 이름")
     private List<TimeBlockDto> available = new ArrayList<>();
 
     public ParticipantResponseDto(Participant participant) {
-        this.username = participant.getParticipantName();
+        this.participantName = participant.getParticipantName();
 
         participant.getScheduleList().stream()
                 .collect(Collectors.groupingBy(Schedule::getAvailableDate))

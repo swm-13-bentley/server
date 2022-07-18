@@ -69,7 +69,7 @@ public class ParticipantService {
 
         participant.emptySchedules();
 
-        availableRequestDto.getTimeBlockDtoList().stream()
+        availableRequestDto.getAvailable().stream()
                 .forEach(timeBlockDto -> {
                     changeTimeBlockDtoToSchedule(timeBlockDto).stream()
                             .forEach(schedule -> participant.addSchedule(schedule));

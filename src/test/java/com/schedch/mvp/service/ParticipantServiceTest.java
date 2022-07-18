@@ -61,7 +61,7 @@ class ParticipantServiceTest {
         ParticipantResponseDto participantResponseDto = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
 
         //then
-        assertThat(participantResponseDto.getUsername()).isEqualTo(participantName);
+        assertThat(participantResponseDto.getParticipantName()).isEqualTo(participantName);
         assertThat(participantResponseDto.getAvailable().isEmpty()).isTrue();
     }
 
@@ -103,7 +103,7 @@ class ParticipantServiceTest {
         ParticipantResponseDto participantResponseDto = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
 
         //then
-        assertThat(participantResponseDto.getUsername()).isEqualTo(participantName);
+        assertThat(participantResponseDto.getParticipantName()).isEqualTo(participantName);
         assertThat(participantResponseDto.getAvailable().size()).isGreaterThan(0);
 
     }

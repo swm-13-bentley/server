@@ -31,7 +31,7 @@ class AvailableRequestDtoTest {
         AvailableRequestDto availableRequestDto = new AvailableRequestDto();
         availableRequestDto.setParticipantName(participantName);
         availableRequestDto.setPassword(password);
-        availableRequestDto.setTimeBlockDtoList(Arrays.asList(timeBlockDto1, timeBlockDto2));
+        availableRequestDto.setAvailable(Arrays.asList(timeBlockDto1, timeBlockDto2));
 
         String jsonString = availableRequestDto.toString();
 
