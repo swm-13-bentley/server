@@ -31,7 +31,7 @@ public class RoomController {
 
     @Operation(summary = "방 생성")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "200 OK: 성공시 roomUuid를 반환", content = @Content(mediaType = "text/plain", schema = @Schema(type = "string", example = "e894e0ef-b6b2-4d03-a4d8-32b3aead7976"))),
+            @ApiResponse(responseCode = "200", description = "200 OK: 성공시 roomUuid를 반환", content = @Content(mediaType = "application/json", schema = @Schema(type = "json", example = "{\"roomUuid\": \"e894e0ef-b6b2-4d03-a4d8-32b3aead7976\"}"))),
             @ApiResponse(responseCode = "400", description = "400 BAD REQUEST: Input 중 누락된 값이 있음")
     })
     @PostMapping("/room")
