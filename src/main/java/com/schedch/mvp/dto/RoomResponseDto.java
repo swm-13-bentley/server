@@ -15,6 +15,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Data
 public class RoomResponseDto {
@@ -25,23 +26,53 @@ public class RoomResponseDto {
     @Schema(description = "방의 날짜들", type = "List", example = "[\"2022-07-15\", \"2022-07-16\", \"2022-08-01\"]")
     private List<LocalDate> dates = new ArrayList<>();
 
-    @Schema(description = "방의 시작 시간(HH:mm:ss)", type = "string", example = "11:30:00")
-    private LocalTime startTime;
+//    @Schema(description = "방의 시작 시간(HH:mm:ss)", type = "string", example = "11:30:00")
+//    private LocalTime startTime;
 
-    @Schema(description = "방의 끝 시간(HH:mm:ss)", type = "string", example = "23:00:00")
-    private LocalTime endTime;
+//    @Schema(description = "방의 끝 시간(HH:mm:ss)", type = "string", example = "23:00:00")
+//    private LocalTime endTime;
+
+    @Schema(description = "방의 시작 시간(30분 단위 블럭)", type = "integer", example = "23")
+    private int startTime;
+
+    @Schema(description = "방의 끝 시간(30분 단위 블럭)", type = "integer", example = "46")
+    private int endTime;
+
+//    public RoomResponseDto(Room room) {
+//        this.title = room.getTitle();
+//        this.dates = room.getRoomDates().stream()
+//                .map(RoomDate::getScheduledDate)
+//                .collect(Collectors.toList());
+//        this.startTime = room.getStartTime();
+//        this.endTime = room.getEndTime();
+//    }
 
     public RoomResponseDto(Room room) {
         this.title = room.getTitle();
         this.dates = room.getRoomDates().stream()
                 .map(RoomDate::getScheduledDate)
                 .collect(Collectors.toList());
-        this.startTime = room.getStartTime();
-        this.endTime = room.getEndTime();
+        this.startTime = toTimeBlockInteger(room.getStartTime());
+        this.endTime = toTimeBlockInteger(room.getEndTime());
     }
 
+    public int toTimeBlockInteger(LocalTime time) {
+        int block = (int) (time.getHour() * (60/30)
+                + Math.floor(time.getMinute() / 30));
+
+        return block;
+    }
+
+//    @Builder
+//    public RoomResponseDto(String title, List<LocalDate> dates, LocalTime startTime, LocalTime endTime) {
+//        this.title = title;
+//        this.dates = dates;
+//        this.startTime = startTime;
+//        this.endTime = endTime;
+//    }
+
     @Builder
-    public RoomResponseDto(String title, List<LocalDate> dates, LocalTime startTime, LocalTime endTime) {
+    public RoomResponseDto(String title, List<LocalDate> dates, int startTime, int endTime) {
         this.title = title;
         this.dates = dates;
         this.startTime = startTime;

@@ -63,8 +63,10 @@ class RoomControllerTest {
         RoomResponseDto roomResponseDto = RoomResponseDto.builder()
                 .title("sample title")
                 .dates(Arrays.asList(LocalDate.of(2022, 4, 1), LocalDate.of(2022, 4, 2)))
-                .startTime(LocalTime.of(4, 30, 0))
-                .endTime(LocalTime.of(20, 0, 0))
+//                .startTime(LocalTime.of(4, 30, 0))
+//                .endTime(LocalTime.of(20, 0, 0))
+                .startTime(9)
+                .endTime(40)
                 .build();
         when(roomService.getRoomInfo("testRoomUuid")).thenReturn(roomResponseDto);
 

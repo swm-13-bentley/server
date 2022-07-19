@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.NoSuchElementException;
-
 @Tag(name = "Room", description = "Room(방) 관련 API")
 @RestController
 @RequiredArgsConstructor
