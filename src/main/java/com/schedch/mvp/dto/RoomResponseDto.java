@@ -47,7 +47,12 @@ public class RoomResponseDto {
                 .map(RoomDate::getScheduledDate)
                 .collect(Collectors.toList());
         this.startTime = toTimeBlockInteger(room.getStartTime());
-        this.endTime = toTimeBlockInteger(room.getEndTime()) - 1;
+
+        if (room.getEndTime().equals(LocalTime.of(23, 59, 0))) {
+            this.endTime = 47;
+        } else {
+            this.endTime = toTimeBlockInteger(room.getEndTime()) - 1;
+        }
     }
 
     public int toTimeBlockInteger(LocalTime time) {
