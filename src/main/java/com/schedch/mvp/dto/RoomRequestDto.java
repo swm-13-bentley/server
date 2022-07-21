@@ -19,7 +19,6 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@Schema(description = "방 생성을 요청할 때 사용하는 DTO")
 public class RoomRequestDto {
 
     @NotNull(message = "Room title cannot be empty")
@@ -28,13 +27,13 @@ public class RoomRequestDto {
     List<LocalDate> dates = new ArrayList<>();
 
     @NotNull(message = "room startTime cannot be empty")
-    LocalTime startTime;
+    String startTime;
 
     @NotNull(message = "room endTime cannot be empty")
-    LocalTime endTime;
+    String endTime;
 
     @Builder
-    public RoomRequestDto(String title, List<LocalDate> dates, LocalTime startTime, LocalTime endTime) {
+    public RoomRequestDto(String title, List<LocalDate> dates, String startTime, String endTime) {
         this.title = title;
         this.dates = dates;
         this.startTime = startTime;

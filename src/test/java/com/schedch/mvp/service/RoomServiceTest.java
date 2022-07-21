@@ -55,8 +55,10 @@ class RoomServiceTest {
         LocalDate date1 = LocalDate.of(2022, 04, 01);
         LocalDate date2 = LocalDate.of(2022, 04, 02);
         List<LocalDate> dates = Arrays.asList(date1, date2);
-        LocalTime startTime = LocalTime.of(04, 30, 00);
-        LocalTime endTime = LocalTime.of(20, 00, 00);
+//        LocalTime startTime = LocalTime.of(04, 30, 00);
+//        LocalTime endTime = LocalTime.of(20, 00, 00);
+        String startTime = "04:30:00";
+        String endTime = "24:00:00";
 
         RoomRequestDto roomRequestDto = RoomRequestDto.builder()
                 .title(title)

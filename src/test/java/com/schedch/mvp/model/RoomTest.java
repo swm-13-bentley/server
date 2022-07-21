@@ -41,8 +41,10 @@ class RoomTest {
         roomDates.add(LocalDate.of(2022, 06, 01));
         roomDates.add(LocalDate.of(2022, 06, 01));
 
-        LocalTime startTime = LocalTime.of(16, 00);
-        LocalTime endTime   = LocalTime.of(23, 00);
+//        LocalTime startTime = LocalTime.of(16, 00);
+//        LocalTime endTime   = LocalTime.of(23, 00);
+        String startTime = "04:30:00";
+        String endTime = "24:00:00";
 
         //when
         RoomRequestDto dto = RoomRequestDto.builder()

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -65,8 +66,18 @@ public class Room {
         roomRequestDto.getDates().stream()
                 .map(RoomDate::new)
                 .forEach(this::addRoomDate);
-        this.startTime = roomRequestDto.getStartTime();
-        this.endTime = roomRequestDto.getEndTime();
+
+        if(roomRequestDto.getStartTime().equals("24:00:00")) {
+            this.startTime = LocalTime.parse("23:59:00", DateTimeFormatter.ISO_LOCAL_TIME);
+        } else {
+            this.startTime = LocalTime.parse(roomRequestDto.getStartTime(), DateTimeFormatter.ISO_LOCAL_TIME);
+        }
+
+        if(roomRequestDto.getEndTime().equals("24:00:00")) {
+            this.endTime = LocalTime.parse("23:59:00", DateTimeFormatter.ISO_LOCAL_TIME);
+        } else {
+            this.endTime = LocalTime.parse(roomRequestDto.getEndTime(), DateTimeFormatter.ISO_LOCAL_TIME);
+        }
 
     }
 }
