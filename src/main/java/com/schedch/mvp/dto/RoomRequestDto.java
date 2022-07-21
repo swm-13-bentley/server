@@ -23,18 +23,14 @@ import java.util.List;
 public class RoomRequestDto {
 
     @NotNull(message = "Room title cannot be empty")
-    @Schema(description = "방 제목", example = "sample title")
     String title;
 
-    @Schema(description = "방의 날짜들", type = "List", example = "[\"2022-07-15\", \"2022-07-16\", \"2022-08-01\"]")
     List<LocalDate> dates = new ArrayList<>();
 
     @NotNull(message = "room startTime cannot be empty")
-    @Schema(description = "방의 시작 시간(HH:mm:ss)", type = "string", example = "11:30:00")
     LocalTime startTime;
 
     @NotNull(message = "room endTime cannot be empty")
-    @Schema(description = "방의 끝 시간(HH:mm:ss)", type = "string", example = "23:00:00")
     LocalTime endTime;
 
     @Builder

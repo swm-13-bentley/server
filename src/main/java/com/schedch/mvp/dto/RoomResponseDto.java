@@ -20,10 +20,7 @@ import java.util.stream.IntStream;
 @Data
 public class RoomResponseDto {
 
-    @Schema(description = "방 제목", example = "sample title")
     private String title;
-
-    @Schema(description = "방의 날짜들", type = "List", example = "[\"2022-07-15\", \"2022-07-16\", \"2022-08-01\"]")
     private List<LocalDate> dates = new ArrayList<>();
 
 //    @Schema(description = "방의 시작 시간(HH:mm:ss)", type = "string", example = "11:30:00")
@@ -32,10 +29,7 @@ public class RoomResponseDto {
 //    @Schema(description = "방의 끝 시간(HH:mm:ss)", type = "string", example = "23:00:00")
 //    private LocalTime endTime;
 
-    @Schema(description = "방의 시작 시간(30분 단위 블럭)", type = "integer", example = "23")
     private int startTime;
-
-    @Schema(description = "방의 끝 시간(30분 단위 블럭)", type = "integer", example = "46")
     private int endTime;
 
 //    public RoomResponseDto(Room room) {

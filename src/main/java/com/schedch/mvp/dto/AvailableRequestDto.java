@@ -17,10 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class AvailableRequestDto {
 
-    @Schema(description = "참가자 이름", type = "string", example = "participant1")
     private String participantName;
-
-    @Schema(description = "비밀번호", type = "string", example = "asdf123!")
     private String password;
 
     private List<TimeBlockDto> available = new ArrayList<>();

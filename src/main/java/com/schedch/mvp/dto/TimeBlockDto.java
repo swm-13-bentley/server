@@ -18,10 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 public class TimeBlockDto {
 
-    @Schema(description = "가능한 일정의 날짜", type = "String", example = "2022-07-15")
     private LocalDate availableDate;
-
-    @Schema(description = "가능한 일정의 시간(30분 단위로 쪼갠 것)", type = "List", example = "[4, 5, 6, 17, 18, 19, 38, 39]")
     private List<Integer> availableTimeList = new ArrayList<>();
 
     @Builder

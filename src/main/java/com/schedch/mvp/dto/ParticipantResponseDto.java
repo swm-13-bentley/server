@@ -14,10 +14,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class ParticipantResponseDto {
 
-    @Schema(description = "참가자 이름", example = "sample participantName")
     private String participantName;
-
-    @Schema(description = "참가자 이름")
     private List<TimeBlockDto> available = new ArrayList<>();
 
     public ParticipantResponseDto(Participant participant) {

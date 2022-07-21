@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ParticipantRequestDto {
 
-    @Schema(description = "참가자 이름", example = "sample participantName")
     private String participantName;
-
-    @Schema(description = "참가자 비밀번호", example = "asdf123!")
     private String password;
 
     public ParticipantRequestDto(String participantName, String password) {

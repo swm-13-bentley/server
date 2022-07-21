@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@Tag(name = "Participant", description = "Participant(참가자) 관련 API")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -31,15 +30,8 @@ public class ParticipantController {
 
     private final ParticipantService participantService;
 
-    @Operation(summary = "비회원 방 입장")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "200 OK", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParticipantResponseDto.class))),
-            @ApiResponse(responseCode = "401", description = "401 Unauthorized: 잘못된 비밀번호"),
-            @ApiResponse(responseCode = "404", description = "404 Not Found: 존재하지 않는 roomUuid")
-    })
     @PostMapping("/room/{roomUuid}/participant/entry")
-    public ResponseEntity participantFind(@Parameter(description = "접속하려는 방의 UUID", required = true, example = "e894e0ef-b6b2-4d03-a4d8-32b3aead7976")
-                                              @PathVariable String roomUuid,
+    public ResponseEntity participantFind(@PathVariable String roomUuid,
                                           @RequestBody ParticipantRequestDto participantRequestDto) {
         String participantName = participantRequestDto.getParticipantName();
         String password = participantRequestDto.getPassword();
@@ -65,14 +57,8 @@ public class ParticipantController {
         }
     }
 
-    @Operation(summary = "비회원 가능한 시간 입력")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "200 OK"),
-            @ApiResponse(responseCode = "404", description = "404 Not Found: 존재하지 않는 roomUuid")
-    })
     @PostMapping("/room/{roomUuid}/participant/available")
-    public ResponseEntity participantAvailablePost(@Parameter(description = "접속하려는 방의 UUID", required = true, example = "e894e0ef-b6b2-4d03-a4d8-32b3aead7976")
-                                                       @PathVariable String roomUuid,
+    public ResponseEntity participantAvailablePost(@PathVariable String roomUuid,
                                                    @RequestBody AvailableRequestDto availableRequestDto) {
         Gson gson = new Gson();
 
@@ -89,14 +75,8 @@ public class ParticipantController {
         }
     }
 
-    @Operation(summary = "방에 속한 모든 인원의 일정 가져오기")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "200 OK", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ParticipantResponseDto.class)))),
-            @ApiResponse(responseCode = "404", description = "404 Not Found: 존재하지 않는 roomUuid")
-    })
     @GetMapping("/room/{roomUuid}/group")
-    public ResponseEntity groupSchedulesFind(@Parameter(description = "접속하려는 방의 UUID", required = true, example = "e894e0ef-b6b2-4d03-a4d8-32b3aead7976")
-                                                @PathVariable String roomUuid) {
+    public ResponseEntity groupSchedulesFind(@PathVariable String roomUuid) {
         Gson gson = new Gson();
 
         try {
