@@ -23,21 +23,13 @@ import java.util.stream.Collectors;
 @Transactional
 public class ParticipantService {
 
-    private final RoomRepository roomRepository;
     private final ParticipantRepository participantRepository;
+    private final RoomService roomService;
 
     public ParticipantResponseDto findUnSignedParticipantAndValidate(
-            String roomUuid, String participantName, String password) throws IllegalAccessException, NoSuchElementException {
-
-        //방에 참여하는 참여자 정보 다 가져옴
-        Optional<Room> roomOptional = roomRepository.findByUuid(roomUuid);
-        Room room = roomOptional.orElseThrow(
-                () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid)));
-        //이 부분은 RoomService 불러서 해야할지, 근데 그러면 exception throw 가 명시적으로 보이지 않아서 걱정.
-
-        List<Participant> foundParticipant = room.getParticipantList().stream()
-                .filter(p -> p.isSignedIn() == false && p.getParticipantName().equals(participantName))
-                .collect(Collectors.toList());
+            String roomUuid, String participantName, String password) throws IllegalAccessException {
+        Room room = roomService.getRoom(roomUuid);
+        List<Participant> foundParticipant = room.findUnSignedParticipant(participantName);
 
         if(foundParticipant.isEmpty()) {
             //신규 유저 -> 유저 등록해야 함
@@ -48,20 +40,16 @@ public class ParticipantService {
 
         Participant participant = foundParticipant.get(0);
 
-        if(participant.checkPassword(password)) {
-            //기존 유저가 맞음 -> 기존 시간 돌려주면 됨
+        if(participant.checkPassword(password)) { //기존 유저가 맞음 -> 기존 시간 돌려주면 됨
             return new ParticipantResponseDto(participant);
         }
-        else {
-            //기존 유저이나, 비밀번호가 틀렸음
+        else { //기존 유저이나, 비밀번호가 틀렸음
             throw new IllegalAccessException("password is incorrect for participant: " + participantName);
-       }
+        }
     }
 
     public void saveParticipantAvailable(String roomUuid, AvailableRequestDto availableRequestDto) {
-        Room room = roomRepository.findByUuid(roomUuid).orElseThrow(
-                () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid)));
-
+        Room room = roomService.getRoom(roomUuid);
         String participantName = availableRequestDto.getParticipantName();
 
         Participant participant = participantRepository.findParticipantByParticipantNameAndRoom(participantName, room)
@@ -101,9 +89,7 @@ public class ParticipantService {
     }
 
     public List<ParticipantResponseDto> findAllParticipantsInRoom(String roomUuid) {
-        Room room = roomRepository.findByUuid(roomUuid).orElseThrow(
-                () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid)));
-
+        Room room = roomService.getRoom(roomUuid);
         List<Participant> participantList = room.getParticipantList();
 
         return participantList.stream()
