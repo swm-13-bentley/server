@@ -34,10 +34,17 @@ public class ControllerHandler {
     public ResponseEntity handleNoSuchElementException(NoSuchElementException e) {
         JsonObject errorJson = getErrorJson(e.getMessage());
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.NOT_FOUND)
                 .body(gson.toJson(errorJson));
     }
 
+    @ExceptionHandler(IllegalAccessException.class)
+    public ResponseEntity handleIllegalAccessException(IllegalAccessException e) {
+        JsonObject errorJson = getErrorJson(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(gson.toJson(errorJson));
+    }
 
     private JsonObject getErrorJson(String errorMessage) {
         JsonObject jsonObject = new JsonObject();
