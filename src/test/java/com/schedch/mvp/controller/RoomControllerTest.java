@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -68,7 +67,7 @@ class RoomControllerTest {
                 .startTime(9)
                 .endTime(40)
                 .build();
-        when(roomService.getRoomInfo("testRoomUuid")).thenReturn(roomResponseDto);
+        when(roomService.getRoomDto("testRoomUuid")).thenReturn(roomResponseDto);
 
         //when
         mockMvc.perform(get("/room/testRoomUuid"))
@@ -80,7 +79,7 @@ class RoomControllerTest {
     void get_room_info_failure_test() throws Exception {
         //given
         String errorMessage = "Room for uuid: testRoomUuid not found";
-        when(roomService.getRoomInfo("testRoomUuid"))
+        when(roomService.getRoomDto("testRoomUuid"))
                 .thenThrow(new NoSuchElementException(errorMessage));
 
         //when
