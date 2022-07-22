@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -49,6 +50,12 @@ public class Room {
     public void addParticipant(Participant participant) {
         participantList.add(participant);
         participant.setRoom(this);
+    }
+
+    public List<Participant> findUnSignedParticipant(String participantName) {
+        return getParticipantList().stream()
+                .filter(p -> p.isSignedIn() == false && p.getParticipantName().equals(participantName))
+                .collect(Collectors.toList());
     }
 
     @Builder
