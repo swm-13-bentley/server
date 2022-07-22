@@ -33,7 +33,7 @@ public class RoomController {
 
     @GetMapping("/room/{roomUuid}")
     public ResponseEntity getRoomInfo(@PathVariable("roomUuid") String roomUuid) {
-        RoomResponseDto roomResponseDto = roomService.getRoomInfo(roomUuid);
+        RoomResponseDto roomResponseDto = roomService.getRoomDto(roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(roomResponseDto);
