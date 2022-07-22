@@ -38,4 +38,4 @@ public class RoomController {
                 .status(HttpStatus.OK)
                 .body(roomResponseDto);
     }
-}
+}함
