@@ -28,8 +28,9 @@ import static org.mockito.Mockito.*;
 class ParticipantServiceTest {
 
     @Autowired ParticipantService participantService;
-    @MockBean RoomRepository roomRepository;
     @MockBean ParticipantRepository participantRepository;
+    @MockBean RoomService roomService;
+
     String roomUuid = "testRoomUuid";
     String participantName = "testName";
     String password = "testPwd";
@@ -37,8 +38,9 @@ class ParticipantServiceTest {
     @Test
     void no_room_for_uuid_test() throws Exception {
         //given
-        when(roomRepository.findByUuid(roomUuid))
-                .thenReturn(Optional.empty());
+        when(roomService.getRoom(roomUuid))
+                .thenThrow(new NoSuchElementException());
+
 
         //when
         try {
@@ -54,8 +56,8 @@ class ParticipantServiceTest {
     @Test
     void new_user_registration_test() throws Exception {
         //given
-        when(roomRepository.findByUuid(roomUuid))
-                .thenReturn(Optional.of(createRoom()));
+        when(roomService.getRoom(roomUuid))
+                .thenReturn(createRoom());
 
         //when
         ParticipantResponseDto participantResponseDto = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
@@ -70,10 +72,10 @@ class ParticipantServiceTest {
         //given
         Participant participant = new Participant(participantName, password, false);
         Room room = createRoom();
-
         room.addParticipant(participant);
-        when(roomRepository.findByUuid(roomUuid))
-                .thenReturn(Optional.of(room));
+
+        when(roomService.getRoom(roomUuid))
+                .thenReturn(room);
 
         //when
         try {
@@ -97,8 +99,8 @@ class ParticipantServiceTest {
         Room room = createRoom();
 
         room.addParticipant(participant);
-        when(roomRepository.findByUuid(roomUuid))
-                .thenReturn(Optional.of(room));
+        when(roomService.getRoom(roomUuid))
+                .thenReturn(room);
 
         ParticipantResponseDto participantResponseDto = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
 
