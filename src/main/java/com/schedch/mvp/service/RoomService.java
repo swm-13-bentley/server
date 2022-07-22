@@ -23,11 +23,17 @@ public class RoomService {
         return save.getUuid();
     }
 
-    public RoomResponseDto getRoomInfo(String roomUuid) {
+    public Room getRoom(String roomUuid) {
         Optional<Room> roomOptional = roomRepository.findByUuid(roomUuid);
         Room room = roomOptional.orElseThrow(
                 () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid))
-            );
+        );
+        return room;
+    }
+
+    public RoomResponseDto getRoomDto(String roomUuid) {
+        Room room = getRoom(roomUuid);
         return new RoomResponseDto(room);
     }
+
 }
