@@ -5,13 +5,6 @@ import com.google.gson.JsonObject;
 import com.schedch.mvp.dto.RoomRequestDto;
 import com.schedch.mvp.dto.RoomResponseDto;
 import com.schedch.mvp.service.RoomService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,13 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.NoSuchElementException;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class RoomController {
 
     private final RoomService roomService;
+    private final Gson gson;
 
     @PostMapping("/room")
     public ResponseEntity createRoom(@Valid @RequestBody RoomRequestDto roomRequestDto) {
@@ -33,18 +26,16 @@ public class RoomController {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("roomUuid", roomUuid);
 
-        return ResponseEntity.status(HttpStatus.OK).body(new Gson().toJson(jsonObject));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(jsonObject));
     }
 
     @GetMapping("/room/{roomUuid}")
     public ResponseEntity getRoomInfo(@PathVariable("roomUuid") String roomUuid) {
-        try {
-            RoomResponseDto roomResponseDto = roomService.getRoomInfo(roomUuid);
-            return ResponseEntity.ok().body(roomResponseDto);
-        } catch (NoSuchElementException e) {
-            JsonObject errorJson = new JsonObject();
-            errorJson.addProperty("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new Gson().toJson(errorJson));
-        }
+        RoomResponseDto roomResponseDto = roomService.getRoomInfo(roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(roomResponseDto);
     }
 }
