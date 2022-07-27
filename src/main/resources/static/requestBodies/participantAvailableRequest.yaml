@@ -1,0 +1,44 @@
+description: "참가자의 가능한 시간"
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        participantName:
+          type: string
+          example: "Tom"
+        password:
+          type: string
+          example: "1234asdf!"
+        available:
+          type: array
+          items:
+            type: object
+            properties:
+              availableDate:
+                type: string
+              availableTimeList:
+                type: array
+                items:
+                  type: integer
+          example: [
+            {
+              "availableDate": "2022-07-16",
+              "availableTimeList": [
+                34,
+                35,
+                36,
+                37
+              ]
+            },
+            {
+              "availableDate": "2022-08-01",
+              "availableTimeList": [
+                23,
+                24,
+                45,
+                46
+              ]
+            }
+          ]
+required: true

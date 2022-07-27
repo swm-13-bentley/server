@@ -1,0 +1,56 @@
+description: "유저 구글 캘린더 반환 형식"
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        summary:
+          type: string
+        calendarId:
+          type: string
+        colorCode:
+          type: string
+        events:
+          type: array
+          items:
+            type: object
+            properties:
+              scheduledDate:
+                type: string
+              scheduledTimeList:
+                type: array
+                items:
+                  type: integer
+      example: [
+        {
+          "summary": "someone@gmail.com",
+          "calendarId": "someone@gmail.com",
+          "colorCode": "#9fe1e7",
+          "events": [
+            {
+              "scheduledDate": "2022-07-15",
+              "scheduledTimeList": [
+                16, 17, 18, 20, 21
+              ]
+            },
+            {
+              "scheduledDate": "2022-07-17",
+              "scheduledTimeList": [
+                30, 31, 32, 33, 34
+              ]
+            }
+          ]
+        },
+        {
+          "summary": "대한민국의 휴일",
+          "calendarId": "ko.south_korea#holiday@group.v.calendar.google.com",
+          "colorCode": "#16a765",
+          "events": []
+        },
+        {
+          "summary": "생일",
+          "calendarId": "addressbook#contacts@group.v.calendar.google.com",
+          "colorCode": "#92e1c0",
+          "events": []
+        }
+      ]

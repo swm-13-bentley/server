@@ -1,0 +1,71 @@
+description: "OK: 그룹원들의 가능한 시간"
+content:
+  application/json:
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          participantName:
+            type: string
+          available:
+            type: array
+            items:
+              type: object
+              properties:
+                availableDate:
+                  type: string
+                availableTimeList:
+                  type: array
+                  items:
+                    type: integer
+      example: [
+        {
+          "participantName": "Sam",
+          "available": [
+            {
+              "availableDate": "2022-07-15",
+              "availableTimeList": [
+                23,
+                24,
+                25,
+                38,
+                39
+              ]
+            },
+            {
+              "availableDate": "2022-07-16",
+              "availableTimeList": [
+                36,
+                37,
+                38,
+                39,
+                40
+              ]
+            }
+          ]
+        },
+        {
+          "participantName": "Tom",
+          "available": [
+            {
+              "availableDate": "2022-07-16",
+              "availableTimeList": [
+                34,
+                35,
+                36,
+                37
+              ]
+            },
+            {
+              "availableDate": "2022-08-01",
+              "availableTimeList": [
+                23,
+                24,
+                45,
+                46
+              ]
+            }
+          ]
+        }
+      ]

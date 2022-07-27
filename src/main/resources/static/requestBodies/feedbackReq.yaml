@@ -1,0 +1,13 @@
+description: "피드백"
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        type:
+          type: string
+          example: "기타"
+        content:
+          type: string
+          example: "피드백입니다"
+required: true

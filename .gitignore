@@ -40,3 +40,4 @@ out/
 src/main/resources/application.yaml
 src/main/resources/application-dev.yaml
 src/main/resources/application-local.yaml
+src/test/java/com/schedch/mvp/Practice.java

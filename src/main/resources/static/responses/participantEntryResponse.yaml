@@ -1,0 +1,43 @@
+description: "기존에 입력했던 가능한 시간 / 신규 참가자의 경우 빈 시간"
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        participantName:
+          type: string
+          example: "Sam"
+        available:
+          type: array
+          items:
+            type: object
+            properties:
+              availableDate:
+                type: string
+              availableTimeList:
+                type: array
+                items:
+                  type: integer
+          example: [
+            {
+              "availableDate": "2022-07-15",
+              "availableTimeList": [
+                23,
+                24,
+                25,
+                38,
+                39
+              ]
+            },
+            {
+              "availableDate": "2022-07-16",
+              "availableTimeList": [
+                36,
+                37,
+                38,
+                39,
+                40
+              ]
+            }
+          ]
+

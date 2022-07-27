@@ -1,0 +1,14 @@
+post:
+  tags:
+    - Feedback
+  summary: "피드백 받기"
+  operationId: postFeedback
+  requestBody:
+    $ref: '../requestBodies/feedbackReq.yaml'
+  responses:
+    200:
+      description: "200 OK"
+      content: {}
+    400:
+      $ref: '../errors/general400error.yaml'
+
