@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -37,5 +39,14 @@ public class RoomController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(roomResponseDto);
+    }
+
+    @GetMapping("/room/{roomUuid}/top/{max}")
+    public ResponseEntity getTopTimes(@PathVariable("roomUuid") String roomUuid,
+                                      @PathVariable("max") int max) {
+        List<RoomService.TimeCount> topAvailableTime = roomService.getTopAvailableTime(roomUuid, max);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(topAvailableTime));
     }
 }

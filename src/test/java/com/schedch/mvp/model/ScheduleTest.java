@@ -70,7 +70,7 @@ class ScheduleTest {
 
         //then
         assertThat(schedule.getStartTime()).isEqualTo(LocalTime.of(0, 30, 0));
-        assertThat(schedule.getEndTime()).isEqualTo(LocalTime.of(5, 30, 0));
+        assertThat(schedule.getEndTime()).isEqualTo(LocalTime.of(6, 0, 0));
     }
 
 }

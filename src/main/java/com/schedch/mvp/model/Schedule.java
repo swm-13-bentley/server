@@ -44,7 +44,7 @@ public class Schedule {
     public Schedule(LocalDate availableDate, int startTimeInt, int endTimeInt) {
         this.availableDate = availableDate;
         this.startTime = toLocalTime(startTimeInt, 30);
-        this.endTime = toLocalTime(endTimeInt, 30);
+        this.endTime = toLocalTime(endTimeInt, 30).plusMinutes(30);
     }
 
     public TimeBlockDto toTimeBlockDto(int unit) {

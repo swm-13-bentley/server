@@ -135,9 +135,9 @@ class ParticipantServiceTest {
 
         //then
         assertThat(scheduleList1.size()).isEqualTo(3);
+        assertThat(scheduleList1.get(2).getEndTime()).isEqualTo(LocalTime.of(10, 30, 0));
         assertThat(scheduleList2.size()).isEqualTo(1);
         assertThat(scheduleList3.size()).isEqualTo(0);
-
     }
 
     private Room createRoom() {

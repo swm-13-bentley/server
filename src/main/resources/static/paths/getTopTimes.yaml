@@ -1,0 +1,22 @@
+get:
+  tags:
+    - Room
+  summary: "가능한 시간 Top List 받기"
+  operationId: getTopTimes
+  parameters:
+    - $ref: '../parameters/roomUuid.yaml'
+    - name: max
+      in: path
+      description: "불러올 최대 수"
+      required: true
+      schema:
+        type: integer
+        example: 5
+  responses:
+    200:
+      $ref: '../responses/topTimes.yaml'
+    400:
+      $ref: '../errors/room400Error.yaml'
+    404:
+      $ref: '../errors/room404Error.yaml'
+

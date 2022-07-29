@@ -127,3 +127,7 @@ paths:
 
   /feedback:
     $ref: '/paths/postFeedback.yaml'
+
+  /room/{roomUuid}/top/{max}:
+    $ref: '/paths/getTopTimes.yaml'
+
