@@ -17,13 +17,25 @@ public class FeedbackRequest {
     @NotNull
     private String content;
 
+    private String email;
+
     @Builder
     public FeedbackRequest(String type, String content) {
         this.type = type;
         this.content = content;
     }
 
+    public FeedbackRequest(String type, String content, String email) {
+        this.type = type;
+        this.content = content;
+        this.email = email;
+    }
+
     public Feedback toEntity() {
-        return new Feedback(type, content);
+        if(email == null) {
+            return new Feedback(type, content);
+        } else {
+            return new Feedback(type, content, email);
+        }
     }
 }

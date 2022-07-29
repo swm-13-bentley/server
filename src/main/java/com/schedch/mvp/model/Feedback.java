@@ -24,8 +24,16 @@ public class Feedback {
     @NotNull
     private String content;
 
+    private String email;
+
     public Feedback(String type, String content) {
         this.type = type;
         this.content = content;
+    }
+
+    public Feedback(String type, String content, String email) {
+        this.type = type;
+        this.content = content;
+        this.email = email;
     }
 }
