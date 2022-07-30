@@ -10,5 +10,5 @@ post:
       description: "200 OK"
       content: {}
     400:
-      $ref: '../errors/general400error.yaml'
+      $ref: '../errors/general400Error.yaml'
 
