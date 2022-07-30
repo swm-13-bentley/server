@@ -65,6 +65,11 @@ public class ParticipantService {
                 });
     }
 
+    /**
+     * 같은 날짜에 이어져있는 time int들을 비연속적이라면, 분리해서 schedule로 변환
+     * @param timeBlockDto
+     * @return
+     */
     public List<Schedule> changeTimeBlockDtoToSchedule(TimeBlockDto timeBlockDto) {
         List<Schedule> scheduleList = new ArrayList<>();
         LocalDate availableDate = timeBlockDto.getAvailableDate();

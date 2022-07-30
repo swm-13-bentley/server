@@ -41,17 +41,28 @@ public class TimeAdapter {
         return block;
     }
 
-    public LocalTime timeBlock2StartLocalTime(int block) {
+    public LocalTime timeBlock2LocalTime(int block) {
         int hour = block/2;
         int min = block%2 * 30;
 
         return LocalTime.of(hour, min, 0);
     }
 
-    public LocalTime timeBlock2EndLocalTime(int block) {
+    public String startBlock2Str(int block) {
         int hour = block/2;
         int min = block%2 * 30;
 
-        return LocalTime.of(hour, min, 0).plusMinutes(30);
+        return String.format("%02d:%02d:00", hour, min);
+    }
+
+    public String endBlock2Str(int block) {
+        if(block == 47) {
+            return "24:00:00";
+        } else {
+            block++;
+            int hour = block/2;
+            int min = block%2 * 30;
+            return String.format("%02d:%02d:00", hour, min);
+        }
     }
 }

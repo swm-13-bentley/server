@@ -1,9 +1,6 @@
 package com.schedch.mvp.service;
 
 import com.schedch.mvp.adapter.TimeAdapter;
-import com.schedch.mvp.dto.RoomRequestDto;
-import com.schedch.mvp.dto.RoomResponseDto;
-import com.schedch.mvp.dto.TimeBlockDto;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.RoomDate;
@@ -13,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.Part;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -26,8 +22,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final TimeAdapter timeAdapter;
 
-    public String createRoom(RoomRequestDto roomRequestDto) {
-        Room room = new Room(roomRequestDto);
+    public String createRoom(Room room) {
         Room save = roomRepository.save(room);
         return save.getUuid();
     }
@@ -38,11 +33,6 @@ public class RoomService {
                 () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid))
         );
         return room;
-    }
-
-    public RoomResponseDto getRoomDto(String roomUuid) {
-        Room room = getRoom(roomUuid);
-        return new RoomResponseDto(room);
     }
 
     public List<TimeCount> getTopAvailableTime(String roomUuid, int max) {
@@ -56,9 +46,6 @@ public class RoomService {
 
         LocalTime roomEndTime = room.getEndTime();
         int roomEndTimeBlock = timeAdapter.localTime2TimeBlockInt(roomEndTime);
-        if(!roomEndTime.equals(LocalTime.of(23, 59, 0))) {//원래 endTimeBlock은 -1을 해줘야 하는데.. 24시인 경우 23시에 59분으로 되어있으면 -1이 이미 되어있는 효과가 발생해서 -1을 해주지 않는다
-            roomEndTimeBlock--;
-        }
 
         int colNum = 0;
         HashMap<LocalDate, Integer> colNumMap = new HashMap<>();
@@ -77,8 +64,8 @@ public class RoomService {
             List<Schedule> scheduleList = participant.getScheduleList();
             for(Schedule schedule : scheduleList) {
                 LocalDate availableDate = schedule.getAvailableDate();
-                int startBlock = timeAdapter.startLocalTime2TimeBlock(schedule.getStartTime());
-                int endBlock = timeAdapter.endLocalTime2TimeBlock(schedule.getEndTime());
+                int startBlock = timeAdapter.localTime2TimeBlockInt(schedule.getStartTime());
+                int endBlock = timeAdapter.localTime2TimeBlockInt(schedule.getEndTime());
 
                 int colIdx = colNumMap.get(availableDate);
                 board[startBlock - roomStartTimeBlock][colIdx]++;
@@ -98,13 +85,13 @@ public class RoomService {
             int starting = 0;
             for (int i = 0; i <= rowSize; i++) {
                 if(i == rowSize) {
-                    TimeCount t = new TimeCount(count, roomDates.get(j).getScheduledDate(), starting, i);
+                    TimeCount t = new TimeCount(count, roomDates.get(j).getScheduledDate(), roomStartTimeBlock + starting, rowSize-1);
                     timeCountList.add(t);
                     break;
                 }
                 int nowCount = board[i][j];
                 if(count != nowCount) {
-                    TimeCount t = new TimeCount(count, roomDates.get(j).getScheduledDate(), roomStartTimeBlock + starting, roomStartTimeBlock + i);
+                    TimeCount t = new TimeCount(count, roomDates.get(j).getScheduledDate(), roomStartTimeBlock + starting, roomStartTimeBlock + i - 1);
                     timeCountList.add(t);
                     count = nowCount;
                     starting = i;
@@ -120,14 +107,14 @@ public class RoomService {
     public class TimeCount implements Comparable<TimeCount> {
         int count;
         LocalDate availableDate;
-        LocalTime startTime;
-        LocalTime endTime;
+        String startTime;
+        String endTime;
 
         public TimeCount(int count, LocalDate availableDate, int start, int end) {
             this.count = count;
             this.availableDate = availableDate;
-            this.startTime = timeAdapter.timeBlock2StartLocalTime(start);
-            this.endTime = timeAdapter.timeBlock2EndLocalTime(end);
+            this.startTime = timeAdapter.startBlock2Str(start);
+            this.endTime = timeAdapter.endBlock2Str(end);
         }
 
         @Override

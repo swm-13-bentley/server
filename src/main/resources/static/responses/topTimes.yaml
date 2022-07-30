@@ -19,30 +19,30 @@ content:
           "count": 4,
           "availableDate": "2022-07-20",
           "startTime": "11:30:00",
-          "endTime": "13:30:00"
-        },
-        {
-          "count": 3,
-          "availableDate": "2022-07-19",
-          "startTime": "11:30:00",
-          "endTime": "13:30:00"
+          "endTime": "13:00:00"
         },
         {
           "count": 3,
           "availableDate": "2022-07-20",
           "startTime": "11:00:00",
-          "endTime": "12:00:00"
+          "endTime": "11:30:00"
         },
         {
           "count": 3,
           "availableDate": "2022-07-20",
           "startTime": "13:00:00",
-          "endTime": "14:00:00"
+          "endTime": "13:30:00"
         },
         {
           "count": 2,
           "availableDate": "2022-07-19",
           "startTime": "11:00:00",
-          "endTime": "12:00:00"
+          "endTime": "13:30:00"
+        },
+        {
+          "count": 2,
+          "availableDate": "2022-07-20",
+          "startTime": "10:30:00",
+          "endTime": "11:00:00"
         }
       ]

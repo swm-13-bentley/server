@@ -63,14 +63,14 @@ class ScheduleTest {
     void from_timeInt_to_localDate() {
         //given
         int startTimeInt = 1; //0시 30분
-        int endTimeInt = 11; //5시 30분
+        int endTimeInt = 11; //5시 30분의 int
 
         //when
         Schedule schedule = new Schedule(availableDate, startTimeInt, endTimeInt);
 
         //then
         assertThat(schedule.getStartTime()).isEqualTo(LocalTime.of(0, 30, 0));
-        assertThat(schedule.getEndTime()).isEqualTo(LocalTime.of(6, 0, 0));
+        assertThat(schedule.getEndTime()).isEqualTo(LocalTime.of(5, 59, 0));
     }
 
 }
