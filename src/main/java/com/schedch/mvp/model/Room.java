@@ -63,6 +63,7 @@ public class Room {
         this.uuid = UUID.randomUUID().toString();
         this.title = title;
         this.roomDates = roomDates;
+        roomDates.stream().forEach(roomDate -> roomDate.setRoom(this));
         this.startTime = startTime;
         this.endTime = endTime;
     }

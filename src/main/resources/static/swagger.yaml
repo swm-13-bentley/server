@@ -33,6 +33,9 @@ paths:
       requestBody:
         $ref: 'requestBodies/roomRequest.yaml'
       responses:
+        200:
+          description: "200 OK"
+          content: {}
         400:
           $ref: 'errors/room400Error.yaml'
 

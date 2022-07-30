@@ -10,4 +10,7 @@ content:
         content:
           type: string
           example: "피드백입니다"
+        email:
+          type: string
+          example: "이메일@email.com"
 required: true
