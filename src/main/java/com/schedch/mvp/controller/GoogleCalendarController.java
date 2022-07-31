@@ -44,7 +44,6 @@ public class GoogleCalendarController {
     @GetMapping("/google/login")
     public ResponseEntity<Object> moveGoogleInitUrl() {
         String authUrl = googleConfigUtils.googleInitUrl();
-        System.out.println("authUrl = " + authUrl);
         URI redirectUri = null;
         try {
             redirectUri = new URI(authUrl);
