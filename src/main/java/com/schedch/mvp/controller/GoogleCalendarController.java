@@ -25,20 +25,26 @@ public class GoogleCalendarController {
     private final Gson gson;
 
 
-    @GetMapping("/room/{roomUuid}/participant/google/{code}")
+//    @GetMapping("/room/{roomUuid}/participant/google/{code}")
+    @GetMapping("/room/{roomUuid}/participant/google")
     public ResponseEntity unSignedUserCalendarFind(@PathVariable("roomUuid") String roomUuid,
-                                                    @PathVariable("code") String code) {
+//                                                    @PathVariable("code") String code,
+                                                   @RequestParam(name = "code") String code) {
         try {
             List<CalendarResponse> schedulesInRoomRange = googleCalendarService.getSchedulesInRoomRange(roomUuid, code);
             return ResponseEntity.status(HttpStatus.OK).body(gson.toJson(schedulesInRoomRange));
         } catch (Exception e) {
+            System.out.println("failure");
+            System.out.println("e.getMessage() = " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(gson.toJson(e.getMessage()));
         }
+
     }
 
     @GetMapping("/google/login")
     public ResponseEntity<Object> moveGoogleInitUrl() {
         String authUrl = googleConfigUtils.googleInitUrl();
+        System.out.println("authUrl = " + authUrl);
         URI redirectUri = null;
         try {
             redirectUri = new URI(authUrl);
