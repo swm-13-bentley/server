@@ -4,6 +4,7 @@ import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.TimeBlockDto;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
+import com.schedch.mvp.model.RoomDate;
 import com.schedch.mvp.model.Schedule;
 import com.schedch.mvp.repository.ParticipantRepository;
 import org.assertj.core.api.Assertions;
@@ -142,14 +143,11 @@ class ParticipantServiceTest {
         String title = "test title";
         LocalTime startTime = LocalTime.of(4, 30, 0);
         LocalTime endTime = LocalTime.of(23, 0, 0);
-        Room room = Room.builder()
-                .title(title)
-                .roomDates(new ArrayList<>())
-                .startTime(startTime)
-                .endTime(endTime)
-                .build();
-        room.addDate(LocalDate.of(2022, 04, 01));
-        room.addDate(LocalDate.of(2022, 04, 02));
+        List<RoomDate> roomDateList = new ArrayList<>();
+        roomDateList.add(new RoomDate(LocalDate.of(2022, 04, 01)));
+        roomDateList.add(new RoomDate(LocalDate.of(2022, 04, 02)));
+
+        Room room = new Room(title, roomDateList, startTime, endTime);
 
         return room;
     }

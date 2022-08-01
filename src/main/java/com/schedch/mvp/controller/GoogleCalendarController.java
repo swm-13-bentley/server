@@ -59,10 +59,13 @@ public class GoogleCalendarController {
 
     @GetMapping("/google/login/redirect")
     public String redirectGoogleLogin(@RequestParam(value = "code") String authCode) throws GeneralSecurityException, IOException {
-        String testRoomUuid = "d3b558c4-11d2-4707-9669-505a1b5a283d";
-        List<CalendarResponse> calendarResponseList = redirectTest(testRoomUuid, authCode);
+//        String testRoomUuid = "d3b558c4-11d2-4707-9669-505a1b5a283d";
+//        List<CalendarResponse> calendarResponseList = redirectTest(testRoomUuid, authCode);
+//
+//        return gson.toJson(calendarResponseList);
 
-        return gson.toJson(calendarResponseList);
+        System.out.println("authCode = " + authCode);
+        return authCode;
     }
 
     public List<CalendarResponse> redirectTest(String roomUuid, String code) throws GeneralSecurityException, IOException {

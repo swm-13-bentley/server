@@ -41,12 +41,6 @@ public class Room {
     private List<Participant> participantList = new ArrayList<>();
 
     //연관관계 편의 메서드
-    public void addDate(LocalDate localDate) {
-        RoomDate roomDate = new RoomDate(localDate);
-        roomDates.add(roomDate);
-        roomDate.setRoom(this);
-    }
-
     public void addParticipant(Participant participant) {
         participantList.add(participant);
         participant.setRoom(this);
@@ -63,9 +57,11 @@ public class Room {
         this.uuid = UUID.randomUUID().toString();
         this.title = title;
         this.roomDates = roomDates;
-        roomDates.stream().forEach(roomDate -> roomDate.setRoom(this));
         this.startTime = startTime;
         this.endTime = endTime;
+
+        //연관관계 맺어주기
+        roomDates.stream().forEach(roomDate -> roomDate.setRoom(this));
     }
 
 }
