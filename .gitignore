@@ -41,4 +41,5 @@ src/main/resources/application.yaml
 src/main/resources/application-dev.yaml
 src/main/resources/application-deploy.yaml
 src/main/resources/application-local.yaml
-src/test/java/com/schedch/mvp/Practice.java
+src/main/resources/static
+src/main/resources/Credentials.json
