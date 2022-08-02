@@ -25,17 +25,13 @@ public class GoogleCalendarController {
     private final Gson gson;
 
 
-//    @GetMapping("/room/{roomUuid}/participant/google/{code}")
     @GetMapping("/room/{roomUuid}/participant/google")
     public ResponseEntity unSignedUserCalendarFind(@PathVariable("roomUuid") String roomUuid,
-//                                                    @PathVariable("code") String code,
                                                    @RequestParam(name = "code") String code) {
         try {
             List<CalendarResponse> schedulesInRoomRange = googleCalendarService.getSchedulesInRoomRange(roomUuid, code);
             return ResponseEntity.status(HttpStatus.OK).body(gson.toJson(schedulesInRoomRange));
         } catch (Exception e) {
-            System.out.println("failure");
-            System.out.println("e.getMessage() = " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(gson.toJson(e.getMessage()));
         }
 
@@ -44,6 +40,7 @@ public class GoogleCalendarController {
     @GetMapping("/google/login")
     public ResponseEntity<Object> moveGoogleInitUrl() {
         String authUrl = googleConfigUtils.googleInitUrl();
+        System.out.println(authUrl);
         URI redirectUri = null;
         try {
             redirectUri = new URI(authUrl);
@@ -57,15 +54,12 @@ public class GoogleCalendarController {
         return ResponseEntity.badRequest().build();
     }
 
-    @GetMapping("/google/login/redirect")
+    @GetMapping("/google/redirect")
     public String redirectGoogleLogin(@RequestParam(value = "code") String authCode) throws GeneralSecurityException, IOException {
-//        String testRoomUuid = "d3b558c4-11d2-4707-9669-505a1b5a283d";
-//        List<CalendarResponse> calendarResponseList = redirectTest(testRoomUuid, authCode);
-//
-//        return gson.toJson(calendarResponseList);
+        String testRoomUuid = "2d5e91f5-5e1c-4d8a-8dec-62114522c9ef";
+        List<CalendarResponse> calendarResponseList = redirectTest(testRoomUuid, authCode);
 
-        System.out.println("authCode = " + authCode);
-        return authCode;
+        return gson.toJson(calendarResponseList);
     }
 
     public List<CalendarResponse> redirectTest(String roomUuid, String code) throws GeneralSecurityException, IOException {
