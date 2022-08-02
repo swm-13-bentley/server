@@ -19,7 +19,6 @@ public class FeedbackController {
 
     @PostMapping("/feedback")
     public ResponseEntity postFeedback(@Valid @RequestBody FeedbackRequest feedbackRequest) {
-
         feedbackService.saveFeedback(feedbackRequest);
 
         return ResponseEntity

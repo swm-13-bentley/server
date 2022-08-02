@@ -60,7 +60,7 @@ public class FeedbackServiceNotionImpl implements FeedbackService{
         //set email column
         JsonObject email = new JsonObject();
         email.addProperty("email",
-                feedbackRequest.getEmail() == null ? "no@email.com" : feedbackRequest.getEmail());
+                (feedbackRequest.getEmail() == "" || feedbackRequest.getEmail() == null) ? "no@email.com" : feedbackRequest.getEmail());
         properties.add("Email", email);
 
         //set datetime column
