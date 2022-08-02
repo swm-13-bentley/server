@@ -14,9 +14,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class FeedbackServiceTest {
+class FeedbackServiceJpaImplTest {
 
-    @InjectMocks private FeedbackService feedbackService;
+    @InjectMocks private FeedbackServiceJpaImpl feedbackServiceJpaImpl;
     @Mock private FeedbackRepository feedbackRepository;
 
     @Test
@@ -27,7 +27,7 @@ class FeedbackServiceTest {
         given(feedbackRepository.save(any(Feedback.class))).willReturn(feedback);
 
         //when
-        boolean success = feedbackService.saveFeedback(feedbackRequest);
+        boolean success = feedbackServiceJpaImpl.saveFeedback(feedbackRequest);
 
         //then
         assertThat(success).isTrue();

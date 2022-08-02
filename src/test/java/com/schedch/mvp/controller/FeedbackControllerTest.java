@@ -2,7 +2,7 @@ package com.schedch.mvp.controller;
 
 import com.google.gson.Gson;
 import com.schedch.mvp.dto.feedback.FeedbackRequest;
-import com.schedch.mvp.service.FeedbackService;
+import com.schedch.mvp.service.FeedbackServiceJpaImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,7 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class FeedbackControllerTest {
 
     @Autowired MockMvc mockMvc;
-    @MockBean FeedbackService feedbackService;
+    @MockBean
+    FeedbackServiceJpaImpl feedbackServiceJpaImpl;
     @Autowired Gson gson;
 
     @Test
@@ -28,7 +29,7 @@ class FeedbackControllerTest {
                 .type("기타")
                 .content("피드백")
                 .build();
-        given(feedbackService.saveFeedback(feedbackRequest)).willReturn(true);
+        given(feedbackServiceJpaImpl.saveFeedback(feedbackRequest)).willReturn(true);
 
         //when
         mockMvc.perform(post("/feedback")
@@ -45,7 +46,7 @@ class FeedbackControllerTest {
         FeedbackRequest feedbackRequest = FeedbackRequest.builder()
                 .type("기타")
                 .build();
-        given(feedbackService.saveFeedback(feedbackRequest)).willReturn(true);
+        given(feedbackServiceJpaImpl.saveFeedback(feedbackRequest)).willReturn(true);
 
         //when
         mockMvc.perform(post("/feedback")
