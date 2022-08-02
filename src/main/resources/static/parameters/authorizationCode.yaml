@@ -1,6 +1,0 @@
-name: code
-in: path
-description: "구글로부터 받은 Authorization code"
-required: true
-schema:
-  type: string
