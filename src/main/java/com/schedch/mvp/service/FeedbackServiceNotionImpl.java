@@ -22,6 +22,8 @@ public class FeedbackServiceNotionImpl implements FeedbackService{
 
     @Override
     public boolean saveFeedback(FeedbackRequest feedbackRequest) {
+        System.out.println(feedbackRequest.getType());
+        System.out.println(feedbackRequest.getContent());
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", notionConfig.getAuthCode());
         headers.add("Notion-Version", notionConfig.getVersion());
