@@ -23,7 +23,6 @@ public class FeedbackController {
 
     @PostMapping("/feedback")
     public ResponseEntity postFeedback(@Valid @RequestBody FeedbackRequest feedbackRequest) {
-        System.out.println("requested");
         feedbackService.saveFeedback(feedbackRequest);
 
         return ResponseEntity
