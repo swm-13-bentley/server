@@ -6,11 +6,15 @@ content:
       properties:
         type:
           type: string
+          required: true
           example: "기타"
         content:
           type: string
+          required: true
           example: "피드백입니다"
         email:
           type: string
+          required: false
+          description: "이메일 정보가 없을 경우, 공백을 입력"
           example: "이메일@email.com"
 required: true

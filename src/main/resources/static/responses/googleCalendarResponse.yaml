@@ -6,12 +6,16 @@ content:
       properties:
         summary:
           type: string
+          description: "캘린더 이름"
         calendarId:
           type: string
+          description: "캘린더 id (구분자)"
         colorCode:
           type: string
+          description: "컬러 코드"
         events:
           type: array
+          description: "일정 정보"
           items:
             type: object
             properties:
