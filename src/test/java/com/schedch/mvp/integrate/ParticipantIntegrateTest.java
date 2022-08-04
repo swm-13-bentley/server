@@ -2,8 +2,8 @@ package com.schedch.mvp.integrate;
 
 import com.schedch.mvp.controller.ParticipantController;
 import com.schedch.mvp.dto.ParticipantResponseDto;
-import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
+import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.RoomDate;
 import com.schedch.mvp.model.Schedule;
 import com.schedch.mvp.repository.ParticipantRepository;
@@ -11,7 +11,6 @@ import com.schedch.mvp.service.ParticipantService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;

@@ -2,7 +2,6 @@ package com.schedch.mvp.dto;
 
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Schedule;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

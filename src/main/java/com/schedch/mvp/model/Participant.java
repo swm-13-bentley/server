@@ -18,7 +18,7 @@ public class Participant {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_id")
+    @JoinColumn(name = "time_room_id")
     private Room room;
 
     @ManyToOne(fetch = FetchType.LAZY)
