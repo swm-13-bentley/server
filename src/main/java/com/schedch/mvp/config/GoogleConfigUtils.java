@@ -4,6 +4,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Getter
+@PropertySource("classpath:google.yaml")
 public class GoogleConfigUtils {
     @Value("${google.auth.url}")
     private String googleAuthUrl;
