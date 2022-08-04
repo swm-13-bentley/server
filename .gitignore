@@ -44,3 +44,4 @@ src/main/resources/application-local.yaml
 src/main/resources/notion.yaml
 src/main/resources/static
 src/main/resources/Credentials.json
+src/main/generated/com/schedch/mvp/mapper
