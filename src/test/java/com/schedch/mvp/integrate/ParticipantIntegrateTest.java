@@ -2,8 +2,8 @@ package com.schedch.mvp.integrate;
 
 import com.schedch.mvp.controller.ParticipantController;
 import com.schedch.mvp.dto.ParticipantResponseDto;
-import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.Participant;
+import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.RoomDate;
 import com.schedch.mvp.model.Schedule;
 import com.schedch.mvp.repository.ParticipantRepository;

@@ -12,13 +12,13 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Participant {
+public class Participant extends BaseEntity{
 
     @Id @GeneratedValue
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "time_room_id")
+    @JoinColumn(name = "room_id")
     private Room room;
 
     @ManyToOne(fetch = FetchType.LAZY)

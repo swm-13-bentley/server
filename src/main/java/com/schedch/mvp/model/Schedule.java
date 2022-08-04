@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Schedule {
+public class Schedule extends BaseEntity{
 
     @Id @GeneratedValue
     private Long id;

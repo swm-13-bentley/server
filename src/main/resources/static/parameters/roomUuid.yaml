@@ -1,7 +1,0 @@
-name: roomUuid
-in: path
-description: 방의 고유 uuid 값
-required: true
-schema:
-  type: string
-  example: e894e0ef-b6b2-4d03-a4d8-32b3aead7976

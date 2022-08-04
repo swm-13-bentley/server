@@ -1,12 +1,8 @@
 package com.schedch.mvp.controller;
 
-import com.google.gson.Gson;
-import com.schedch.mvp.config.NotionConfig;
 import com.schedch.mvp.dto.feedback.FeedbackRequest;
 import com.schedch.mvp.service.FeedbackService;
-import com.schedch.mvp.service.FeedbackServiceJpaImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

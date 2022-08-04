@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Room {
+public class Room extends BaseEntity{
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 

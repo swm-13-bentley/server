@@ -4,8 +4,10 @@ import com.schedch.mvp.controller.handler.ControllerHandler;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
+@EnableJpaAuditing
 @Import(ControllerHandler.class)
 public class MvpApplication {
 
