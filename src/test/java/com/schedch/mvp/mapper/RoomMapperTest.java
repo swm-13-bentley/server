@@ -4,10 +4,7 @@ import com.schedch.mvp.dto.RoomRequest;
 import com.schedch.mvp.model.Room;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -18,7 +15,6 @@ class RoomMapperTest {
 
     private RoomMapper roomMapper = RoomMapper.INSTANCE;
     private RoomRequest roomReq;
-    private Room room;
 
     @BeforeEach
     public void createRoomEntity() {
