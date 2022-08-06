@@ -21,8 +21,10 @@ import com.schedch.mvp.dto.CalendarResponse;
 import com.schedch.mvp.dto.CalendarScheduleDto;
 import com.schedch.mvp.dto.GoogleLoginRequest;
 import com.schedch.mvp.dto.GoogleLoginResponse;
+import com.schedch.mvp.model.GToken;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.RoomDate;
+import com.schedch.mvp.repository.GTokenRepository;
 import com.schedch.mvp.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -50,14 +52,29 @@ import java.util.stream.IntStream;
 public class GoogleCalendarService {
 
     private final GoogleConfigUtils googleConfigUtils;
-    private final RoomRepository roomRepository;
+    private final GTokenRepository gTokenRepository;
+    private final RoomService roomService;
     private final TimeAdapter timeAdapter;
 
-    public List<CalendarResponse> getSchedulesInRoomRange(String roomUuid, String code) throws GeneralSecurityException, IOException {
-        TokenResponse tokenResponse = getTokenResponse(code);
+    public void save(GToken gToken) {
+        GToken save = gTokenRepository.save(gToken);
+    }
+    public List<CalendarResponse> getSchedulesInRoomRange(String roomUuid, String state) throws GeneralSecurityException, IOException {
+        Optional<GToken> gTokenOptional = gTokenRepository.findByState(state);
+        GToken gToken = gTokenOptional.orElseThrow(
+                () -> new NoSuchElementException(String.format("GToken for state: %s does not exist", state))
+        );
+
+        TokenResponse tokenResponse = new TokenResponse()
+                .setAccessToken(gToken.getAccessToken())
+                .setRefreshToken(gToken.getRefreshToken())
+                .setTokenType(gToken.getTokenType())
+                .setExpiresInSeconds(gToken.getExpiresIn())
+                .setScope(gToken.getScope());
+
         Calendar googleCalendar = getGoogleCalendar(tokenResponse);
 
-        Room room = roomRepository.findByUuid(roomUuid).get();
+        Room room = roomService.getRoom(roomUuid);
         List<LocalDate> roomDates = room.getRoomDates().stream().map(RoomDate::getScheduledDate).collect(Collectors.toList());
 
         CalendarList calendarList = getCalendarList(googleCalendar);
@@ -180,7 +197,7 @@ public class GoogleCalendarService {
         return block;
     }
 
-    private TokenResponse getTokenResponse(String code) {
+    public TokenResponse getTokenResponse(String code) {
         RestTemplate restTemplate = new RestTemplate();
         GoogleLoginRequest requestParams = GoogleLoginRequest.builder()
                 .clientId(googleConfigUtils.getGoogleClientId())

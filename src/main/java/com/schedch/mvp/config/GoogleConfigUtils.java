@@ -47,13 +47,14 @@ public class GoogleConfigUtils {
     private JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
     // Google 로그인 URL 생성 로직
-    public String googleInitUrl() {
+    public String googleInitUrl(String state) {
         Map<String, Object> params = new HashMap<>();
         params.put("access_type", getGoogleAccessType());
         params.put("client_id", getGoogleClientId());
         params.put("redirect_uri", getGoogleRedirectUrl());
         params.put("response_type", "code");
         params.put("scope", getScopeUrl());
+        params.put("state", state);
 
         String paramStr = params.entrySet().stream()
                 .map(param -> param.getKey() + "=" + param.getValue())
