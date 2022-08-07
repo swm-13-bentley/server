@@ -52,8 +52,5 @@ public class RoomIntegrateTest {
         Room foundRoom = roomService.getRoom(uuid);
         assertThat(foundRoom.getCreateDate()).isNotNull();
         assertThat(foundRoom.getRoomDates().size()).isEqualTo(3);
-
-
-
     }
 }

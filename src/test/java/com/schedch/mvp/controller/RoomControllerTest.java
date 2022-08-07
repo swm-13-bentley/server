@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.schedch.mvp.adapter.LocalDateAdapter;
 import com.schedch.mvp.adapter.LocalTimeAdapter;
-import com.schedch.mvp.dto.RoomRequest;
+import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.mapper.RoomMapper;
 import com.schedch.mvp.service.RoomService;
 import org.junit.jupiter.api.BeforeAll;
