@@ -111,31 +111,53 @@ public class RoomService {
     public class TimeCount implements Comparable<TimeCount> {
         int count;
         LocalDate availableDate;
-        String startTime;
-        String endTime;
+        int start;
+        int end;
+        int len;
 
         public TimeCount(int count, LocalDate availableDate, int start, int end) {
             this.count = count;
             this.availableDate = availableDate;
-            this.startTime = timeAdapter.startBlock2Str(start);
-            this.endTime = timeAdapter.endBlock2Str(end);
+            this.start = start;
+            this.end = end;
+            this.len = end - start;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public LocalDate getAvailableDate() {
+            return availableDate;
+        }
+
+        public int getStart() {
+            return start;
+        }
+
+        public int getEnd() {
+            return end;
         }
 
         @Override
         public int compareTo(TimeCount o) {
             //인원 수 역순
+            //길이 긴 순
             //날짜 빠른 순
             //시간 빠른 순
             if(this.count == o.count) {
-                if(this.availableDate.isEqual(o.availableDate)) {
-                    return this.startTime.compareTo(o.endTime);
+                if(o.len == this.len) {
+                    if (this.availableDate.isEqual(o.availableDate)) {
+                        return this.start - o.start;
+                    } else {
+                        return this.availableDate.compareTo(o.availableDate);
+                    }
                 } else {
-                    return this.availableDate.compareTo(o.availableDate);
+                    return o.len - this.len;
                 }
             } else {
                 return o.count - this.count;
             }
         }
     }
-
 }
