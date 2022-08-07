@@ -85,14 +85,18 @@ public class RoomService {
             int starting = 0;
             for (int i = 0; i <= rowSize; i++) {
                 if(i == rowSize) {
-                    TimeCount t = new TimeCount(count, roomDates.get(j).getScheduledDate(), roomStartTimeBlock + starting, rowSize-1);
-                    timeCountList.add(t);
+                    if(count >= 2) {
+                        TimeCount t = new TimeCount(count, roomDates.get(j).getScheduledDate(), roomStartTimeBlock + starting, rowSize - 1);
+                        timeCountList.add(t);
+                    }
                     break;
                 }
                 int nowCount = board[i][j];
                 if(count != nowCount) {
-                    TimeCount t = new TimeCount(count, roomDates.get(j).getScheduledDate(), roomStartTimeBlock + starting, roomStartTimeBlock + i - 1);
-                    timeCountList.add(t);
+                    if(count >= 2) {
+                        TimeCount t = new TimeCount(count, roomDates.get(j).getScheduledDate(), roomStartTimeBlock + starting, roomStartTimeBlock + i - 1);
+                        timeCountList.add(t);
+                    }
                     count = nowCount;
                     starting = i;
                 }
