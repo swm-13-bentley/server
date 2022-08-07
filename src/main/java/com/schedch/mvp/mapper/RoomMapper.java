@@ -1,7 +1,7 @@
 package com.schedch.mvp.mapper;
 
-import com.schedch.mvp.dto.RoomRequest;
-import com.schedch.mvp.dto.RoomResponse;
+import com.schedch.mvp.dto.room.RoomRequest;
+import com.schedch.mvp.dto.room.RoomResponse;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.RoomDate;
 import org.mapstruct.Mapper;
