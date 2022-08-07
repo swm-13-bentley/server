@@ -49,7 +49,7 @@ public class GoogleCalendarController {
     }
 
     @GetMapping("/google/calendar/redirect")
-    public void redirectGoogleLogin(@RequestParam(value = "code") String authCode,
+    public ResponseEntity redirectGoogleLogin(@RequestParam(value = "code") String authCode,
                                       @RequestParam(value = "state") String state) {
         TokenResponse tokenResponse = googleCalendarService.getTokenResponse(authCode);
         GToken gToken = GToken.builder()
@@ -61,5 +61,9 @@ public class GoogleCalendarController {
                 .tokenType(tokenResponse.getTokenType())
                 .build();
         googleCalendarService.save(gToken);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(state);
     }
 }
