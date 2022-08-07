@@ -1,4 +1,4 @@
-package com.schedch.mvp.dto;
+package com.schedch.mvp.dto.room;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
