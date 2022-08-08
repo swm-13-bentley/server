@@ -5,12 +5,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.schedch.mvp.config.GoogleConfigUtils;
 import com.schedch.mvp.dto.CalendarResponse;
-import com.schedch.mvp.dto.google.GCalTokenRequest;
 import com.schedch.mvp.model.GToken;
 import com.schedch.mvp.service.GoogleCalendarService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -62,8 +60,15 @@ public class GoogleCalendarController {
                 .build();
         googleCalendarService.save(gToken);
 
+        HttpHeaders headers = new HttpHeaders();
+        try {
+            headers.setLocation(new URI(googleConfigUtils.getFrontPath()));
+            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(state);
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build();
     }
 }

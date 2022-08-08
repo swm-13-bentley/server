@@ -44,6 +44,9 @@ public class GoogleConfigUtils {
     @Value("${google.auth.TOKENS_DIRECTORY_PATH}")
     private String TOKENS_DIRECTORY_PATH;
 
+    @Value("${google.front.location}")
+    private String frontPath;
+
     private JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
     // Google 로그인 URL 생성 로직
