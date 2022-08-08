@@ -9,7 +9,7 @@
         <property resource="logback-dev.properties"/>
     </springProfile>
     <springProfile name="deploy">
-        <property resource="logback-dev.properties"/>
+        <property resource="logback-deploy.properties"/>
     </springProfile>
     <!--Environment 내의 프로퍼티들을 개별적으로 설정할 수도 있다.-->
     <springProperty scope="context" name="LOG_LEVEL" source="logging.level.root"/>
