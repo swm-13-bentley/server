@@ -48,27 +48,29 @@ public class GoogleCalendarController {
 
     @GetMapping("/google/calendar/redirect")
     public ResponseEntity redirectGoogleLogin(@RequestParam(value = "code") String authCode,
-                                      @RequestParam(value = "state") String state) {
-        TokenResponse tokenResponse = googleCalendarService.getTokenResponse(authCode);
-        GToken gToken = GToken.builder()
-                .state(state)
-                .accessToken(tokenResponse.getAccessToken())
-                .expiresIn(tokenResponse.getExpiresInSeconds())
-                .refreshToken(tokenResponse.getRefreshToken())
-                .scope(tokenResponse.getScope())
-                .tokenType(tokenResponse.getTokenType())
-                .build();
-        googleCalendarService.save(gToken);
-
+                                      @RequestParam(value = "state") String state) throws URISyntaxException {
         HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(new URI(googleConfigUtils.getFrontPath()));
         try {
+            TokenResponse tokenResponse = googleCalendarService.getTokenResponse(authCode);
+            GToken gToken = GToken.builder()
+                    .state(state)
+                    .accessToken(tokenResponse.getAccessToken())
+                    .expiresIn(tokenResponse.getExpiresInSeconds())
+                    .refreshToken(tokenResponse.getRefreshToken())
+                    .scope(tokenResponse.getScope())
+                    .tokenType(tokenResponse.getTokenType())
+                    .build();
+            googleCalendarService.save(gToken);
+
+        } catch (Exception e) {
             headers.setLocation(new URI(googleConfigUtils.getFrontPath()));
+            headers.add("success", "false");
+            headers.add("error", e.toString());
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
         }
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .build();
+
+        headers.add("success", "true");
+        return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
     }
 }
