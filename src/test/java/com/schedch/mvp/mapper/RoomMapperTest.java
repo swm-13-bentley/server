@@ -1,6 +1,6 @@
 package com.schedch.mvp.mapper;
 
-import com.schedch.mvp.dto.RoomRequest;
+import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.model.Room;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

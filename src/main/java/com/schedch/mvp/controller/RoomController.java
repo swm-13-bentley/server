@@ -2,8 +2,10 @@ package com.schedch.mvp.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.schedch.mvp.dto.RoomRequest;
-import com.schedch.mvp.dto.RoomResponse;
+import com.schedch.mvp.adapter.TimeAdapter;
+import com.schedch.mvp.dto.TimeCountResponse;
+import com.schedch.mvp.dto.room.RoomRequest;
+import com.schedch.mvp.dto.room.RoomResponse;
 import com.schedch.mvp.mapper.RoomMapper;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.service.RoomService;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class RoomController {
     private final RoomService roomService;
     private final Gson gson;
     private final RoomMapper roomMapper;
+    private final TimeAdapter timeAdapter;
 
     @PostMapping("/room")
     public ResponseEntity createRoom(@Valid @RequestBody RoomRequest roomReq) {
@@ -52,10 +56,19 @@ public class RoomController {
     @GetMapping("/room/{roomUuid}/top/{max}")
     public ResponseEntity getTopTimes(@PathVariable("roomUuid") String roomUuid,
                                       @PathVariable("max") int max) {
-        log.info("roomUuid: {}, max: {}", roomUuid, max);
         List<RoomService.TimeCount> topAvailableTime = roomService.getTopAvailableTime(roomUuid, max);
+        List<TimeCountResponse> responseList = topAvailableTime.stream().map(timeCount -> {
+            return TimeCountResponse.builder()
+                    .count(timeCount.getCount())
+                    .availableDate(timeCount.getAvailableDate())
+                    .startTime(timeAdapter.startBlock2Str(timeCount.getStart()))
+                    .endTime(timeAdapter.endBlock2Str(timeCount.getEnd()))
+                    .build();
+        }).collect(Collectors.toList());
+
+        log.info("roomUuid: {}, max: {}, foundLen: {}", roomUuid, max, responseList.size());
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(gson.toJson(topAvailableTime));
+                .body(gson.toJson(responseList));
     }
 }

@@ -1,13 +1,14 @@
 package com.schedch.mvp.controller;
 
+import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.schedch.mvp.config.GoogleConfigUtils;
 import com.schedch.mvp.dto.CalendarResponse;
+import com.schedch.mvp.model.GToken;
 import com.schedch.mvp.service.GoogleCalendarService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,47 +26,51 @@ public class GoogleCalendarController {
     private final GoogleConfigUtils googleConfigUtils;
     private final Gson gson;
 
+    @PostMapping("google/calendar")
+    public ResponseEntity googleCalendarTokenRequest() {
+        String state = UUID.randomUUID().toString();
+        String authUrl = googleConfigUtils.googleInitUrl(state);
+        JsonObject bodyJson = new JsonObject();
+        bodyJson.addProperty("state", state);
+        bodyJson.addProperty("authUrl", authUrl);
 
-    @GetMapping("/room/{roomUuid}/participant/google")
-    public ResponseEntity unSignedUserCalendarFind(@PathVariable("roomUuid") String roomUuid,
-                                                   @RequestParam(name = "code") String code) {
-        try {
-            List<CalendarResponse> schedulesInRoomRange = googleCalendarService.getSchedulesInRoomRange(roomUuid, code);
-            return ResponseEntity.status(HttpStatus.OK).body(gson.toJson(schedulesInRoomRange));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(gson.toJson(e.getMessage()));
-        }
-
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(bodyJson));
     }
 
-    @GetMapping("/google/login")
-    public ResponseEntity<Object> moveGoogleInitUrl() {
-        String authUrl = googleConfigUtils.googleInitUrl();
-        System.out.println(authUrl);
-        URI redirectUri = null;
-        try {
-            redirectUri = new URI(authUrl);
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setLocation(redirectUri);
-            return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        return ResponseEntity.badRequest().build();
-    }
-
-    @GetMapping("/google/redirect")
-    public String redirectGoogleLogin(@RequestParam(value = "code") String authCode) throws GeneralSecurityException, IOException {
-        String testRoomUuid = "2d5e91f5-5e1c-4d8a-8dec-62114522c9ef";
-        List<CalendarResponse> calendarResponseList = redirectTest(testRoomUuid, authCode);
-
-        return gson.toJson(calendarResponseList);
-    }
-
-    public List<CalendarResponse> redirectTest(String roomUuid, String code) throws GeneralSecurityException, IOException {
-        System.out.println("unSignedUserCalendarFind 호출됨");
-        List<CalendarResponse> schedulesInRoomRange = googleCalendarService.getSchedulesInRoomRange(roomUuid, code);
+    @GetMapping("google/calendar")
+    public List<CalendarResponse> googleCalendarLoad(@RequestParam(value = "roomUuid") String roomUuid,
+                                                     @RequestParam(value = "state") String state) throws GeneralSecurityException, IOException {
+        List<CalendarResponse> schedulesInRoomRange = googleCalendarService.getSchedulesInRoomRange(roomUuid, state);
         return schedulesInRoomRange;
+    }
+
+    @GetMapping("/google/calendar/redirect")
+    public ResponseEntity redirectGoogleLogin(@RequestParam(value = "code") String authCode,
+                                      @RequestParam(value = "state") String state) throws URISyntaxException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(new URI(googleConfigUtils.getFrontPath()));
+        try {
+            TokenResponse tokenResponse = googleCalendarService.getTokenResponse(authCode);
+            GToken gToken = GToken.builder()
+                    .state(state)
+                    .accessToken(tokenResponse.getAccessToken())
+                    .expiresIn(tokenResponse.getExpiresInSeconds())
+                    .refreshToken(tokenResponse.getRefreshToken())
+                    .scope(tokenResponse.getScope())
+                    .tokenType(tokenResponse.getTokenType())
+                    .build();
+            googleCalendarService.save(gToken);
+
+        } catch (Exception e) {
+            headers.setLocation(new URI(googleConfigUtils.getFrontPath()));
+            headers.add("success", "false");
+            headers.add("error", e.toString());
+            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
+        }
+
+        headers.add("success", "true");
+        return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
     }
 }
