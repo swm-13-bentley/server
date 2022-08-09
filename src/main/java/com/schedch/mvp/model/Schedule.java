@@ -41,12 +41,6 @@ public class Schedule extends BaseEntity{
         this.endTime = endTime;
     }
 
-    public Schedule(LocalDate availableDate, int startTimeInt, int endTimeInt) {
-        this.availableDate = availableDate;
-        this.startTime = toLocalTime(startTimeInt, 30);
-        this.endTime = toLocalTime(endTimeInt, 30).plusMinutes(29);
-    }
-
     public TimeBlockDto toTimeBlockDto(int unit) {
         return TimeBlockDto.builder()
                 .availableDate(this.availableDate)
@@ -60,6 +54,10 @@ public class Schedule extends BaseEntity{
 
         int end = (int) (endTime.getHour() * (60/unit)
                 + Math.floor(endTime.getMinute() / unit));
+
+        if (endTime.isBefore(startTime)) {
+            end += 48; // 24 / (60 / unit)
+        }
 
         return IntStream.range(start, end+1).boxed().collect(Collectors.toList());
     }
