@@ -64,12 +64,12 @@ public class TimeAdapter {
         return LocalTime.of(hour, min).plusMinutes(29);
     }
 
-    //블록의 크기가 24시를 넘어서는 새벽인지를 확인. default: 24시를 30분으로 분할 -> 47
+    //블록의 크기가 24시를 넘어서는 새벽인지를 확인. default: 24시를 30분으로 분할 -> 48
     public boolean checkBlockOverDefault(int block) {
-        return block > 47;
+        return block >= 48;
     }
 
     public int reduceBlockDefault(int block) {
-        return block - 47;
+        return block - 48;
     }
 }
