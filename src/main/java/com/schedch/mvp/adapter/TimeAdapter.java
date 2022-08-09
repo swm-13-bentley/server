@@ -25,29 +25,6 @@ public class TimeAdapter {
                 + Math.floor(localTime.getMinute() / 30));
     }
 
-    public int startLocalTime2TimeBlock(LocalTime localTime) {
-        return (int) (localTime.getHour() * (60 / 30)
-                + Math.floor(localTime.getMinute() / 30));
-    }
-
-    public int endLocalTime2TimeBlock(LocalTime localTime) {
-        int block = (int) (localTime.getHour() * (60 / 30)
-                + Math.floor(localTime.getMinute() / 30)) - 1;
-
-        if(localTime.equals(LocalTime.of(23, 59, 0))) {
-            block++;
-        }
-
-        return block;
-    }
-
-    public LocalTime timeBlock2LocalTime(int block) {
-        int hour = block/2;
-        int min = block%2 * 30;
-
-        return LocalTime.of(hour, min, 0);
-    }
-
     public String startBlock2Str(int block) {
         int hour = block/2;
         int min = block%2 * 30;
@@ -55,6 +32,7 @@ public class TimeAdapter {
         return String.format("%02d:%02d:00", hour, min);
     }
 
+    //유저에게 보이는 값을 반환할 때는 29, 59분이 아닌 정각으로 반환한다
     public String endBlock2Str(int block) {
         if(block == 47) {
             return "24:00:00";
@@ -64,5 +42,34 @@ public class TimeAdapter {
             int min = block%2 * 30;
             return String.format("%02d:%02d:00", hour, min);
         }
+    }
+
+    public LocalTime startBlock2lt(int block) {
+        if(checkBlockOverDefault(block))
+            block = reduceBlockDefault(block);
+
+        int hour = block/2;
+        int min = block%2 * 30;
+
+        return LocalTime.of(hour, min);
+    }
+
+    //lt로 변환할 때는 db에 저장하기 위한 목적임으로 29, 59분 형태로 저장한다
+    public LocalTime endBlock2lt(int block) {
+        if(checkBlockOverDefault(block))
+            block = reduceBlockDefault(block);
+
+        int hour = block/2;
+        int min = block%2 * 30;
+        return LocalTime.of(hour, min).plusMinutes(29);
+    }
+
+    //블록의 크기가 24시를 넘어서는 새벽인지를 확인. default: 24시를 30분으로 분할 -> 47
+    public boolean checkBlockOverDefault(int block) {
+        return block > 47;
+    }
+
+    public int reduceBlockDefault(int block) {
+        return block - 47;
     }
 }
