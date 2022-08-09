@@ -34,6 +34,7 @@ public class Schedule extends BaseEntity{
     @NotNull(message = "Schedule endTime cannot be empty")
     private LocalTime endTime;
 
+    private LocalTime roomStartTime;
 
     public Schedule(LocalDate availableDate, LocalTime startTime, LocalTime endTime) {
         this.availableDate = availableDate;
@@ -41,10 +42,11 @@ public class Schedule extends BaseEntity{
         this.endTime = endTime;
     }
 
-    public Schedule(LocalDate availableDate, int startTimeInt, int endTimeInt) {
+    public Schedule(LocalDate availableDate, LocalTime startTime, LocalTime endTime, LocalTime roomStartTime) {
         this.availableDate = availableDate;
-        this.startTime = toLocalTime(startTimeInt, 30);
-        this.endTime = toLocalTime(endTimeInt, 30).plusMinutes(29);
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.roomStartTime = roomStartTime;
     }
 
     public TimeBlockDto toTimeBlockDto(int unit) {
@@ -61,11 +63,12 @@ public class Schedule extends BaseEntity{
         int end = (int) (endTime.getHour() * (60/unit)
                 + Math.floor(endTime.getMinute() / unit));
 
-        return IntStream.range(start, end+1).boxed().collect(Collectors.toList());
-    }
+        if(roomStartTime != null) {
+            if(startTime.isBefore(roomStartTime)) start += 48;
+            if(endTime.isBefore(roomStartTime)) end += 48;
+        }
 
-    public LocalTime toLocalTime(int timeInteger, int unit) {
-        return LocalTime.of(timeInteger / (60/unit), unit * (timeInteger % (60/unit)), 0);
+        return IntStream.range(start, end+1).boxed().collect(Collectors.toList());
     }
 
     public void setParticipant(Participant participant) {

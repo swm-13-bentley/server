@@ -17,8 +17,8 @@ class RoomTest {
         String title = "testTitle";
         List<RoomDate> roomDates = new ArrayList<>();
         roomDates.add(new RoomDate(LocalDate.of(2022, 06, 01)));
-        roomDates.add(new RoomDate(LocalDate.of(2022, 06, 01)));
-        roomDates.add(new RoomDate(LocalDate.of(2022, 06, 01)));
+        roomDates.add(new RoomDate(LocalDate.of(2022, 06, 02)));
+        roomDates.add(new RoomDate(LocalDate.of(2022, 06, 03)));
 
         LocalTime startTime = LocalTime.of(16, 00);
         LocalTime endTime   = LocalTime.of(23, 00);
