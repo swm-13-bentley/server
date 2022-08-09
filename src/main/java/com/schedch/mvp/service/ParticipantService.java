@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -57,9 +58,10 @@ public class ParticipantService {
 
         participant.emptySchedules();
 
+        LocalTime roomStartTime = room.getStartTime();
         availableRequestDto.getAvailable().stream()
                 .forEach(timeBlockDto -> {
-                    changeTimeBlockDtoToSchedule(timeBlockDto).stream()
+                    changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime).stream()
                             .forEach(schedule -> participant.addSchedule(schedule));
 
                 });
@@ -70,7 +72,7 @@ public class ParticipantService {
      * @param timeBlockDto
      * @return
      */
-    public List<Schedule> changeTimeBlockDtoToSchedule(TimeBlockDto timeBlockDto) {
+    public List<Schedule> changeTimeBlockDtoToSchedule(TimeBlockDto timeBlockDto, LocalTime roomStartTime) {
         List<Schedule> scheduleList = new ArrayList<>();
         LocalDate availableDate = timeBlockDto.getAvailableDate();
         List<Integer> availableTimeList = timeBlockDto.getAvailableTimeList();
@@ -80,11 +82,12 @@ public class ParticipantService {
 
             for (int i = 1; i <= availableTimeList.size(); i++) {
                 if(i == availableTimeList.size()) {
-                    scheduleList.add(new Schedule(availableDate, timeAdapter.startBlock2lt(start), timeAdapter.endBlock2lt(end)));
+                    LocalTime startTime = timeAdapter.startBlock2lt(start);
+                    scheduleList.add(new Schedule(availableDate, startTime, timeAdapter.endBlock2lt(end), roomStartTime));
                     return scheduleList;
                 }
                 if (availableTimeList.get(i) != end + 1) {//불연속 or 마지막
-                    scheduleList.add(new Schedule(availableDate, timeAdapter.startBlock2lt(start), timeAdapter.endBlock2lt(end)));
+                    scheduleList.add(new Schedule(availableDate, timeAdapter.startBlock2lt(start), timeAdapter.endBlock2lt(end), roomStartTime));
                     start = availableTimeList.get(i);
                 }
                 end = availableTimeList.get(i);
