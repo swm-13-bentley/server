@@ -93,7 +93,7 @@ public interface RoomMapper{
         );
 
         if (endLt.isBefore(startLt)) {
-            endInt += (24/unit);
+            endInt += (24 * (60 / unit));
         }
 
         return endInt;
