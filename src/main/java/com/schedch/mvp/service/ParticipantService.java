@@ -1,5 +1,6 @@
 package com.schedch.mvp.service;
 
+import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.dto.AvailableRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.TimeBlockDto;
@@ -23,6 +24,7 @@ public class ParticipantService {
 
     private final ParticipantRepository participantRepository;
     private final RoomService roomService;
+    private final TimeAdapter timeAdapter;
 
     public ParticipantResponseDto findUnSignedParticipantAndValidate(
             String roomUuid, String participantName, String password) throws IllegalAccessException {
@@ -78,11 +80,11 @@ public class ParticipantService {
 
             for (int i = 1; i <= availableTimeList.size(); i++) {
                 if(i == availableTimeList.size()) {
-                    scheduleList.add(new Schedule(availableDate, start, end));
+                    scheduleList.add(new Schedule(availableDate, timeAdapter.startBlock2lt(start), timeAdapter.endBlock2lt(end)));
                     return scheduleList;
                 }
                 if (availableTimeList.get(i) != end + 1) {//불연속 or 마지막
-                    scheduleList.add(new Schedule(availableDate, start, end));
+                    scheduleList.add(new Schedule(availableDate, timeAdapter.startBlock2lt(start), timeAdapter.endBlock2lt(end)));
                     start = availableTimeList.get(i);
                 }
                 end = availableTimeList.get(i);
