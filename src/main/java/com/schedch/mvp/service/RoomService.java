@@ -43,10 +43,14 @@ public class RoomService {
         // 2차원 배열 순회하면서 인원수 체크하고, 붙어있으면 붙은 일정으로 내보내기
         Room room = getRoom(roomUuid);
         List<RoomDate> roomDates = room.getRoomDates();
-        int roomStartTimeBlock = timeAdapter.localTime2TimeBlockInt(room.getStartTime());
+        LocalTime roomStartTime = room.getStartTime();
+        int roomStartTimeBlock = timeAdapter.localTime2TimeBlockInt(roomStartTime);
 
         LocalTime roomEndTime = room.getEndTime();
         int roomEndTimeBlock = timeAdapter.localTime2TimeBlockInt(roomEndTime);
+        if(roomEndTime.isBefore(roomStartTime)) {
+            roomEndTimeBlock += 48;
+        }
 
         int colNum = 0;
         HashMap<LocalDate, Integer> colNumMap = new HashMap<>();
@@ -68,7 +72,10 @@ public class RoomService {
             for(Schedule schedule : scheduleList) {
                 LocalDate availableDate = schedule.getAvailableDate();
                 int startBlock = timeAdapter.localTime2TimeBlockInt(schedule.getStartTime());
+                if(startBlock < roomStartTimeBlock) startBlock += 48;
+
                 int endBlock = timeAdapter.localTime2TimeBlockInt(schedule.getEndTime());
+                if(endBlock < roomStartTimeBlock) endBlock += 48;
 
                 int colIdx = colNumMap.get(availableDate);
                 board[startBlock - roomStartTimeBlock][colIdx]++;

@@ -26,6 +26,7 @@ public class TimeAdapter {
     }
 
     public String startBlock2Str(int block) {
+        if(block >= 48) block -= 48;
         int hour = block/2;
         int min = block%2 * 30;
 
@@ -34,6 +35,7 @@ public class TimeAdapter {
 
     //유저에게 보이는 값을 반환할 때는 29, 59분이 아닌 정각으로 반환한다
     public String endBlock2Str(int block) {
+        if(block >= 48) block -= 48;
         if(block == 47) {
             return "24:00:00";
         } else {
