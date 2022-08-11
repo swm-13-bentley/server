@@ -77,6 +77,7 @@ public class RoomService {
                 int endBlock = timeAdapter.localTime2TimeBlockInt(schedule.getEndTime());
                 if(endBlock < roomStartTimeBlock) endBlock += 48;
 
+                if(!colNumMap.containsKey(availableDate)) continue;
                 int colIdx = colNumMap.get(availableDate);
                 board[startBlock - roomStartTimeBlock][colIdx]++;
                 board[endBlock - roomStartTimeBlock + 1][colIdx]--;
