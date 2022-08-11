@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +31,8 @@ public class Room extends BaseEntity{
     @OrderBy(value = "scheduledDate ASC")
     private List<RoomDate> roomDates = new ArrayList<>();
 
-    @NotNull(message = "Room startTime is empty")
     private LocalTime startTime;
 
-    @NotNull(message = "Room endTime is empty")
     private LocalTime endTime;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "room")
@@ -48,6 +47,11 @@ public class Room extends BaseEntity{
     public List<Participant> findUnSignedParticipant(String participantName) {
         return getParticipantList().stream()
                 .filter(p -> p.isSignedIn() == false && p.getParticipantName().equals(participantName))
+                .collect(Collectors.toList());
+    }
+
+    public List<LocalDate> getLocalDateList() {
+        return roomDates.stream().map(RoomDate::getScheduledDate)
                 .collect(Collectors.toList());
     }
 
