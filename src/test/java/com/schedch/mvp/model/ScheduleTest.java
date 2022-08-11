@@ -1,7 +1,9 @@
 package com.schedch.mvp.model;
 
+import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.dto.TimeBlockDto;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -64,9 +66,10 @@ class ScheduleTest {
         //given
         int startTimeInt = 1; //0시 30분
         int endTimeInt = 11; //5시 30분의 int
+        TimeAdapter timeAdapter = new TimeAdapter();
 
         //when
-        Schedule schedule = new Schedule(availableDate, startTimeInt, endTimeInt);
+        Schedule schedule = new Schedule(availableDate, timeAdapter.startBlock2lt(startTimeInt), timeAdapter.endBlock2lt(endTimeInt));
 
         //then
         assertThat(schedule.getStartTime()).isEqualTo(LocalTime.of(0, 30, 0));

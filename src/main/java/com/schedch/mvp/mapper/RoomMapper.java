@@ -24,7 +24,7 @@ public interface RoomMapper{
     Room req2Entity(RoomRequest roomReq);
 
     @Mapping(target = "startTime", expression = "java(lt2int(room.getStartTime(), 30))")
-    @Mapping(target = "endTime", expression = "java(lt2int(room.getEndTime(), 30))")
+    @Mapping(target = "endTime", expression = "java(endLt2int(room.getStartTime(), room.getEndTime(), 30))")
     @Mapping(target = "dates", expression = "java(rdList2LdList(room.getRoomDates()))")
     RoomResponse entity2Res(Room room);
 
@@ -84,5 +84,18 @@ public interface RoomMapper{
                 lt.getHour() * (60 / unit)
                         + Math.floor(lt.getMinute() / unit)
         );
+    }
+
+    default int endLt2int(LocalTime startLt, LocalTime endLt, int unit) {
+        int endInt = (int) (
+                endLt.getHour() * (60 / unit)
+                        + Math.floor(endLt.getMinute() / unit)
+        );
+
+        if (endLt.isBefore(startLt)) {
+            endInt += (24 * (60 / unit));
+        }
+
+        return endInt;
     }
 }
