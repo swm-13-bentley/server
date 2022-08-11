@@ -98,7 +98,7 @@ public class RoomService {
                 int nowCount = board[i][j];
                 if(stack.isEmpty()) {//비었다면 새 항목을 추가
                     LocalDate scheduledDate = roomDates.get(j).getScheduledDate();
-                    if(roomStartTimeBlock + i >= 48) scheduledDate = scheduledDate.plusDays(1);
+                    if(roomStartTimeBlock + i >= 48) scheduledDate.plusDays(1);
                     stack.add(new TimeCount(nowCount, scheduledDate,
                             roomStartTimeBlock + i,
                             roomStartTimeBlock + i));
@@ -110,7 +110,7 @@ public class RoomService {
                         peek.setEnd(roomStartTimeBlock + i);
                     } else if(peek.getCount() < nowCount) {//peek < 현재 카운트: 새 항목 추가
                         LocalDate scheduledDate = roomDates.get(j).getScheduledDate();
-                        if(roomStartTimeBlock + i >= 48) scheduledDate = scheduledDate.plusDays(1);
+                        if(roomStartTimeBlock + i >= 48) scheduledDate.plusDays(1);
                         stack.add(new TimeCount(nowCount, scheduledDate,
                                 roomStartTimeBlock + i,
                                 roomStartTimeBlock + i));
