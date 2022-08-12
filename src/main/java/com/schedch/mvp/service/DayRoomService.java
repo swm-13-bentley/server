@@ -38,9 +38,7 @@ public class DayRoomService {
         List<DayRoomTopRes> dayRoomTopResList = new ArrayList<>();
 
         countMap.forEach((k, v) -> {
-            if(v.size() > 1) {
-                dayRoomTopResList.add(new DayRoomTopRes(k, v));
-            }
+            dayRoomTopResList.add(new DayRoomTopRes(k, v));
         });
 
         dayRoomTopResList.sort(new Comparator<DayRoomTopRes>() {
