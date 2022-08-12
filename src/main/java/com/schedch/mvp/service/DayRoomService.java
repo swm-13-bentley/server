@@ -3,7 +3,6 @@ package com.schedch.mvp.service;
 import com.schedch.mvp.dto.room.DayRoomTopRes;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
-import com.schedch.mvp.model.RoomDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +37,9 @@ public class DayRoomService {
         List<DayRoomTopRes> dayRoomTopResList = new ArrayList<>();
 
         countMap.forEach((k, v) -> {
-            dayRoomTopResList.add(new DayRoomTopRes(k, v));
+            if(v.size() > 0) {
+                dayRoomTopResList.add(new DayRoomTopRes(k, v));
+            }
         });
 
         dayRoomTopResList.sort(new Comparator<DayRoomTopRes>() {
