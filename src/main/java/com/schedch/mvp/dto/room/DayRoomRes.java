@@ -13,5 +13,5 @@ import java.util.List;
 public class DayRoomRes {
     private String title;
     private List<LocalDate> dates = new ArrayList<>();
-    private int count;
+    private List<String> participants = new ArrayList<>();
 }
