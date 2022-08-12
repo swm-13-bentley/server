@@ -36,7 +36,7 @@ public class RoomController {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("roomUuid", roomUuid);
 
-        log.info("created roomUuid: {}", roomUuid);
+        log.info("created roomUuid: {}, roomInfo: {}", roomUuid, gson.toJson(roomReq));
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(jsonObject));
@@ -71,4 +71,5 @@ public class RoomController {
                 .status(HttpStatus.OK)
                 .body(gson.toJson(responseList));
     }
+
 }

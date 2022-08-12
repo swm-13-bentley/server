@@ -38,7 +38,7 @@ public class DayRoomController {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("roomUuid", roomUuid);
 
-        log.info("created dayRoomUuid: {}", roomUuid);
+        log.info("created dayRoomUuid: {}, dates: {}", roomUuid, gson.toJson(dayRoomReq.getDates()));
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(jsonObject));
