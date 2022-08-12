@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +28,7 @@ public class DayParticipantService {
 
         if(foundParticipant.isEmpty()) {
             //신규 유저 -> 유저 등록해야 함
-            Participant newParticipant = new Participant(participantName, password, false);
-            room.addParticipant(newParticipant);
-            return newParticipant;
+            throw new NoSuchElementException(String.format("No participant found for participant name: {%s}", participantName));
         }
 
         Participant participant = foundParticipant.get(0);
@@ -42,15 +41,25 @@ public class DayParticipantService {
         }
     }
 
-    public void saveParticipantAvailable(String roomUuid, String participantName, List<LocalDate> localDateList) {
+    public void saveParticipantAvailable(String roomUuid, String participantName, String password, List<LocalDate> localDateList) throws IllegalAccessException {
         Room room = roomService.getRoom(roomUuid);
 
-        Participant participant = participantRepository.findParticipantByParticipantNameAndRoom(participantName, room)
-                .orElseThrow(() -> new NoSuchElementException(String.format("Participant not found for name: %s", participantName)));
+        Optional<Participant> participantOptional = participantRepository.findParticipantByParticipantNameAndRoom(participantName, room);
+        Participant participant = null;
+        if (participantOptional.isEmpty()) {//없는 참가자일 경우 새로이 추가
+            participant = new Participant(participantName, password, false);
+            room.addParticipant(participant);
+        } else {//기존 참가자일 경우 기존 입력을 초기화
+            participant = participantOptional.get();
+            if (participant.checkPassword(password) == false) {
+                throw new IllegalAccessException(String.format("password is incorrect for participant: {%s}", participantName));
+            }
+            participant.emptySchedules();
+        }
 
-        participant.emptySchedules();
+        Participant finalParticipant = participant;
         localDateList.stream().forEach(localDate -> {
-            participant.addSchedule(new Schedule(localDate));
+            finalParticipant.addSchedule(new Schedule(localDate));
         });
     }
 

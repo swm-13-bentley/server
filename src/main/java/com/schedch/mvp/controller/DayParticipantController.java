@@ -25,7 +25,7 @@ public class DayParticipantController {
     private final DayParticipantMapper dayParticipantMapper;
     private final Gson gson;
 
-    @PostMapping("day/room/{roomUuid}/participant/entry")
+    @PostMapping("day/room/{roomUuid}/participant/load")
     public ResponseEntity dayParticipantFind(@PathVariable("roomUuid") String roomUuid,
                                              @RequestBody ParticipantRequestDto participantRequestDto) throws IllegalAccessException {
         String participantName = participantRequestDto.getParticipantName();
@@ -42,11 +42,12 @@ public class DayParticipantController {
 
     @PostMapping("day/room/{roomUuid}/participant/available")
     public ResponseEntity saveDayParticipantAvailable(@PathVariable("roomUuid") String roomUuid,
-                                                      @RequestBody DayParticipantReq dayParticipantReq) {
+                                                      @RequestBody DayParticipantReq dayParticipantReq) throws IllegalAccessException{
 
         String participantName = dayParticipantReq.getParticipantName();
+        String password = dayParticipantReq.getPassword();
         List<LocalDate> availableDates = dayParticipantReq.getAvailableDates();
-        dayParticipantService.saveParticipantAvailable(roomUuid, participantName, availableDates);
+        dayParticipantService.saveParticipantAvailable(roomUuid, participantName, password, availableDates);
 
         log.info("roomUuid: {}, participantName: {}", roomUuid, participantName);
         return ResponseEntity
