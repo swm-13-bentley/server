@@ -4,6 +4,7 @@ import com.schedch.mvp.dto.room.DayRoomTopRes;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class DayRoomService {
 
     private final RoomService roomService;
@@ -30,6 +32,8 @@ public class DayRoomService {
                 if(countMap.containsKey(availableDate)) {
                     PriorityQueue<String> pq = countMap.get(availableDate);
                     pq.add(participant.getParticipantName());
+                } else {
+                    log.warn("참가자가 입력한 날짜가 방 기간을 벗어납니다.");
                 }
             });
         });
