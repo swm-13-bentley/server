@@ -21,14 +21,4 @@ public class AvailableRequestDto {
     private String password;
 
     private List<TimeBlockDto> available = new ArrayList<>();
-
-    public String toString() {
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-                .registerTypeAdapter(LocalTime.class, new LocalTimeAdapter())
-                .create();
-
-        return gson.toJson(this);
-    }
 }
