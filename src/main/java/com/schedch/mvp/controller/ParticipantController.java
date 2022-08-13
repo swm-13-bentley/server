@@ -25,10 +25,10 @@ public class ParticipantController {
     @PostMapping("/room/{roomUuid}/participant/entry")
     public ResponseEntity participantFind(@PathVariable String roomUuid,
                                           @RequestBody ParticipantRequestDto participantRequestDto) throws IllegalAccessException {
-        log.info("roomUuid: {}, participantName: {}", roomUuid, participantRequestDto.getParticipantName());
         String participantName = participantRequestDto.getParticipantName();
         String password = participantRequestDto.getPassword();
 
+        log.info("roomUuid: {}, participantName: {}, pwd: {}", roomUuid, participantName, password);
         ParticipantResponseDto participantResponseDto
                 = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
 
@@ -40,16 +40,20 @@ public class ParticipantController {
     @PostMapping("/room/{roomUuid}/participant/available")
     public ResponseEntity participantAvailablePost(@PathVariable String roomUuid,
                                                    @RequestBody AvailableRequestDto availableRequestDto) {
-        log.info("roomUuid: {}, participantName: {}", roomUuid, availableRequestDto.getParticipantName());
+        log.info("roomUuid: {}, availableRequestDto: {}", roomUuid, gson.toJson(availableRequestDto));
         participantService.saveParticipantAvailable(roomUuid, availableRequestDto);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
     }
 
     @GetMapping("/room/{roomUuid}/group")
     public ResponseEntity groupSchedulesFind(@PathVariable String roomUuid) {
-        log.info("roomUuid: {}", roomUuid);
         List<ParticipantResponseDto> participantResponseDtoList = participantService.findAllParticipantsInRoom(roomUuid);
-        return ResponseEntity.status(HttpStatus.OK).body(participantResponseDtoList);
+        log.info("roomUuid: {}", roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(participantResponseDtoList));
     }
 
 }

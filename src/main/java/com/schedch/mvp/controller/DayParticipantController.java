@@ -34,7 +34,7 @@ public class DayParticipantController {
         Participant participant = dayParticipantService.findParticipant(roomUuid, participantName, password);
         DayParticipantRes dayParticipantRes = dayParticipantMapper.entity2Res(participant);
 
-        log.info("roomUuid: {}, participantName: {}", roomUuid, participantName);
+        log.info("roomUuid: {}, pName: {}, pwd: {}", roomUuid, participantName, password);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(dayParticipantRes));
@@ -49,7 +49,7 @@ public class DayParticipantController {
         List<LocalDate> availableDates = dayParticipantReq.getAvailableDates();
         dayParticipantService.saveParticipantAvailable(roomUuid, participantName, password, availableDates);
 
-        log.info("roomUuid: {}, participantName: {}", roomUuid, participantName);
+        log.info("roomUuid: {}, participantName: {}, dates: {}", roomUuid, participantName, gson.toJson(availableDates));
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .build();

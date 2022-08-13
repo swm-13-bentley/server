@@ -8,6 +8,7 @@ import com.schedch.mvp.model.Schedule;
 import com.schedch.mvp.repository.RoomRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class RoomService {
 
     private final RoomRepository roomRepository;
@@ -77,7 +79,10 @@ public class RoomService {
                 int endBlock = timeAdapter.localTime2TimeBlockInt(schedule.getEndTime());
                 if(endBlock < roomStartTimeBlock) endBlock += 48;
 
-                if(!colNumMap.containsKey(availableDate)) continue;
+                if(!colNumMap.containsKey(availableDate)) {
+                    log.warn("참가자가 입력한 날짜가 방의 날짜 기간을 벗어납니다.");
+                    continue;
+                }
                 int colIdx = colNumMap.get(availableDate);
                 board[startBlock - roomStartTimeBlock][colIdx]++;
                 board[endBlock - roomStartTimeBlock + 1][colIdx]--;
