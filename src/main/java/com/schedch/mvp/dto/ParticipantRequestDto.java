@@ -16,8 +16,4 @@ public class ParticipantRequestDto {
         this.participantName = participantName;
         this.password = password;
     }
-
-    public String toString() {
-       return new Gson().toJson(this);
-    }
 }
