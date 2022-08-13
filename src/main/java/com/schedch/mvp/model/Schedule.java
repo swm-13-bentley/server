@@ -28,14 +28,15 @@ public class Schedule extends BaseEntity{
     @NotNull(message = "Schedule scheduledDate cannot be empty")
     private LocalDate availableDate;
 
-    @NotNull(message = "Schedule startTime cannot be empty")
     private LocalTime startTime;
 
-    @NotNull(message = "Schedule endTime cannot be empty")
     private LocalTime endTime;
 
     private LocalTime roomStartTime;
 
+    public Schedule(LocalDate availableDate) {
+        this.availableDate = availableDate;
+    }
     public Schedule(LocalDate availableDate, LocalTime startTime, LocalTime endTime) {
         this.availableDate = availableDate;
         this.startTime = startTime;

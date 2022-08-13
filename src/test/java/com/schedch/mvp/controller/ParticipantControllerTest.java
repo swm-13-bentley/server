@@ -1,10 +1,12 @@
 package com.schedch.mvp.controller;
 
+import com.google.gson.Gson;
 import com.schedch.mvp.dto.AvailableRequestDto;
 import com.schedch.mvp.dto.ParticipantRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.service.ParticipantService;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,7 +26,7 @@ class ParticipantControllerTest {
 
     @Autowired MockMvc mockMvc;
     @MockBean ParticipantService participantService;
-
+    @Autowired Gson gson;
     String roomUuid = "testRoomUuid";
     String participantName = "testName";
     String password = "password";
@@ -40,7 +42,7 @@ class ParticipantControllerTest {
         mockMvc.perform(post("/room/testRoomUuid/participant/entry")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("roomUuid", roomUuid)
-                .content(participantRequestDto.toString())
+                .content(gson.toJson(participantRequestDto))
         )
         //then
                 .andExpect(status().isOk())
@@ -60,7 +62,7 @@ class ParticipantControllerTest {
         mockMvc.perform(post("/room/testRoomUuid/participant/entry")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("roomUuid", roomUuid)
-                .content(participantRequestDto.toString())
+                .content(gson.toJson(participantRequestDto))
         )
         //then
                 .andExpect(status().isUnauthorized())
@@ -78,7 +80,7 @@ class ParticipantControllerTest {
         mockMvc.perform(post("/room/testRoomUuid/participant/entry")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("roomUuid", roomUuid)
-                        .content(participantRequestDto.toString())
+                        .content(gson.toJson(participantRequestDto))
                 )
         //then
                 .andExpect(status().isNotFound())
@@ -93,12 +95,10 @@ class ParticipantControllerTest {
         //when
         mockMvc.perform(post("/room/testRoomUuid/participant/available")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(availableRequestDto.toString())
+                        .content(gson.toJson(availableRequestDto))
                 )
         //then
                 .andExpect(status().isOk());
-
-
     }
 
 }

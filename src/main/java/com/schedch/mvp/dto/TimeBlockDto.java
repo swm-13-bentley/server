@@ -26,14 +26,4 @@ public class TimeBlockDto {
         this.availableDate = availableDate;
         this.availableTimeList = availableTimeList;
     }
-
-    public String toString() {
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-                .registerTypeAdapter(LocalTime.class, new LocalTimeAdapter())
-                .create();
-
-        return gson.toJson(this);
-    }
 }
