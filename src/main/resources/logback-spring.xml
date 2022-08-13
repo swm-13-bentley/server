@@ -177,7 +177,7 @@
             <appender-ref ref="Error"/>
         </springProfile>
 
-        <springProfile name="dev">
+        <springProfile name="deploy">
             <appender-ref ref="aws_info"/>
             <appender-ref ref="aws_err"/>
         </springProfile>
