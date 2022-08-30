@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class DayParticipantController {
 
     @PostMapping("day/room/{roomUuid}/participant/available")
     public ResponseEntity saveDayParticipantAvailable(@PathVariable("roomUuid") String roomUuid,
-                                                      @RequestBody DayParticipantReq dayParticipantReq) throws IllegalAccessException{
+                                                      @Valid @RequestBody DayParticipantReq dayParticipantReq) throws IllegalAccessException{
 
         String participantName = dayParticipantReq.getParticipantName();
         String password = dayParticipantReq.getPassword();
