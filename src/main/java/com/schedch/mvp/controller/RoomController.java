@@ -63,6 +63,7 @@ public class RoomController {
                     .availableDate(timeCount.getAvailableDate())
                     .startTime(timeAdapter.startBlock2Str(timeCount.getStart()))
                     .endTime(timeAdapter.endBlock2Str(timeCount.getStart() + timeCount.getLen() - 1))
+                    .participantNames(timeCount.getParticipantNames())
                     .build();
         }).collect(Collectors.toList());
 
