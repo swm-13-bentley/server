@@ -3,7 +3,7 @@ package com.schedch.mvp.controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.schedch.mvp.adapter.TimeAdapter;
-import com.schedch.mvp.dto.TimeCountResponse;
+import com.schedch.mvp.dto.TopCountRes;
 import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.dto.room.RoomResponse;
 import com.schedch.mvp.mapper.RoomMapper;
@@ -56,13 +56,13 @@ public class RoomController {
     @GetMapping("/room/{roomUuid}/top/{max}")
     public ResponseEntity getTopTimes(@PathVariable("roomUuid") String roomUuid,
                                       @PathVariable("max") int max) {
-        List<RoomService.TimeCount> topAvailableTime = roomService.getTopAvailableTime(roomUuid, max);
-        List<TimeCountResponse> responseList = topAvailableTime.stream().map(timeCount -> {
-            return TimeCountResponse.builder()
-                    .count(timeCount.getCount())
+        List<RoomService.TopTime> topAvailableTimeAndNames = roomService.getTopAvailableTimeAndNames(roomUuid, max);
+        List<TopCountRes> responseList = topAvailableTimeAndNames.stream().map(timeCount -> {
+            return TopCountRes.builder()
+                    .size(timeCount.getParticipantSize())
                     .availableDate(timeCount.getAvailableDate())
                     .startTime(timeAdapter.startBlock2Str(timeCount.getStart()))
-                    .endTime(timeAdapter.endBlock2Str(timeCount.getEnd()))
+                    .endTime(timeAdapter.endBlock2Str(timeCount.getStart() + timeCount.getLen() - 1))
                     .build();
         }).collect(Collectors.toList());
 
