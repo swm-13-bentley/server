@@ -59,7 +59,7 @@ public class RoomController {
         List<RoomService.TopTime> topAvailableTimeAndNames = roomService.getTopAvailableTimeAndNames(roomUuid, max);
         List<TopCountRes> responseList = topAvailableTimeAndNames.stream().map(timeCount -> {
             return TopCountRes.builder()
-                    .size(timeCount.getParticipantSize())
+                    .count(timeCount.getParticipantSize())
                     .availableDate(timeCount.getAvailableDate())
                     .startTime(timeAdapter.startBlock2Str(timeCount.getStart()))
                     .endTime(timeAdapter.endBlock2Str(timeCount.getStart() + timeCount.getLen() - 1))

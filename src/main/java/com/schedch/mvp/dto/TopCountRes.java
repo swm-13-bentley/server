@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class TopCountRes {
-    private int size;
+    private int count;
     private LocalDate availableDate;
     private String startTime;
     private String endTime;
