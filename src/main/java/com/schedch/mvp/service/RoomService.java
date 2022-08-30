@@ -109,7 +109,7 @@ public class RoomService {
         topTimes.stream().forEach(topTime -> {
             long participantBit = topTime.getParticipantBit();
             for (int i = 0; i < participantList.size(); i++) {
-                if((participantBit | (1 << i)) > 0) {
+                if((participantBit & (1 << i)) > 0) {
                     topTime.addName(participantList.get(i).getParticipantName());
                 }
             }
