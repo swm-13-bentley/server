@@ -57,7 +57,10 @@ public class GoogleConfigUtils {
         params.put("redirect_uri", getGoogleRedirectUrl());
         params.put("response_type", "code");
         params.put("scope", getScopeUrl());
-        params.put("state", state);
+
+        if(state != null) {//add state if not null
+            params.put("state", state);
+        }
 
         String paramStr = params.entrySet().stream()
                 .map(param -> param.getKey() + "=" + param.getValue())
