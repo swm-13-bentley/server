@@ -38,157 +38,212 @@ public class RoomService {
         return room;
     }
 
-    public List<TimeCount> getTopAvailableTime(String roomUuid, int max) {
-        // 방 내 모든 시간 불러온 후
-        // 시간을 timeblock으로 바꾸고
-        // 모든 날짜에, 모든 시간에 각각 몇명이나 있는지 파악하기
-        // 2차원 배열 순회하면서 인원수 체크하고, 붙어있으면 붙은 일정으로 내보내기
+    public List<TopTime> getTopAvailableTimeAndNames(String roomUuid, int max) {
         Room room = getRoom(roomUuid);
         List<RoomDate> roomDates = room.getRoomDates();
+
+        //get room start time block
         LocalTime roomStartTime = room.getStartTime();
         int roomStartTimeBlock = timeAdapter.localTime2TimeBlockInt(roomStartTime);
 
+        //get room end time block, add 48 if end time is before start time (night times)
         LocalTime roomEndTime = room.getEndTime();
         int roomEndTimeBlock = timeAdapter.localTime2TimeBlockInt(roomEndTime);
-        if(roomEndTime.isBefore(roomStartTime)) {
+        if (roomEndTime.isBefore(roomStartTime)) {
             roomEndTimeBlock += 48;
         }
 
-        int colNum = 0;
-        HashMap<LocalDate, Integer> colNumMap = new HashMap<>();
-        for (RoomDate roomdate: roomDates) {
-            colNumMap.put(roomdate.getScheduledDate(), colNum++);
-        }
+        // initialize column map
+        HashMap<LocalDate, Integer> columnMap = getColumnMap(roomDates);
 
+        // create 2d hash set arr list and initialize
         int rowSize = roomEndTimeBlock - roomStartTimeBlock + 1;
         int colSize = roomDates.size();
+        int[][] sizeBoard = new int[rowSize + 1][colSize];
+        long[][] bitBoard = new long[rowSize][colSize];
 
-        //극단적으로 생각해보면 row, col 바꾸는게 나을지도? 디스크에서 읽는 속도 생각하면
-        //row: times
-        //col: dates
-        int[][] board = new int[rowSize+1][colSize];
-
+        // fill board by participant schedules, O(p x d x t) [p: participants, d: dates, t: times]
         List<Participant> participantList = room.getParticipantList();
-        for(Participant participant : participantList) {
-            List<Schedule> scheduleList = participant.getScheduleList();
-            for(Schedule schedule : scheduleList) {
-                LocalDate availableDate = schedule.getAvailableDate();
-                int startBlock = timeAdapter.localTime2TimeBlockInt(schedule.getStartTime());
-                if(startBlock < roomStartTimeBlock) startBlock += 48;
+        fillBoard(participantList, roomStartTimeBlock, columnMap, sizeBoard, bitBoard);
 
-                int endBlock = timeAdapter.localTime2TimeBlockInt(schedule.getEndTime());
-                if(endBlock < roomStartTimeBlock) endBlock += 48;
+        // init max Counter
+        List<TopTime> topTimeList = new ArrayList<>();
 
-                if(!colNumMap.containsKey(availableDate)) {
-                    log.warn("참가자가 입력한 날짜가 방의 날짜 기간을 벗어납니다.");
+        // check top list, O(p x d x t)
+        for (int j = 0; j < colSize; j++) {
+            LocalDate availableDate = roomDates.get(j).getScheduledDate();
+            Stack<TopTime> stack = new Stack<>();
+
+            for (int i = 0; i < rowSize; i++) {
+                int nowStartBlock = i + roomStartTimeBlock;
+                int nowSize = sizeBoard[i][j];
+                long nowBit = bitBoard[i][j];
+
+                if (stack.isEmpty()) {
+                    stack.add(new TopTime(availableDate, nowSize, nowBit, nowStartBlock, 1));
                     continue;
                 }
-                int colIdx = colNumMap.get(availableDate);
-                board[startBlock - roomStartTimeBlock][colIdx]++;
-                board[endBlock - roomStartTimeBlock + 1][colIdx]--;
+
+                adjustStack(stack, topTimeList, availableDate, nowStartBlock, nowSize, nowBit);
             }
-        }
 
-        for (int j = 0; j < colSize; j++) {
-            for (int i = 1; i <= rowSize; i++) {
-                board[i][j] += board[i - 1][j];
-            }
-        }
-
-        List<TimeCount> timeCountList = new ArrayList<>();
-        for (int j = 0; j < colSize; j++) {
-            Stack<TimeCount> stack = new Stack();
-            int peekCount = 0;
-            for (int i = 0; i < rowSize; i++) {
-                int nowCount = board[i][j];
-                if(stack.isEmpty()) {//비었다면 새 항목을 추가
-                    stack.add(new TimeCount(nowCount, roomDates.get(j).getScheduledDate(),
-                            roomStartTimeBlock + i,
-                            roomStartTimeBlock + i));
-                    peekCount = nowCount;
-                }
-                else {
-                    TimeCount peek = stack.peek();
-                    if(peek.getCount() == nowCount) {//카운트가 같다면 end 연장
-                        peek.setEnd(roomStartTimeBlock + i);
-                    } else if(peek.getCount() < nowCount) {//peek < 현재 카운트: 새 항목 추가
-                        stack.add(new TimeCount(nowCount, roomDates.get(j).getScheduledDate(),
-                                roomStartTimeBlock + i,
-                                roomStartTimeBlock + i));
-                        peekCount = nowCount;
-                    } else {//peek > 현재 카운트: stack 조정
-                        while (!stack.isEmpty() && peekCount != nowCount) {
-                            //최상단 꺼내기
-                            TimeCount pop = stack.pop();
-
-                            //카운트 > 1 이라면: 리스트에 더하기
-                            if(pop.getCount() > 1) {
-                                timeCountList.add(pop);
-                            }
-
-                            if (!stack.isEmpty()) {//다음으로 연장
-                                TimeCount peekAfterPop = stack.peek();
-                                peekAfterPop.setEnd(pop.getEnd());
-                                peekCount = peekAfterPop.getCount();
-                            } else {
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
             while (!stack.isEmpty()) {
                 //최상단 꺼내기
-                TimeCount pop = stack.pop();
+                TopTime popNode = stack.pop();
 
-                //카운트 > 1 이라면: 리스트에 더하기
-                if(pop.getCount() > 1) {
-                    timeCountList.add(pop);
+                //사람 수 >= 1이면 추가
+                if (popNode.participantSize >= 1) {
+                    topTimeList.add(popNode);
                 }
 
-                if (!stack.isEmpty()) {//다음으로 연장
-                    TimeCount peekAfterPop = stack.peek();
-                    peekAfterPop.setEnd(pop.getEnd());
+                if (!stack.isEmpty()) {
+                    stack.peek().addLen(popNode.len);
                 } else {
                     break;
                 }
             }
         }
 
-        Collections.sort(timeCountList);
+        Collections.sort(topTimeList);
+        List<TopTime> topTimes = topTimeList.subList(0, Math.min(topTimeList.size(), max));
+        topTimes.stream().forEach(topTime -> {
+            long participantBit = topTime.getParticipantBit();
+            for (int i = 0; i < participantList.size(); i++) {
+                if((participantBit & (1 << i)) > 0) {
+                    topTime.addName(participantList.get(i).getParticipantName());
+                }
+            }
+        });
 
-        return timeCountList.subList(0, Math.min(timeCountList.size(), max));
+        return topTimes;
+    }
+
+    private void adjustStack(Stack<TopTime> stack, List<TopTime> topTimeList, LocalDate availableDate, int nowStartBlock, int nowSize, long nowBit) {
+        TopTime peekNode = stack.peek();
+
+        if (nowBit == peekNode.participantBit) {//구성원이 같다면 len 추가
+            peekNode.addLen(1);
+        } else if (checkConsist(peekNode, nowSize, nowBit) == true) {//인원 포함 + 추가된다면, stack에 새 항목 추가
+            stack.add(new TopTime(availableDate, nowSize, nowBit, nowStartBlock, 1));
+
+        } else { //인원 구성 아예 변동됨 -> stack 구조 변경
+            while (!stack.isEmpty()) {
+                //최상단 꺼내기
+                TopTime popNode = stack.pop(); // = peekNode
+
+                //사람 수 >= 1이면 추가
+                if (popNode.participantSize >= 1) {
+                    topTimeList.add(popNode);
+                }
+
+                if (!stack.isEmpty()) { // stack에 항목이 남아있다면
+                    TopTime peekAfterPop = stack.peek();
+                    peekAfterPop.addLen(popNode.len);
+
+                    if (peekAfterPop.participantBit == nowBit) { // bit가 같다면 길이 + 1
+                        peekAfterPop.addLen(1);
+                        break;
+                    }
+
+                    //포함 관계라면 stack에 추가
+                    else if (checkConsist(stack.peek(), nowSize, nowBit)) {//포함 관계
+                        stack.add(new TopTime(availableDate, nowSize, nowBit, nowStartBlock, 1));
+                        break;
+                    } else { //peekAfterPop도 제거 해야 할 대상임
+                        continue;
+                    }
+                }
+            }
+
+            if (stack.isEmpty()) {//stack이 빈 상태가 되어버렸다면
+                stack.add(new TopTime(availableDate, nowSize, nowBit, nowStartBlock, 1));
+            }
+        }
+    }
+
+    private boolean checkConsist(TopTime topTime, int size, long bit) {
+        if (topTime.participantSize <= size
+                && (topTime.participantBit <= (topTime.participantBit & bit))) return true;
+        else return false;
+    }
+
+    private void fillBoard(List<Participant> participantList, int roomStartTimeBlock, HashMap<LocalDate, Integer> columnMap, int[][] sizeBoard, long[][] bitBoard) {
+        for (int pIdx = 0; pIdx < participantList.size(); pIdx++) {
+            Participant participant = participantList.get(pIdx);
+            List<Schedule> scheduleList = participant.getScheduleList();
+
+            for (Schedule schedule : scheduleList) {
+                LocalDate availableDate = schedule.getAvailableDate();
+                if (!columnMap.containsKey(availableDate)) {
+                    log.warn("참가자가 입력한 날짜가 방의 날짜 기간을 벗어납니다.");
+                    continue;
+                }
+
+                int startBlock = timeAdapter.localTime2TimeBlockInt(schedule.getStartTime());
+                if (startBlock < roomStartTimeBlock) startBlock += 48; // 시작 시간이 새벽 시간대라면, +48
+
+                int endBlock = timeAdapter.localTime2TimeBlockInt(schedule.getEndTime());
+                if (endBlock < roomStartTimeBlock) endBlock += 48; // 시작 시간이 새벽 시간대라면, +48
+
+                int colIdx = columnMap.get(availableDate);
+
+                // size board 구간합 +- 적용
+                sizeBoard[startBlock - roomStartTimeBlock][colIdx]++;
+                sizeBoard[endBlock - roomStartTimeBlock + 1][colIdx]--;
+
+                // bit board 업데이트
+                for (int rowIdx = startBlock; rowIdx <= endBlock; rowIdx++) {
+                    bitBoard[rowIdx - roomStartTimeBlock][colIdx] |= (1L << pIdx);
+                }
+            }
+        }
+
+        //구간 합 업데이트
+        for (int j = 0; j < sizeBoard[0].length; j++) {
+            for (int i = 1; i < sizeBoard.length; i++) {
+                sizeBoard[i][j] += sizeBoard[i - 1][j];
+            }
+        }
+    }
+
+    private HashMap<LocalDate, Integer> getColumnMap(List<RoomDate> roomDates) {
+        int colNum = 0;
+        HashMap<LocalDate, Integer> colNumMap = new HashMap<>();
+        for (RoomDate roomdate : roomDates) {
+            colNumMap.put(roomdate.getScheduledDate(), colNum++);
+        }
+        return colNumMap;
     }
 
     @Getter
-    public class TimeCount implements Comparable<TimeCount> {
-        int count;
+    public class TopTime implements Comparable<TopTime> {
         LocalDate availableDate;
+        int participantSize;
+        long participantBit;
         int start;
-        int end;
         int len;
+        List<String> participantNames = new ArrayList<>();
 
-        public TimeCount(int count, LocalDate availableDate, int start, int end) {
-            this.count = count;
+        public TopTime(LocalDate availableDate, int participantSize, long participantBit, int start, int len) {
             this.availableDate = availableDate;
+            this.participantSize = participantSize;
+            this.participantBit = participantBit;
             this.start = start;
-            this.end = end;
-            this.len = end - start;
+            this.len = len;
         }
 
-        public void setEnd(int end) {
-            this.end = end;
-            this.len = end - start;
+        public void addLen(int num) {
+            this.len += num;
+        }
+
+        public void addName(String name) {
+            this.participantNames.add(name);
         }
 
         @Override
-        public int compareTo(TimeCount o) {
-            //인원 수 역순
-            //길이 긴 순
-            //날짜 빠른 순
-            //시간 빠른 순
-            if(this.count == o.count) {
-                if(o.len == this.len) {
+        public int compareTo(TopTime o) {
+            if (this.participantSize == o.participantSize) {
+                if (o.len == this.len) {
                     if (this.availableDate.isEqual(o.availableDate)) {
                         return this.start - o.start;
                     } else {
@@ -198,7 +253,7 @@ public class RoomService {
                     return o.len - this.len;
                 }
             } else {
-                return o.count - this.count;
+                return o.participantSize - this.participantSize;
             }
         }
     }
