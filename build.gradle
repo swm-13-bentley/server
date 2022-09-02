@@ -30,6 +30,9 @@ dependencies {
 	//spring security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
+	//jwt
+	implementation group: 'com.auth0', name: 'java-jwt', version: '3.19.2'
+
 	//swagger
 	implementation 'org.springdoc:springdoc-openapi-ui:1.6.8'
 
