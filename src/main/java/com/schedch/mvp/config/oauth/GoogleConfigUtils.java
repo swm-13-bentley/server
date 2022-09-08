@@ -1,4 +1,4 @@
-package com.schedch.mvp.config;
+package com.schedch.mvp.config.oauth;
 
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Getter
-@PropertySource("classpath:google.yaml")
+@PropertySource("classpath:oauth.yaml")
 public class GoogleConfigUtils {
     @Value("${google.auth.url}")
     private String googleAuthUrl;
@@ -26,8 +26,11 @@ public class GoogleConfigUtils {
     @Value("${google.login.url}")
     private String googleLoginUrl;
 
-    @Value("${google.redirect.uri}")
-    private String googleRedirectUrl;
+    @Value("${google.sign.in.redirect.uri}")
+    private String googleSignInRedirectUrl;
+
+    @Value("${google.sign.out.redirect.uri}")
+    private String googleSignOutRedirectUrl;
 
     @Value("${google.client.id}")
     private String googleClientId;
@@ -50,26 +53,28 @@ public class GoogleConfigUtils {
     private JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
     // Google 로그인 URL 생성 로직
-    public String googleInitUrl(String state) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("access_type", getGoogleAccessType());
-        params.put("client_id", getGoogleClientId());
-        params.put("redirect_uri", getGoogleRedirectUrl());
-        params.put("response_type", "code");
+    public String googleSignInInitUrl(String state) {
+        Map<String, Object> params = getParamsMap();
+        params.put("redirect_uri", getGoogleSignInRedirectUrl());
         params.put("scope", getScopeUrl());
 
         if(state != null) {//add state if not null
             params.put("state", state);
         }
 
-        String paramStr = params.entrySet().stream()
-                .map(param -> param.getKey() + "=" + param.getValue())
-                .collect(Collectors.joining("&"));
+        return getOAuthUrl(params);
+    }
 
-        return getGoogleLoginUrl()
-                + "/o/oauth2/v2/auth"
-                + "?"
-                + paramStr;
+    public String googleSignOutInitUrl(String state) {
+        Map<String, Object> params = getParamsMap();
+        params.put("redirect_uri", getGoogleSignOutRedirectUrl());
+        params.put("scope", getScopeUrl());
+
+        if(state != null) {//add state if not null
+            params.put("state", state);
+        }
+
+        return getOAuthUrl(params);
     }
 
     public String getScopeUrl() {
@@ -78,5 +83,25 @@ public class GoogleConfigUtils {
 
     public List<String> getScopeList() {
         return Arrays.stream(scopes.split(",")).collect(Collectors.toList());
+    }
+
+    private Map<String, Object> getParamsMap() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("access_type", getGoogleAccessType());
+        params.put("client_id", getGoogleClientId());
+        params.put("response_type", "code");
+
+        return params;
+    }
+
+    private String getOAuthUrl(Map<String, Object> params) {
+        String paramStr = params.entrySet().stream()
+                .map(param -> param.getKey() + "=" + param.getValue())
+                .collect(Collectors.joining("&"));
+
+        return getGoogleLoginUrl()
+                + "/o/oauth2/v2/auth"
+                + "?"
+                + paramStr;
     }
 }
