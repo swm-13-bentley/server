@@ -1,7 +1,6 @@
 package com.schedch.mvp.config;
 
 import com.schedch.mvp.config.jwt.ExceptionHandlerFilter;
-import com.schedch.mvp.config.jwt.JwtAuthenticationFilter;
 import com.schedch.mvp.config.jwt.JwtAuthorizationFilter;
 import com.schedch.mvp.repository.TokenRepository;
 import com.schedch.mvp.repository.UserRepository;
