@@ -38,7 +38,7 @@ public class User {
     private String calendarAccessToken;
     private String calendarRefreshToken;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Participant> participantList = new ArrayList<>();
 
     public User(String username, String email, String password, String signInChannel) {
@@ -64,5 +64,13 @@ public class User {
     public void addParticipant(Participant participant) {
         participantList.add(participant);
         participant.setUser(this);
+    }
+
+    /**
+     * 참가자 정보를 삭제한다.
+     */
+    public void detachFromParticipant() {
+        this.participantList.stream()
+                .forEach(p -> p.setUser(null));
     }
 }
