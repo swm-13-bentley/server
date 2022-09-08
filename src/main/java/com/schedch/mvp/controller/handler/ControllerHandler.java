@@ -1,5 +1,6 @@
 package com.schedch.mvp.controller.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.security.auth.login.FailedLoginException;
+import java.net.URISyntaxException;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -43,6 +46,30 @@ public class ControllerHandler {
         JsonObject errorJson = getErrorJson(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
+                .body(gson.toJson(errorJson));
+    }
+
+    @ExceptionHandler(URISyntaxException.class)
+    public ResponseEntity handleUriSyntaxException(URISyntaxException e) {
+        JsonObject errorJson = getErrorJson(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(gson.toJson(errorJson));
+    }
+
+    @ExceptionHandler(FailedLoginException.class)
+    public ResponseEntity handleFailedLoginException(FailedLoginException e) {
+        JsonObject errorJson = getErrorJson(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(gson.toJson(errorJson));
+    }
+
+    @ExceptionHandler(JsonProcessingException.class)
+    public ResponseEntity handleJsonProcessingException(JsonProcessingException e) {
+        JsonObject errorJson = getErrorJson(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(gson.toJson(errorJson));
     }
 
