@@ -1,4 +1,4 @@
-package com.schedch.mvp.dto.google;
+package com.schedch.mvp.dto.oauth;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,4 +28,5 @@ public class GoogleLoginDto {
     private String expiresIn;
     private String refreshToken;
     private String scope;
+    private String password;
 }
