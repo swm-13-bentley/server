@@ -1,4 +1,4 @@
-package com.schedch.mvp.dto.google;
+package com.schedch.mvp.dto.oauth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
