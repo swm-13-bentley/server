@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.NoSuchElementException;
@@ -22,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ParticipantController.class)
+@WithMockUser
 class ParticipantControllerTest {
 
     @Autowired MockMvc mockMvc;
@@ -41,6 +44,7 @@ class ParticipantControllerTest {
         //when
         mockMvc.perform(post("/room/testRoomUuid/participant/entry")
                 .contentType(MediaType.APPLICATION_JSON)
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .param("roomUuid", roomUuid)
                 .content(gson.toJson(participantRequestDto))
         )
@@ -61,6 +65,7 @@ class ParticipantControllerTest {
         //when
         mockMvc.perform(post("/room/testRoomUuid/participant/entry")
                 .contentType(MediaType.APPLICATION_JSON)
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .param("roomUuid", roomUuid)
                 .content(gson.toJson(participantRequestDto))
         )
@@ -79,6 +84,7 @@ class ParticipantControllerTest {
         //when
         mockMvc.perform(post("/room/testRoomUuid/participant/entry")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .param("roomUuid", roomUuid)
                         .content(gson.toJson(participantRequestDto))
                 )
@@ -95,6 +101,7 @@ class ParticipantControllerTest {
         //when
         mockMvc.perform(post("/room/testRoomUuid/participant/available")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(gson.toJson(availableRequestDto))
                 )
         //then

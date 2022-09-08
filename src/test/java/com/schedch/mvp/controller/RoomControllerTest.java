@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -29,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(RoomController.class)
+@WithMockUser
 class RoomControllerTest {
 
     @Autowired private MockMvc mockMvc;
@@ -53,6 +56,7 @@ class RoomControllerTest {
         //when
         mockMvc.perform(post("/room")
                 .contentType(MediaType.APPLICATION_JSON)
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(gson.toJson(roomRequest))
             )
         //then
@@ -67,6 +71,7 @@ class RoomControllerTest {
         //when
         mockMvc.perform(post("/room")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(gson.toJson(invalidRoomRequest)))
         //then
                 .andExpect(status().isBadRequest())
@@ -79,7 +84,9 @@ class RoomControllerTest {
         given(roomService.getRoom(any(String.class))).willReturn(null);
 
         //when
-        mockMvc.perform(get("/room/testRoomUuid"))
+        mockMvc.perform(get("/room/testRoomUuid")
+                    .with(SecurityMockMvcRequestPostProcessors.csrf()))
+
         //then
                 .andExpect(status().isOk());
     }
@@ -91,7 +98,8 @@ class RoomControllerTest {
                 .willThrow(new NoSuchElementException("sampleErrMsg"));
 
         //when
-        mockMvc.perform(get("/room/testRoomUuid"))
+        mockMvc.perform(get("/room/testRoomUuid")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
         //then
                 .andExpect(status().isNotFound()) //404 not found
                 .andExpect(jsonPath("message").value("sampleErrMsg")
