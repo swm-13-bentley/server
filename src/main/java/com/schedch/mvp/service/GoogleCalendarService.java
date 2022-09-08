@@ -16,7 +16,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.*;
 import com.schedch.mvp.adapter.TimeAdapter;
-import com.schedch.mvp.config.GoogleConfigUtils;
+import com.schedch.mvp.config.oauth.GoogleConfigUtils;
 import com.schedch.mvp.dto.CalendarResponse;
 import com.schedch.mvp.dto.CalendarScheduleDto;
 import com.schedch.mvp.dto.GoogleLoginRequest;
@@ -25,7 +25,6 @@ import com.schedch.mvp.model.GToken;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.RoomDate;
 import com.schedch.mvp.repository.GTokenRepository;
-import com.schedch.mvp.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -203,7 +202,7 @@ public class GoogleCalendarService {
                 .clientId(googleConfigUtils.getGoogleClientId())
                 .clientSecret(googleConfigUtils.getGoogleSecret())
                 .code(code)
-                .redirectUri(googleConfigUtils.getGoogleRedirectUrl())
+                .redirectUri(googleConfigUtils.getGoogleSignInRedirectUrl())
                 .grantType("authorization_code")
                 .build();
 

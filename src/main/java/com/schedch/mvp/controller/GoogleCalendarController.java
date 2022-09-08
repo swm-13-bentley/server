@@ -3,7 +3,7 @@ package com.schedch.mvp.controller;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.schedch.mvp.config.GoogleConfigUtils;
+import com.schedch.mvp.config.oauth.GoogleConfigUtils;
 import com.schedch.mvp.dto.CalendarResponse;
 import com.schedch.mvp.model.GToken;
 import com.schedch.mvp.service.GoogleCalendarService;
@@ -29,7 +29,7 @@ public class GoogleCalendarController {
     @PostMapping("google/calendar")
     public ResponseEntity googleCalendarTokenRequest() {
         String state = UUID.randomUUID().toString();
-        String authUrl = googleConfigUtils.googleInitUrl(state);
+        String authUrl = googleConfigUtils.googleSignInInitUrl(state);
         JsonObject bodyJson = new JsonObject();
         bodyJson.addProperty("state", state);
         bodyJson.addProperty("authUrl", authUrl);
