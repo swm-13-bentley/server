@@ -52,26 +52,34 @@ public class SignController {
      * @throws URISyntaxException
      */
     @GetMapping("/sign/in/redirect/google")
-    @ResponseBody
     public ResponseEntity redirectGoogleSignIn(@RequestParam(value = "code") String authCode) throws URISyntaxException, FailedLoginException, JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
 
         try {
-            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
             User user = oAuthService.googleSignIn(authCode);
             String accessToken = jwtConfig.createAccessTokenByUser(user);
             String refreshToken = jwtConfig.createRefreshToken();
             oAuthService.saveToken(user.getEmail(), accessToken, refreshToken);
 
-            redirectAccessToken(accessToken);
+            String uri = jwtConfig.getFrontSuccessRedirect()
+                    + "?access-token="
+                    + accessToken;
+            headers.setLocation(new URI(uri));
 
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
 
         } catch (IllegalArgumentException e) { //이미 회원 가입된 이메일인 경우
-            //TODO: error url로 변경
+            //TO함DO: error url로 변경
             headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
         }
+    }
+
+    @GetMapping("/sign/in/redirect/google")
+    public ResponseEntity signInFailure(@RequestParam(value = "error") String error) throws URISyntaxException, FailedLoginException, JsonProcessingException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
+        return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
     }
 
     @GetMapping("/sign/in/redirect/kakao")
@@ -79,13 +87,15 @@ public class SignController {
         HttpHeaders headers = new HttpHeaders();
 
         try {
-            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
             User user = oAuthService.kakaoSignIn(authCode);
             String accessToken = jwtConfig.createAccessTokenByUser(user);
             String refreshToken = jwtConfig.createRefreshToken();
             oAuthService.saveToken(user.getEmail(), accessToken, refreshToken);
 
-            redirectAccessToken(accessToken);
+            String uri = jwtConfig.getFrontSuccessRedirect()
+                    + "?access-token="
+                    + accessToken;
+            headers.setLocation(new URI(uri));
 
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
 
@@ -149,14 +159,5 @@ public class SignController {
             headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
         }
-    }
-
-    public void redirectAccessToken(String accessToken) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = jwtConfig.getFrontSuccessRedirect()
-                + "?access-token="
-                + accessToken;
-        ResponseEntity<String> res = restTemplate.getForEntity(url, String.class);
-        res.getStatusCode();
     }
 }
