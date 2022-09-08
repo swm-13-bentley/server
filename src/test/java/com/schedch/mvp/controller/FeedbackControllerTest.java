@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.given;
@@ -15,11 +17,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(FeedbackController.class)
+@WithMockUser
 class FeedbackControllerTest {
 
     @Autowired MockMvc mockMvc;
-    @MockBean
-    FeedbackServiceJpaImpl feedbackServiceJpaImpl;
+    @MockBean FeedbackServiceJpaImpl feedbackServiceJpaImpl;
     @Autowired Gson gson;
 
     @Test
@@ -34,6 +36,7 @@ class FeedbackControllerTest {
         //when
         mockMvc.perform(post("/feedback")
                 .contentType(MediaType.APPLICATION_JSON)
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .content(gson.toJson(feedbackRequest))
         )
         //then
@@ -51,6 +54,7 @@ class FeedbackControllerTest {
         //when
         mockMvc.perform(post("/feedback")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .content(gson.toJson(feedbackRequest))
                 )
         //then
