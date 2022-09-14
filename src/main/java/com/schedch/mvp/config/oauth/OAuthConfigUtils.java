@@ -43,4 +43,8 @@ public class OAuthConfigUtils {
     public String getMainPageUrl() throws URISyntaxException {
         return new URI("https://mannatime.io").toString();
     }
+
+    public String getFailurePageUrl() throws URISyntaxException {
+        return new URI("https://mannatime.io").toString();
+    }
 }
