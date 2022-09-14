@@ -14,7 +14,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.security.auth.login.FailedLoginException;
 import java.net.URI;
@@ -51,27 +50,37 @@ public class SignController {
      * @return
      * @throws URISyntaxException
      */
-    @GetMapping("/sign/in/redirect/google")
-    @ResponseBody
+    @GetMapping(value = "/sign/in/redirect/google", params = {"code"})
     public ResponseEntity redirectGoogleSignIn(@RequestParam(value = "code") String authCode) throws URISyntaxException, FailedLoginException, JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
 
         try {
-            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
             User user = oAuthService.googleSignIn(authCode);
             String accessToken = jwtConfig.createAccessTokenByUser(user);
             String refreshToken = jwtConfig.createRefreshToken();
             oAuthService.saveToken(user.getEmail(), accessToken, refreshToken);
 
-            redirectAccessToken(accessToken);
+            String uri = jwtConfig.getFrontSuccessRedirect()
+                    + "?accessToken="
+                    + accessToken;
+            headers.setLocation(new URI(uri));
 
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
 
         } catch (IllegalArgumentException e) { //이미 회원 가입된 이메일인 경우
-            //TODO: error url로 변경
-            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
+            //TO함DO: error url로 변경
+            headers.setLocation(new URI(oAuthConfigUtils.getFailurePageUrl()));
+            log.warn("login failed");
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
         }
+    }
+
+    @GetMapping(value = "/sign/in/redirect/google", params = {"error"})
+    public ResponseEntity signInFailure(@RequestParam(value = "error") String error) throws URISyntaxException, FailedLoginException, JsonProcessingException {
+        HttpHeaders headers = new HttpHeaders();
+        log.warn("login failed due to user cancellation");
+        headers.setLocation(new URI(oAuthConfigUtils.getFailurePageUrl()));
+        return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
     }
 
     @GetMapping("/sign/in/redirect/kakao")
@@ -79,13 +88,15 @@ public class SignController {
         HttpHeaders headers = new HttpHeaders();
 
         try {
-            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
             User user = oAuthService.kakaoSignIn(authCode);
             String accessToken = jwtConfig.createAccessTokenByUser(user);
             String refreshToken = jwtConfig.createRefreshToken();
             oAuthService.saveToken(user.getEmail(), accessToken, refreshToken);
 
-            redirectAccessToken(accessToken);
+            String uri = jwtConfig.getFrontSuccessRedirect()
+                    + "?accessToken="
+                    + accessToken;
+            headers.setLocation(new URI(uri));
 
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
 
@@ -149,14 +160,5 @@ public class SignController {
             headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
         }
-    }
-
-    public void redirectAccessToken(String accessToken) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = jwtConfig.getFrontSuccessRedirect()
-                + "?access-token="
-                + accessToken;
-        ResponseEntity<String> res = restTemplate.getForEntity(url, String.class);
-        res.getStatusCode();
     }
 }
