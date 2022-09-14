@@ -14,7 +14,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import javax.security.auth.login.FailedLoginException;
 import java.net.URI;
@@ -51,7 +50,7 @@ public class SignController {
      * @return
      * @throws URISyntaxException
      */
-    @GetMapping("/sign/in/redirect/google")
+    @GetMapping(value = "/sign/in/redirect/google", params = {"code"})
     public ResponseEntity redirectGoogleSignIn(@RequestParam(value = "code") String authCode) throws URISyntaxException, FailedLoginException, JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
 
@@ -62,7 +61,7 @@ public class SignController {
             oAuthService.saveToken(user.getEmail(), accessToken, refreshToken);
 
             String uri = jwtConfig.getFrontSuccessRedirect()
-                    + "?access-token="
+                    + "?accessToken="
                     + accessToken;
             headers.setLocation(new URI(uri));
 
@@ -70,15 +69,17 @@ public class SignController {
 
         } catch (IllegalArgumentException e) { //이미 회원 가입된 이메일인 경우
             //TO함DO: error url로 변경
-            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
+            headers.setLocation(new URI(oAuthConfigUtils.getFailurePageUrl()));
+            log.warn("login failed");
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
         }
     }
 
-    @GetMapping("/sign/in/redirect/google")
+    @GetMapping(value = "/sign/in/redirect/google", params = {"error"})
     public ResponseEntity signInFailure(@RequestParam(value = "error") String error) throws URISyntaxException, FailedLoginException, JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
+        log.warn("login failed due to user cancellation");
+        headers.setLocation(new URI(oAuthConfigUtils.getFailurePageUrl()));
         return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
     }
 
@@ -93,7 +94,7 @@ public class SignController {
             oAuthService.saveToken(user.getEmail(), accessToken, refreshToken);
 
             String uri = jwtConfig.getFrontSuccessRedirect()
-                    + "?access-token="
+                    + "?accessToken="
                     + accessToken;
             headers.setLocation(new URI(uri));
 
