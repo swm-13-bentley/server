@@ -75,7 +75,7 @@ class RoomControllerTest {
                         .content(gson.toJson(invalidRoomRequest)))
         //then
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("message").value("Room title cannot be empty"));
+                .andExpect(jsonPath("message").value("Room: title cannot be empty"));
     }
 
     @Test
