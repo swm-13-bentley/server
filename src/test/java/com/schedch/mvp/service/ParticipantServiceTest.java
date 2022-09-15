@@ -124,7 +124,7 @@ class ParticipantServiceTest {
     void 약속_인원_제한_테스트() throws Exception {
         //given
         Room room = createTestRoom();
-        room.setMemberLimit(5);
+        room.setParticipantLimit(5);
         given(roomService.getRoom(roomUuid)).willReturn(room);
         for (int i = 1; i <= 5; i++) {
             room.addParticipant(new Participant("p" + i, "", false));
@@ -228,7 +228,7 @@ class ParticipantServiceTest {
         roomDateList.add(new RoomDate(LocalDate.of(2022, 04, 02)));
 
         Room room = new Room(title, roomDateList, startTime, endTime);
-        room.setMemberLimit(5);
+        room.setParticipantLimit(5);
 
         return room;
     }
