@@ -4,6 +4,7 @@ import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.dto.AvailableRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.TimeBlockDto;
+import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.Schedule;
@@ -32,8 +33,11 @@ public class ParticipantService {
         Room room = roomService.getRoom(roomUuid);
         List<Participant> foundParticipant = room.findUnSignedParticipant(participantName);
 
-        if(foundParticipant.isEmpty()) {
-            //신규 유저 -> 유저 등록해야 함
+        if(foundParticipant.isEmpty()) {//신규 유저 -> 유저 등록해야 함
+            if(!room.canAddMember()) {//member limit
+                throw new FullMemberException("Room is full for roomUuid: {}");
+            }
+
             Participant newParticipant = new Participant(participantName, password, false);
             room.addParticipant(newParticipant);
             return new ParticipantResponseDto(newParticipant);

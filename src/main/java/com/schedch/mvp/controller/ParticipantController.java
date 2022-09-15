@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.schedch.mvp.dto.AvailableRequestDto;
 import com.schedch.mvp.dto.ParticipantRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
+import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.service.ParticipantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +30,20 @@ public class ParticipantController {
         String password = participantRequestDto.getPassword();
 
         log.info("roomUuid: {}, participantName: {}, pwd: {}", roomUuid, participantName, password);
-        ParticipantResponseDto participantResponseDto
-                = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(gson.toJson(participantResponseDto));
+        try {
+            ParticipantResponseDto participantResponseDto
+                    = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(gson.toJson(participantResponseDto));
+
+        } catch (FullMemberException e) {
+            JsonObject errorJson = new JsonObject();
+            errorJson.addProperty("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(gson.toJson(errorJson));
+        }
 
     }
 

@@ -24,8 +24,11 @@ public class Room extends BaseEntity{
     @Column(nullable = false)
     private String uuid;
 
-    @NotNull(message = "Room title is empty")
+    @NotNull(message = "Room: title cannot be empty")
     private String title;
+
+    @NotNull(message = "Room: participant_limit cannot be empty")
+    private int participantLimit;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "room")
     @OrderBy(value = "scheduledDate ASC")
@@ -65,6 +68,18 @@ public class Room extends BaseEntity{
 
         //연관관계 맺어주기
         roomDates.stream().forEach(roomDate -> roomDate.setRoom(this));
+    }
+
+    public void setParticipantLimit(int participantLimit) {
+        this.participantLimit = participantLimit;
+    }
+
+    public boolean canAddMember() {
+        if(participantList.size() >= participantLimit) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }
