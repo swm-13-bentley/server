@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.TimeBlockDto;
+import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.RoomDate;
@@ -66,7 +67,7 @@ class ParticipantServiceTest {
     void new_user_registration_test() throws Exception {
         //given
         when(roomService.getRoom(roomUuid))
-                .thenReturn(getRoom());
+                .thenReturn(createTestRoom());
 
         //when
         ParticipantResponseDto participantResponseDto = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
@@ -80,7 +81,7 @@ class ParticipantServiceTest {
     void user_password_mismatch_test() throws Exception {
         //given
         Participant participant = new Participant(participantName, password, false);
-        Room room = getRoom();
+        Room room = createTestRoom();
         room.addParticipant(participant);
 
         when(roomService.getRoom(roomUuid))
@@ -105,7 +106,7 @@ class ParticipantServiceTest {
                 LocalDate.of(2022, 4, 1),
                 LocalTime.of(4, 30, 0),
                 LocalTime.of(6, 0, 0)));
-        Room room = getRoom();
+        Room room = createTestRoom();
 
         room.addParticipant(participant);
         when(roomService.getRoom(roomUuid))
@@ -117,6 +118,29 @@ class ParticipantServiceTest {
         assertThat(participantResponseDto.getParticipantName()).isEqualTo(participantName);
         assertThat(participantResponseDto.getAvailable().size()).isGreaterThan(0);
 
+    }
+
+    @Test
+    void 약속_인원_제한_테스트() throws Exception {
+        //given
+        Room room = createTestRoom();
+        room.setMemberLimit(5);
+        given(roomService.getRoom(roomUuid)).willReturn(room);
+        for (int i = 1; i <= 5; i++) {
+            room.addParticipant(new Participant("p" + i, "", false));
+        }
+
+        //when
+        try {
+            participantService.findUnSignedParticipantAndValidate(roomUuid, "p6", "");
+        }
+
+        //then
+        catch (FullMemberException e){
+            return;
+        }
+
+        Assertions.fail("should not reach here");
     }
 
     @Test
@@ -195,7 +219,7 @@ class ParticipantServiceTest {
         assertThat(new Gson().toJson(availableTimeList)).isEqualTo("[42,43,46,47,48,49,50,51,52,53,54,55,56,64,65]");
     }
 
-    private Room getRoom() {
+    private Room createTestRoom() {
         String title = "test title";
         LocalTime startTime = LocalTime.of(4, 30, 0);
         LocalTime endTime = LocalTime.of(23, 0, 0);
@@ -204,6 +228,7 @@ class ParticipantServiceTest {
         roomDateList.add(new RoomDate(LocalDate.of(2022, 04, 02)));
 
         Room room = new Room(title, roomDateList, startTime, endTime);
+        room.setMemberLimit(5);
 
         return room;
     }
