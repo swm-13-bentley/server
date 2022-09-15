@@ -26,6 +26,7 @@ public class RoomService {
     private final TimeAdapter timeAdapter;
 
     public String createRoom(Room room) {
+        room.setParticipantLimit(5);
         Room save = roomRepository.save(room);
         return save.getUuid();
     }
