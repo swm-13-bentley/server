@@ -33,6 +33,10 @@ public class Participant extends BaseEntity{
 
     private String password;
 
+    private String roomTitle;
+
+    private boolean isConfirmed;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "participant")
     @OrderBy(value = "availableDate ASC")
     private List<Schedule> scheduleList = new ArrayList<>();
@@ -43,6 +47,10 @@ public class Participant extends BaseEntity{
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public void setRoomTitle(String roomTitle) {
+        this.roomTitle = roomTitle;
     }
 
     //연관관계 편의 메서드
@@ -59,6 +67,14 @@ public class Participant extends BaseEntity{
         this.participantName = participantName;
         this.password = password;
         this.isSignedIn = isSignedIn;
+        this.isConfirmed = false;
+    }
+
+    public Participant(User user) {
+        this.participantName = user.getUsername();
+        this.password = "";
+        this.isSignedIn = true;
+        this.isConfirmed = false;
     }
 
     public boolean checkPassword(String inputPassword) {
