@@ -35,8 +35,6 @@ public class Participant extends BaseEntity{
 
     private String roomTitle;
 
-    private boolean isConfirmed;
-
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "participant")
     @OrderBy(value = "availableDate ASC")
     private List<Schedule> scheduleList = new ArrayList<>();
@@ -67,14 +65,12 @@ public class Participant extends BaseEntity{
         this.participantName = participantName;
         this.password = password;
         this.isSignedIn = isSignedIn;
-        this.isConfirmed = false;
     }
 
     public Participant(User user) {
         this.participantName = user.getUsername();
         this.password = "";
         this.isSignedIn = true;
-        this.isConfirmed = false;
     }
 
     public boolean checkPassword(String inputPassword) {
