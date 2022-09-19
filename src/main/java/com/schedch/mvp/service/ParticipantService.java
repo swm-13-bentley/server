@@ -1,6 +1,7 @@
 package com.schedch.mvp.service;
 
 import com.schedch.mvp.adapter.TimeAdapter;
+import com.schedch.mvp.config.ErrorMessage;
 import com.schedch.mvp.dto.AvailableRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.TimeBlockDto;
@@ -26,7 +27,6 @@ public class ParticipantService {
 
     private final ParticipantRepository participantRepository;
     private final RoomService roomService;
-    private final TimeAdapter timeAdapter;
 
     public ParticipantResponseDto findUnSignedParticipantAndValidate(
             String roomUuid, String participantName, String password) throws IllegalAccessException {
@@ -35,7 +35,7 @@ public class ParticipantService {
 
         if(foundParticipant.isEmpty()) {//신규 유저 -> 유저 등록해야 함
             if(!room.canAddMember()) {//member limit
-                throw new FullMemberException("Room is full for roomUuid: {}");
+                throw new FullMemberException(ErrorMessage.fullMemberForUuid(roomUuid));
             }
 
             Participant newParticipant = new Participant(participantName, password, false);
@@ -57,7 +57,7 @@ public class ParticipantService {
         Room room = roomService.getRoom(roomUuid);
         String participantName = availableRequestDto.getParticipantName();
 
-        Participant participant = participantRepository.findParticipantByParticipantNameAndRoom(participantName, room)
+        Participant participant = participantRepository.findParticipantByParticipantNameAndRoomAndIsSignedIn(participantName, room, false)
                 .orElseThrow(() -> new NoSuchElementException(String.format("Participant not found for name: %s", participantName)));
 
         participant.emptySchedules();
@@ -86,12 +86,12 @@ public class ParticipantService {
 
             for (int i = 1; i <= availableTimeList.size(); i++) {
                 if(i == availableTimeList.size()) {
-                    LocalTime startTime = timeAdapter.startBlock2lt(start);
-                    scheduleList.add(new Schedule(availableDate, startTime, timeAdapter.endBlock2lt(end), roomStartTime));
+                    LocalTime startTime = TimeAdapter.startBlock2lt(start);
+                    scheduleList.add(new Schedule(availableDate, startTime, TimeAdapter.endBlock2lt(end), roomStartTime));
                     return scheduleList;
                 }
                 if (availableTimeList.get(i) != end + 1) {//불연속 or 마지막
-                    scheduleList.add(new Schedule(availableDate, timeAdapter.startBlock2lt(start), timeAdapter.endBlock2lt(end), roomStartTime));
+                    scheduleList.add(new Schedule(availableDate, TimeAdapter.startBlock2lt(start), TimeAdapter.endBlock2lt(end), roomStartTime));
                     start = availableTimeList.get(i);
                 }
                 end = availableTimeList.get(i);
