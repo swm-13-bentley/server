@@ -34,8 +34,6 @@ class ParticipantServiceTest {
 
     @Autowired
     ParticipantService participantService;
-    @Autowired
-    TimeAdapter timeAdapter;
     @MockBean
     ParticipantRepository participantRepository;
     @MockBean
