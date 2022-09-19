@@ -38,13 +38,17 @@ public class Room extends BaseEntity{
 
     private LocalTime endTime;
 
+    private boolean confirmed;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "room")
+    @OrderBy(value = "participantName ASC")
     private List<Participant> participantList = new ArrayList<>();
 
     //연관관계 편의 메서드
     public void addParticipant(Participant participant) {
         participantList.add(participant);
         participant.setRoom(this);
+        participant.setRoomTitle(this.title);
     }
 
     public List<Participant> findUnSignedParticipant(String participantName) {
@@ -65,6 +69,7 @@ public class Room extends BaseEntity{
         this.roomDates = roomDates;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.confirmed = false;
 
         //연관관계 맺어주기
         roomDates.stream().forEach(roomDate -> roomDate.setRoom(this));
@@ -82,4 +87,10 @@ public class Room extends BaseEntity{
         }
     }
 
+    public boolean contains(User user) {
+        List<Participant> collect = participantList.stream().filter(participant -> participant.isSignedIn())
+                .filter(participant -> participant.getUser() == user).collect(Collectors.toList());
+
+        return !collect.isEmpty();
+    }
 }
