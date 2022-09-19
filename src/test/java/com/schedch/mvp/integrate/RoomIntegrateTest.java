@@ -5,6 +5,7 @@ import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.RoomDate;
 import com.schedch.mvp.model.Schedule;
+import com.schedch.mvp.model.TopTime;
 import com.schedch.mvp.repository.RoomRepository;
 import com.schedch.mvp.service.RoomService;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 @Transactional
@@ -86,7 +86,7 @@ public class RoomIntegrateTest {
 
         //when
         em.persist(room);
-        List<RoomService.TopTime> topAvailableTimeAndNames = roomService.getTopAvailableTimeAndNames(room.getUuid(), 5);
+        List<TopTime> topAvailableTimeAndNames = roomService.getTopAvailableTimeAndNames(room.getUuid(), 5);
 
         //then
         assertThat(topAvailableTimeAndNames.get(0).getStart()).isEqualTo(17);
