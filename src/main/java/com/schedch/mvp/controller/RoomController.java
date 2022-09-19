@@ -8,6 +8,7 @@ import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.dto.room.RoomResponse;
 import com.schedch.mvp.mapper.RoomMapper;
 import com.schedch.mvp.model.Room;
+import com.schedch.mvp.model.TopTime;
 import com.schedch.mvp.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,6 @@ public class RoomController {
     private final RoomService roomService;
     private final Gson gson;
     private final RoomMapper roomMapper;
-    private final TimeAdapter timeAdapter;
 
     @PostMapping("/room")
     public ResponseEntity createRoom(@Valid @RequestBody RoomRequest roomReq) {
@@ -56,13 +56,13 @@ public class RoomController {
     @GetMapping("/room/{roomUuid}/top/{max}")
     public ResponseEntity getTopTimes(@PathVariable("roomUuid") String roomUuid,
                                       @PathVariable("max") int max) {
-        List<RoomService.TopTime> topAvailableTimeAndNames = roomService.getTopAvailableTimeAndNames(roomUuid, max);
+        List<TopTime> topAvailableTimeAndNames = roomService.getTopAvailableTimeAndNames(roomUuid, max);
         List<TopCountRes> responseList = topAvailableTimeAndNames.stream().map(timeCount -> {
             return TopCountRes.builder()
                     .count(timeCount.getParticipantSize())
                     .availableDate(timeCount.getAvailableDate())
-                    .startTime(timeAdapter.startBlock2Str(timeCount.getStart()))
-                    .endTime(timeAdapter.endBlock2Str(timeCount.getStart() + timeCount.getLen() - 1))
+                    .startTime(TimeAdapter.startBlock2Str(timeCount.getStart()))
+                    .endTime(TimeAdapter.endBlock2Str(timeCount.getStart() + timeCount.getLen() - 1))
                     .participantNames(timeCount.getParticipantNames())
                     .build();
         }).collect(Collectors.toList());
