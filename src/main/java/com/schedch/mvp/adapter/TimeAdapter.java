@@ -1,11 +1,15 @@
 package com.schedch.mvp.adapter;
 
 import com.google.api.client.util.DateTime;
+import com.schedch.mvp.dto.TimeBlockDto;
+import com.schedch.mvp.model.Schedule;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class TimeAdapter {
@@ -73,5 +77,29 @@ public class TimeAdapter {
 
     public static int reduceBlockDefault(int block) {
         return block - 48;
+    }
+
+    public static List<Schedule> changeTimeBlockDtoToSchedule(TimeBlockDto timeBlockDto, LocalTime roomStartTime) {
+        List<Schedule> scheduleList = new ArrayList<>();
+        LocalDate availableDate = timeBlockDto.getAvailableDate();
+        List<Integer> availableTimeList = timeBlockDto.getAvailableTimeList();
+        if(!availableTimeList.isEmpty()) {
+            int start = availableTimeList.get(0);
+            int end = start;
+
+            for (int i = 1; i <= availableTimeList.size(); i++) {
+                if(i == availableTimeList.size()) {
+                    LocalTime startTime = TimeAdapter.startBlock2lt(start);
+                    scheduleList.add(new Schedule(availableDate, startTime, TimeAdapter.endBlock2lt(end), roomStartTime));
+                    return scheduleList;
+                }
+                if (availableTimeList.get(i) != end + 1) {//불연속 or 마지막
+                    scheduleList.add(new Schedule(availableDate, TimeAdapter.startBlock2lt(start), TimeAdapter.endBlock2lt(end), roomStartTime));
+                    start = availableTimeList.get(i);
+                }
+                end = availableTimeList.get(i);
+            }
+        }
+        return scheduleList;
     }
 }
