@@ -162,9 +162,9 @@ class ParticipantServiceTest {
         LocalTime roomStartTime = LocalTime.of(0, 0);
 
         //when
-        List<Schedule> scheduleList1 = participantService.changeTimeBlockDtoToSchedule(timeBlockDto1, roomStartTime);
-        List<Schedule> scheduleList2 = participantService.changeTimeBlockDtoToSchedule(timeBlockDto2, roomStartTime);
-        List<Schedule> scheduleList3 = participantService.changeTimeBlockDtoToSchedule(timeBlockDto3, roomStartTime);
+        List<Schedule> scheduleList1 = TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto1, roomStartTime);
+        List<Schedule> scheduleList2 = TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto2, roomStartTime);
+        List<Schedule> scheduleList3 = TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto3, roomStartTime);
 
         //then
         assertThat(scheduleList1.size()).isEqualTo(3);
@@ -185,7 +185,7 @@ class ParticipantServiceTest {
         LocalTime roomStartTime = LocalTime.of(20, 0);
 
         //when
-        List<Schedule> scheduleList = participantService.changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime);
+        List<Schedule> scheduleList = TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime);
 
         //then
         assertThat(scheduleList.size()).isEqualTo(2);
