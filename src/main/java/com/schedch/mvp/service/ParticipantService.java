@@ -65,40 +65,12 @@ public class ParticipantService {
         LocalTime roomStartTime = room.getStartTime();
         availableRequestDto.getAvailable().stream()
                 .forEach(timeBlockDto -> {
-                    changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime).stream()
+                    TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime).stream()
                             .forEach(schedule -> participant.addSchedule(schedule));
 
                 });
     }
 
-    /**
-     * 같은 날짜에 이어져있는 time int들을 비연속적이라면, 분리해서 schedule로 변환
-     * @param timeBlockDto
-     * @return
-     */
-    public List<Schedule> changeTimeBlockDtoToSchedule(TimeBlockDto timeBlockDto, LocalTime roomStartTime) {
-        List<Schedule> scheduleList = new ArrayList<>();
-        LocalDate availableDate = timeBlockDto.getAvailableDate();
-        List<Integer> availableTimeList = timeBlockDto.getAvailableTimeList();
-        if(!availableTimeList.isEmpty()) {
-            int start = availableTimeList.get(0);
-            int end = start;
-
-            for (int i = 1; i <= availableTimeList.size(); i++) {
-                if(i == availableTimeList.size()) {
-                    LocalTime startTime = TimeAdapter.startBlock2lt(start);
-                    scheduleList.add(new Schedule(availableDate, startTime, TimeAdapter.endBlock2lt(end), roomStartTime));
-                    return scheduleList;
-                }
-                if (availableTimeList.get(i) != end + 1) {//불연속 or 마지막
-                    scheduleList.add(new Schedule(availableDate, TimeAdapter.startBlock2lt(start), TimeAdapter.endBlock2lt(end), roomStartTime));
-                    start = availableTimeList.get(i);
-                }
-                end = availableTimeList.get(i);
-            }
-        }
-        return scheduleList;
-    }
 
     public List<ParticipantResponseDto> findAllParticipantsInRoom(String roomUuid) {
         Room room = roomService.getRoom(roomUuid);
