@@ -1,6 +1,5 @@
 package com.schedch.mvp.controller.user;
 
-import com.google.gson.Gson;
 import com.schedch.mvp.config.auth.PrincipalDetails;
 import com.schedch.mvp.dto.user.UserAvailableDayReq;
 import com.schedch.mvp.dto.user.UserAvailableTimeReq;
