@@ -5,7 +5,6 @@ import com.schedch.mvp.config.GsonConfig;
 import com.schedch.mvp.config.JwtConfig;
 import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.mapper.RoomMapper;
-import com.schedch.mvp.model.Room;
 import com.schedch.mvp.service.RoomService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,24 +94,6 @@ class RoomControllerTest {
                 .andExpect(status().isNotFound()) //404 not found
                 .andExpect(jsonPath("message").value("sampleErrMsg")
                 );
-    }
-
-    //TODO: replace this test code with jwt filter test
-    @Test
-    void 프리미엄_약속_생성_테스트() throws Exception{
-        //given
-        RoomRequest roomRequestDto = getRoomRequestDto();
-        Room room = roomMapper.req2Entity(roomRequestDto);
-        given(roomService.createPremiumRoom(room))
-                .willReturn("roomUuid");
-
-        //when
-        mockMvc.perform(post("/user/room")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(gson.toJson(roomRequestDto)))
-        //then
-                .andExpect(status().isOk());
     }
 
     private RoomRequest getRoomRequestDto() {
