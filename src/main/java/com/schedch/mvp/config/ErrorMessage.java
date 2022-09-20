@@ -10,4 +10,8 @@ public class ErrorMessage {
     public static String fullMemberForUuid(String roomUuid) {
         return String.format("Room is full for roomUuid: %s", roomUuid);
     }
+
+    public static String userNotInRoom(String roomUuid) {
+        return String.format("User is not in room for roomUuid: %s", roomUuid);
+    }
 }
