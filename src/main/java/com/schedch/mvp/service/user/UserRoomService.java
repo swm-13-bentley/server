@@ -4,10 +4,10 @@ import com.schedch.mvp.config.ErrorMessage;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.user.UserParticipatingRoomRes;
 import com.schedch.mvp.exception.FullMemberException;
+import com.schedch.mvp.exception.UserNotInRoomException;
 import com.schedch.mvp.model.*;
 import com.schedch.mvp.repository.ParticipantRepository;
 import com.schedch.mvp.repository.RoomRepository;
-import com.schedch.mvp.repository.UserRepository;
 import com.schedch.mvp.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,17 +22,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserRoomService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ParticipantRepository participantRepository;
     private final RoomRepository roomRepository;
     private final RoomService roomService;
 
     public ParticipantResponseDto entry(String userEmail, String roomUuid) {
         Room room = roomService.getRoom(roomUuid);
-        User user = getUserByEmail(userEmail);
+        User user = userService.getUserByEmail(userEmail);
 
-        if (room.contains(user)) {
-            Participant participant = participantRepository.findByUserAndRoom(user, room).get();
+        Optional<Participant> participantOptional = participantRepository.findByUserAndRoom(user, room);
+        if (participantOptional.isPresent()) {// Case: user is already in room
+            Participant participant = participantOptional.get();
             return new ParticipantResponseDto(participant);
         }
 
@@ -40,10 +41,24 @@ public class UserRoomService {
             throw new FullMemberException(ErrorMessage.fullMemberForUuid(roomUuid));
         }
 
+        // Case: new user enters room
         Participant participant = new Participant(user);
         user.addParticipant(participant);
         room.addParticipant(participant);
         return new ParticipantResponseDto(participant);
+    }
+
+    public void exitRoom(String userEmail, String roomUuid) {
+        Room room = roomService.getRoom(roomUuid);
+        User user = userService.getUserByEmail(userEmail);
+
+        Optional<Participant> participantOptional = participantRepository.findByUserAndRoom(user, room);
+        if (participantOptional.isEmpty()) {
+            throw new UserNotInRoomException(ErrorMessage.userNotInRoom(roomUuid));
+        }
+
+        Participant participant = participantOptional.get();
+        participantRepository.delete(participant);
     }
 
     public List<UserParticipatingRoomRes> getAllRooms(String userEmail, boolean confirmed) {
@@ -89,15 +104,5 @@ public class UserRoomService {
                 });
 
         return resList;
-    }
-
-    /**
-     * should only call when user existence is already validated
-     * ex) user existence validated through jwt token check
-     * @param userEmail
-     * @return
-     */
-    public User getUserByEmail(String userEmail) {
-        return userRepository.findByEmail(userEmail).get();
     }
 }
