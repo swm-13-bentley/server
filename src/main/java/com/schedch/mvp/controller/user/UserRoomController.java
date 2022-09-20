@@ -7,10 +7,10 @@ import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.room.DayRoomReq;
 import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.dto.user.UserParticipatingRoomRes;
+import com.schedch.mvp.exception.UserNotInRoomException;
 import com.schedch.mvp.mapper.DayRoomMapper;
 import com.schedch.mvp.mapper.RoomMapper;
 import com.schedch.mvp.model.Room;
-import com.schedch.mvp.model.User;
 import com.schedch.mvp.service.RoomService;
 import com.schedch.mvp.service.user.UserRoomService;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -65,17 +62,33 @@ public class UserRoomController {
 
     @PostMapping("/user/room/{roomUuid}/entry")
     public ResponseEntity userRoomEntry(@PathVariable String roomUuid, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        User user = principalDetails.getUser();
-        ParticipantResponseDto resDto = userRoomService.entry(user.getEmail(), roomUuid);
+        String userEmail = getUserEmail(principalDetails);
+        ParticipantResponseDto resDto = userRoomService.entry(userEmail, roomUuid);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(resDto));
     }
 
+    @PostMapping("/user/room/{roomUuid}/exit")
+    public ResponseEntity userRoomExit(@PathVariable String roomUuid, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String userEmail = getUserEmail(principalDetails);
+
+        try {
+            userRoomService.exitRoom(userEmail, roomUuid);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .build();
+
+        } catch (UserNotInRoomException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
+    }
+
     @GetMapping("/user/myRoom/unConfirmed")
     public ResponseEntity getAllUnConfirmedRooms(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        List<UserParticipatingRoomRes> resList = userRoomService.getAllRooms(principalDetails.getUser().getEmail(), false);
+        String userEmail = getUserEmail(principalDetails);
+        List<UserParticipatingRoomRes> resList = userRoomService.getAllRooms(userEmail, false);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -84,10 +97,16 @@ public class UserRoomController {
 
     @GetMapping("/user/myRoom/confirmed")
     public ResponseEntity getAllConfirmedRooms(@AuthenticationPrincipal PrincipalDetails principalDetails) {
-        List<UserParticipatingRoomRes> resList = userRoomService.getAllRooms(principalDetails.getUser().getEmail(), true);
+        String userEmail = getUserEmail(principalDetails);
+        List<UserParticipatingRoomRes> resList = userRoomService.getAllRooms(userEmail, true);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(resList));
+    }
+
+    private String getUserEmail(PrincipalDetails principalDetails) {
+        String userEmail = principalDetails.getUsername();
+        return userEmail;
     }
 }
