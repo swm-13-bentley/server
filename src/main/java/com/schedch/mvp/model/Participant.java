@@ -51,6 +51,8 @@ public class Participant extends BaseEntity{
         this.roomTitle = roomTitle;
     }
 
+    public void setParticipantName(String participantName) {this.participantName = participantName;}
+
     //연관관계 편의 메서드
     public void addSchedule(Schedule schedule) {
         scheduleList.add(schedule);
