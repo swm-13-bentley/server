@@ -1,4 +1,4 @@
-package com.schedch.mvp.service;
+package com.schedch.mvp.service.user;
 
 import com.schedch.mvp.model.User;
 import com.schedch.mvp.repository.UserRepository;
@@ -17,5 +17,15 @@ public class UserService {
     public User save(User user) {
         User saved = userRepository.save(user);
         return saved;
+    }
+
+    /**
+     * should only call when user existence is already validated
+     * ex) user existence validated through jwt token check
+     * @param userEmail
+     * @return
+     */
+    public User getUserByEmail(String userEmail) {
+        return userRepository.findByEmail(userEmail).get();
     }
 }

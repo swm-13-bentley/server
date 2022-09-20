@@ -44,7 +44,7 @@ public class DayParticipantService {
     public void saveParticipantAvailable(String roomUuid, String participantName, String password, List<LocalDate> localDateList) throws IllegalAccessException {
         Room room = roomService.getRoom(roomUuid);
 
-        Optional<Participant> participantOptional = participantRepository.findParticipantByParticipantNameAndRoom(participantName, room);
+        Optional<Participant> participantOptional = participantRepository.findParticipantByParticipantNameAndRoomAndIsSignedIn(participantName, room, false);
         Participant participant = null;
         if (participantOptional.isEmpty()) {//없는 참가자일 경우 새로이 추가
             participant = new Participant(participantName, password, false);

@@ -1,12 +1,9 @@
 package com.schedch.mvp.service;
 
 import com.schedch.mvp.adapter.TimeAdapter;
-import com.schedch.mvp.model.Participant;
-import com.schedch.mvp.model.Room;
-import com.schedch.mvp.model.RoomDate;
-import com.schedch.mvp.model.Schedule;
+import com.schedch.mvp.model.*;
+import com.schedch.mvp.repository.ParticipantRepository;
 import com.schedch.mvp.repository.RoomRepository;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,10 +20,16 @@ import java.util.*;
 public class RoomService {
 
     private final RoomRepository roomRepository;
-    private final TimeAdapter timeAdapter;
+    private final ParticipantRepository participantRepository;
 
     public String createRoom(Room room) {
         room.setParticipantLimit(5);
+        Room save = roomRepository.save(room);
+        return save.getUuid();
+    }
+
+    public String createPremiumRoom(Room room) {
+        room.setParticipantLimit(50);
         Room save = roomRepository.save(room);
         return save.getUuid();
     }
@@ -45,11 +48,11 @@ public class RoomService {
 
         //get room start time block
         LocalTime roomStartTime = room.getStartTime();
-        int roomStartTimeBlock = timeAdapter.localTime2TimeBlockInt(roomStartTime);
+        int roomStartTimeBlock = TimeAdapter.localTime2TimeBlockInt(roomStartTime);
 
         //get room end time block, add 48 if end time is before start time (night times)
         LocalTime roomEndTime = room.getEndTime();
-        int roomEndTimeBlock = timeAdapter.localTime2TimeBlockInt(roomEndTime);
+        int roomEndTimeBlock = TimeAdapter.localTime2TimeBlockInt(roomEndTime);
         if (roomEndTime.isBefore(roomStartTime)) {
             roomEndTimeBlock += 48;
         }
@@ -64,7 +67,7 @@ public class RoomService {
         long[][] bitBoard = new long[rowSize][colSize];
 
         // fill board by participant schedules, O(p x d x t) [p: participants, d: dates, t: times]
-        List<Participant> participantList = room.getParticipantList();
+        List<Participant> participantList = participantRepository.findAllByRoom(room);
         fillBoard(participantList, roomStartTimeBlock, columnMap, sizeBoard, bitBoard);
 
         // init max Counter
@@ -93,12 +96,12 @@ public class RoomService {
                 TopTime popNode = stack.pop();
 
                 //사람 수 >= 1이면 추가
-                if (popNode.participantSize >= 1) {
+                if (popNode.getParticipantSize() >= 1) {
                     topTimeList.add(popNode);
                 }
 
                 if (!stack.isEmpty()) {
-                    stack.peek().addLen(popNode.len);
+                    stack.peek().addLen(popNode.getLen());
                 } else {
                     break;
                 }
@@ -122,7 +125,7 @@ public class RoomService {
     private void adjustStack(Stack<TopTime> stack, List<TopTime> topTimeList, LocalDate availableDate, int nowStartBlock, int nowSize, long nowBit) {
         TopTime peekNode = stack.peek();
 
-        if (nowBit == peekNode.participantBit) {//구성원이 같다면 len 추가
+        if (nowBit == peekNode.getParticipantBit()) {//구성원이 같다면 len 추가
             peekNode.addLen(1);
         } else if (checkConsist(peekNode, nowSize, nowBit) == true) {//인원 포함 + 추가된다면, stack에 새 항목 추가
             stack.add(new TopTime(availableDate, nowSize, nowBit, nowStartBlock, 1));
@@ -133,15 +136,15 @@ public class RoomService {
                 TopTime popNode = stack.pop(); // = peekNode
 
                 //사람 수 >= 1이면 추가
-                if (popNode.participantSize >= 1) {
+                if (popNode.getParticipantSize() >= 1) {
                     topTimeList.add(popNode);
                 }
 
                 if (!stack.isEmpty()) { // stack에 항목이 남아있다면
                     TopTime peekAfterPop = stack.peek();
-                    peekAfterPop.addLen(popNode.len);
+                    peekAfterPop.addLen(popNode.getLen());
 
-                    if (peekAfterPop.participantBit == nowBit) { // bit가 같다면 길이 + 1
+                    if (peekAfterPop.getParticipantBit() == nowBit) { // bit가 같다면 길이 + 1
                         peekAfterPop.addLen(1);
                         break;
                     }
@@ -163,8 +166,8 @@ public class RoomService {
     }
 
     private boolean checkConsist(TopTime topTime, int size, long bit) {
-        if (topTime.participantSize <= size
-                && (topTime.participantBit <= (topTime.participantBit & bit))) return true;
+        if (topTime.getParticipantSize() <= size
+                && (topTime.getParticipantBit() <= (topTime.getParticipantBit() & bit))) return true;
         else return false;
     }
 
@@ -180,10 +183,10 @@ public class RoomService {
                     continue;
                 }
 
-                int startBlock = timeAdapter.localTime2TimeBlockInt(schedule.getStartTime());
+                int startBlock = TimeAdapter.localTime2TimeBlockInt(schedule.getStartTime());
                 if (startBlock < roomStartTimeBlock) startBlock += 48; // 시작 시간이 새벽 시간대라면, +48
 
-                int endBlock = timeAdapter.localTime2TimeBlockInt(schedule.getEndTime());
+                int endBlock = TimeAdapter.localTime2TimeBlockInt(schedule.getEndTime());
                 if (endBlock < roomStartTimeBlock) endBlock += 48; // 시작 시간이 새벽 시간대라면, +48
 
                 int colIdx = columnMap.get(availableDate);
@@ -214,48 +217,5 @@ public class RoomService {
             colNumMap.put(roomdate.getScheduledDate(), colNum++);
         }
         return colNumMap;
-    }
-
-    @Getter
-    public class TopTime implements Comparable<TopTime> {
-        LocalDate availableDate;
-        int participantSize;
-        long participantBit;
-        int start;
-        int len;
-        List<String> participantNames = new ArrayList<>();
-
-        public TopTime(LocalDate availableDate, int participantSize, long participantBit, int start, int len) {
-            this.availableDate = availableDate;
-            this.participantSize = participantSize;
-            this.participantBit = participantBit;
-            this.start = start;
-            this.len = len;
-        }
-
-        public void addLen(int num) {
-            this.len += num;
-        }
-
-        public void addName(String name) {
-            this.participantNames.add(name);
-        }
-
-        @Override
-        public int compareTo(TopTime o) {
-            if (this.participantSize == o.participantSize) {
-                if (o.len == this.len) {
-                    if (this.availableDate.isEqual(o.availableDate)) {
-                        return this.start - o.start;
-                    } else {
-                        return this.availableDate.compareTo(o.availableDate);
-                    }
-                } else {
-                    return o.len - this.len;
-                }
-            } else {
-                return o.participantSize - this.participantSize;
-            }
-        }
     }
 }

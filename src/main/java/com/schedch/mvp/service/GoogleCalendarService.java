@@ -53,7 +53,6 @@ public class GoogleCalendarService {
     private final GoogleConfigUtils googleConfigUtils;
     private final GTokenRepository gTokenRepository;
     private final RoomService roomService;
-    private final TimeAdapter timeAdapter;
 
     public void save(GToken gToken) {
         GToken save = gTokenRepository.save(gToken);
@@ -146,14 +145,14 @@ public class GoogleCalendarService {
     }
 
     private void addToMap(HashMap<LocalDate, HashSet<Integer>> map, DateTime start, DateTime end, int roomStartTimeBlockInt, int roomEndTimeBlockInt) {
-        LocalDate startDate = timeAdapter.dateTime2LocalDate(start);
-        LocalTime startTime = timeAdapter.dateTime2LocalTime(start);
+        LocalDate startDate = TimeAdapter.dateTime2LocalDate(start);
+        LocalTime startTime = TimeAdapter.dateTime2LocalTime(start);
 
-        LocalDate endDate = timeAdapter.dateTime2LocalDate(end);
-        LocalTime endTime = timeAdapter.dateTime2LocalTime(end);
+        LocalDate endDate = TimeAdapter.dateTime2LocalDate(end);
+        LocalTime endTime = TimeAdapter.dateTime2LocalTime(end);
 
-        int startTimeBlockInt = timeAdapter.localTime2TimeBlockInt(startTime);
-        int endTimeBlockInt = timeAdapter.localTime2TimeBlockInt(endTime);
+        int startTimeBlockInt = TimeAdapter.localTime2TimeBlockInt(startTime);
+        int endTimeBlockInt = TimeAdapter.localTime2TimeBlockInt(endTime);
 
         startTimeBlockInt = Math.max(startTimeBlockInt, roomStartTimeBlockInt);
         endTimeBlockInt = Math.min(endTimeBlockInt, roomEndTimeBlockInt);

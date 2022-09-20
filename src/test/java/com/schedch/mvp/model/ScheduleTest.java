@@ -49,7 +49,7 @@ class ScheduleTest {
         Schedule schedule = new Schedule(availableDate, startTime, endTime);
 
         //when
-        TimeBlockDto timeBlockDto = schedule.toTimeBlockDto(30);
+        TimeBlockDto timeBlockDto = new TimeBlockDto(availableDate, schedule.cutTime(30));
 
         //then
         int listSize = timeBlockDto.getAvailableTimeList().size();

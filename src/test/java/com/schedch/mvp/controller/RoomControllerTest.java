@@ -1,25 +1,22 @@
 package com.schedch.mvp.controller;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.schedch.mvp.adapter.LocalDateAdapter;
-import com.schedch.mvp.adapter.LocalTimeAdapter;
-import com.schedch.mvp.adapter.TimeAdapter;
+import com.schedch.mvp.config.GsonConfig;
+import com.schedch.mvp.config.JwtConfig;
 import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.mapper.RoomMapper;
 import com.schedch.mvp.service.RoomService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -31,23 +28,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(RoomController.class)
+@Import({JwtConfig.class, GsonConfig.class})
 @WithMockUser
 class RoomControllerTest {
 
     @Autowired private MockMvc mockMvc;
+    @Autowired JwtConfig jwtConfig;
+    @Autowired Gson gson;
     @MockBean RoomService roomService;
     @MockBean RoomMapper roomMapper;
-    @MockBean TimeAdapter timeAdapter;
-    private static Gson gson;
 
-    @BeforeAll
-    public static void configGson() {
-        gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-                .registerTypeAdapter(LocalTime.class, new LocalTimeAdapter())
-                .create();
-    }
     @Test
     void 방_생성_테스트() throws Exception {
         //given

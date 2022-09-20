@@ -91,6 +91,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             Token token = tokenOptional.get();
             token.setAccessToken(accessToken);
             token.setRefreshToken(refreshToken);
+            tokenRepository.save(token);
 
             throw new TokenExpiredException(String.format("new-access-token=%s", accessToken));
         }
