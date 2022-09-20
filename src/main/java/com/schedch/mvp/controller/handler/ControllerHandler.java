@@ -3,6 +3,7 @@ package com.schedch.mvp.controller.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.schedch.mvp.exception.UserNotInRoomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,6 +71,14 @@ public class ControllerHandler {
         JsonObject errorJson = getErrorJson(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(gson.toJson(errorJson));
+    }
+
+    @ExceptionHandler(UserNotInRoomException.class)
+    public ResponseEntity userNotInRoomExceptionHandle(JsonProcessingException e) {
+        JsonObject errorJson = getErrorJson(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(gson.toJson(errorJson));
     }
 
