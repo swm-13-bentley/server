@@ -27,7 +27,7 @@ public class UserParticipantController {
                                         @RequestBody UserAvailableTimeReq userAvailableTimeReq,
                                         @AuthenticationPrincipal PrincipalDetails principalDetails) throws UserNotInRoomException {
         String userEmail = getUserEmail(principalDetails);
-        userParticipantService.saveAvailableTimeToRoom(userEmail, roomUuid, userAvailableTimeReq.getAvailable());
+        userParticipantService.saveAvailableTimeToRoom(userEmail, roomUuid, userAvailableTimeReq);
         return ResponseEntity.status(HttpStatus.OK)
                 .build();
     }
@@ -37,7 +37,7 @@ public class UserParticipantController {
                                                @RequestBody UserAvailableDayReq userAvailableDayReq,
                                                @AuthenticationPrincipal PrincipalDetails principalDetails) throws UserNotInRoomException {
         String userEmail = getUserEmail(principalDetails);
-        userParticipantService.saveAvailableDayToRoom(userEmail, roomUuid, userAvailableDayReq.getAvailableDates());
+        userParticipantService.saveAvailableDayToRoom(userEmail, roomUuid, userAvailableDayReq);
         return ResponseEntity.status(HttpStatus.OK)
                 .build();
 

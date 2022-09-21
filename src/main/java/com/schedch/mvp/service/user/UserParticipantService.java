@@ -3,13 +3,14 @@ package com.schedch.mvp.service.user;
 import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.config.ErrorMessage;
 import com.schedch.mvp.dto.TimeBlockDto;
+import com.schedch.mvp.dto.user.UserAvailableDayReq;
+import com.schedch.mvp.dto.user.UserAvailableTimeReq;
 import com.schedch.mvp.exception.UserNotInRoomException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.Schedule;
 import com.schedch.mvp.model.User;
 import com.schedch.mvp.repository.ParticipantRepository;
-import com.schedch.mvp.service.ParticipantService;
 import com.schedch.mvp.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,12 +29,15 @@ public class UserParticipantService {
     private final UserService userService;
     private final ParticipantRepository participantRepository;
 
-    public void saveAvailableTimeToRoom(String userEmail, String roomUuid, List<TimeBlockDto> timeBlockDtoList) {
+    public void saveAvailableTimeToRoom(String userEmail, String roomUuid, UserAvailableTimeReq userAvailableTimeReq) {
         Room room = roomService.getRoom(roomUuid);
         User user = userService.getUserByEmail(userEmail);
         Participant participant = getParticipant(user, room);
-        participant.emptySchedules();
 
+        participant.emptySchedules();
+        participant.setParticipantName(userAvailableTimeReq.getParticipantName());
+
+        List<TimeBlockDto> timeBlockDtoList = userAvailableTimeReq.getAvailable();
         timeBlockDtoList.stream().forEach(
                 block -> {
                     List<Schedule> scheduleList = TimeAdapter.changeTimeBlockDtoToSchedule(block, room.getStartTime());
@@ -42,11 +46,14 @@ public class UserParticipantService {
         );
     }
 
-    public void saveAvailableDayToRoom(String userEmail, String roomUuid, List<LocalDate> availableDateList) {
+    public void saveAvailableDayToRoom(String userEmail, String roomUuid, UserAvailableDayReq userAvailableDayReq) {
         Participant participant = getParticipant(userEmail, roomUuid);
 
         participant.emptySchedules();
-        availableDateList.stream().forEach(
+        participant.setParticipantName(userAvailableDayReq.getParticipantName());
+
+        List<LocalDate> availableDates = userAvailableDayReq.getAvailableDates();
+        availableDates.stream().forEach(
                 date -> {
                     participant.addSchedule(new Schedule(date));
                 }
