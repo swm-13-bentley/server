@@ -10,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 public class UserAvailableDayReq {
 
+    private String participantName;
     private List<LocalDate> availableDates;
 
 }
