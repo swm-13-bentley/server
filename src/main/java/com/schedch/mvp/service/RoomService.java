@@ -23,7 +23,7 @@ public class RoomService {
     private final ParticipantRepository participantRepository;
 
     public String createRoom(Room room) {
-        room.setParticipantLimit(5);
+        room.setParticipantLimit(50);
         Room save = roomRepository.save(room);
         return save.getUuid();
     }
@@ -36,6 +36,14 @@ public class RoomService {
 
     public Room getRoom(String roomUuid) {
         Optional<Room> roomOptional = roomRepository.findByUuid(roomUuid);
+        Room room = roomOptional.orElseThrow(
+                () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid))
+        );
+        return room;
+    }
+
+    public Room getRoomWithRoomDates(String roomUuid) {
+        Optional<Room> roomOptional = roomRepository.findByUuidJoinFetchRoomDates(roomUuid);
         Room room = roomOptional.orElseThrow(
                 () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid))
         );
