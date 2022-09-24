@@ -15,6 +15,11 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
     @Query("select distinct r from Room r" +
             " join fetch r.roomDates" +
+            " where r.uuid = :roomUuid")
+    Optional<Room> findByUuidJoinFetchRoomDates(@Param("roomUuid") String roomUuid);
+
+    @Query("select distinct r from Room r" +
+            " join fetch r.roomDates" +
             " where r.id in :idList")
     List<Room> findAllInIdListJoinFetchRoomDates(@Param("idList") List<Long> idList);
 
