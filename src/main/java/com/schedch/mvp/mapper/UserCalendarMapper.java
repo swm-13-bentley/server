@@ -18,8 +18,9 @@ public interface UserCalendarMapper {
     UserCalendarRes userCalendar2Res(UserCalendar userCalendar);
 
     default List<SubCalendarRes> getSubCalendarList(UserCalendar userCalendar) {
+        SubCalendarMapper subCalendarMapper = SubCalendarMapper.INSTANCE;
         List<SubCalendarRes> subCalendarResList = userCalendar.getSubCalendarList().stream()
-                .map(subCalendar -> SubCalendarMapper.INSTANCE.subCalendar2Res(subCalendar))
+                .map(subCalendar -> subCalendarMapper.subCalendar2Res(subCalendar))
                 .collect(Collectors.toList());
 
         return subCalendarResList;
