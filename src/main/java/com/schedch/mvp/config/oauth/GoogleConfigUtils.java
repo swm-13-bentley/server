@@ -32,6 +32,9 @@ public class GoogleConfigUtils {
     @Value("${google.sign.out.redirect.uri}")
     private String googleSignOutRedirectUrl;
 
+    @Value("${google.add.calendar.redirect.uri}")
+    private String googleAddCalendarRedirectUrl;
+
     @Value("${google.client.id}")
     private String googleClientId;
 
@@ -77,6 +80,14 @@ public class GoogleConfigUtils {
         return getOAuthUrl(params);
     }
 
+    public String googleAddCalendarInitUrl(Long userId) {
+        Map<String, Object> params = getParamsMap();
+        params.put("redirect_uri", getGoogleAddCalendarRedirectUrl());
+        params.put("scope", getScopeUrl());
+        params.put("state", userId.toString());
+
+        return getOAuthUrl(params);
+    }
     public String getScopeUrl() {
         return scopes.replaceAll(",", "%20");
     }
