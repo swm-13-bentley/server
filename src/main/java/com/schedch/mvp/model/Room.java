@@ -93,4 +93,12 @@ public class Room extends BaseEntity{
 
         return !collect.isEmpty();
     }
+
+    public LocalDate getStartLocalDate() {
+        return roomDates.get(0).getScheduledDate();
+    }
+
+    public LocalDate getEndLocalDate() {
+        return roomDates.get(roomDates.size() -1).getScheduledDate();
+    }
 }
