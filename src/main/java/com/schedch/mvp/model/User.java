@@ -1,6 +1,6 @@
 package com.schedch.mvp.model;
 
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity @Getter
-@NoArgsConstructor
-public class User {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseEntity{
 
     @Id @GeneratedValue
     private Long id;
@@ -34,9 +34,8 @@ public class User {
     @NotNull(message = "user role cannot be empty")
     private String role;
 
-    private String calendarChannel;
-    private String calendarAccessToken;
-    private String calendarRefreshToken;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
+    private List<UserCalendar> userCalendarList = new ArrayList();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Participant> participantList = new ArrayList<>();
@@ -48,22 +47,14 @@ public class User {
         this.signInChannel = signInChannel;
         this.role = "ROLE_USER";
     }
-
-    @Builder
-    public User(String username, String email, String password, String signInChannel, String calendarChannel, String calendarAccessToken, String calendarRefreshToken) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.signInChannel = signInChannel;
-        this.calendarChannel = calendarChannel;
-        this.calendarAccessToken = calendarAccessToken;
-        this.calendarRefreshToken = calendarRefreshToken;
-        this.role = "ROLE_USER";
-    }
-
     public void addParticipant(Participant participant) {
         participantList.add(participant);
         participant.setUser(this);
+    }
+
+    public void addUserCalendar(UserCalendar userCalendar) {
+        userCalendarList.add(userCalendar);
+        userCalendar.setUser(this);
     }
 
     /**
@@ -71,6 +62,33 @@ public class User {
      */
     public void detachFromParticipant() {
         this.participantList.stream()
-                .forEach(p -> p.setUser(null));
+                .forEach(p -> {
+                    p.setUser(null);
+                });
+    }
+
+    public boolean changeMainCalendarTo(Long newMainCalId) {
+        UserCalendar currentMainCal = null;
+        UserCalendar newMainCal = null;
+
+        for (UserCalendar userCalendar : userCalendarList) {
+            if(userCalendar.isMainCalendar()) {
+                currentMainCal = userCalendar;
+                continue;
+            }
+
+            if (userCalendar.getId().equals(newMainCalId)) {
+                newMainCal = userCalendar;
+            }
+        }
+
+        if(currentMainCal == null || newMainCal == null) {
+            return false;
+        }
+
+        currentMainCal.setMainCalendar(false);
+        newMainCal.setMainCalendar(true);
+
+        return true;
     }
 }
