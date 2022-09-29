@@ -54,7 +54,8 @@ public class UserCalendarService {
             return;
         }
 
-        addCalendarToUser(googleLoginDto, user);
+        UserCalendar userCalendar = googleLoginDto.toUserCalendar();
+        user.addUserCalendar(userCalendar);
     }
 
     public UserCalendar addCalendarToUser(GoogleLoginDto googleLoginDto, User user) throws CalendarLoadException {
@@ -76,6 +77,7 @@ public class UserCalendarService {
                 String subCalendarName = calendarListEntry.getSummary();
                 String gCalId = calendarListEntry.getId();
                 Boolean selected = calendarListEntry.getSelected();
+                if(selected == null) selected = false;
                 SubCalendar subCalendar = new SubCalendar(subCalendarName, selected, gCalId);
                 userCalendar.addSubCalendar(subCalendar);
             });
@@ -86,6 +88,8 @@ public class UserCalendarService {
         } catch (GeneralSecurityException e) {
             throw new CalendarLoadException(e.getMessage());
         } catch (IOException e) {
+            throw new CalendarLoadException(e.getMessage());
+        } catch (Exception e) {
             throw new CalendarLoadException(e.getMessage());
         }
     }
