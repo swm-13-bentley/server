@@ -147,10 +147,8 @@ public class UserCalendarService {
             return userCalendarLoadResList;
 
         } catch (GeneralSecurityException e) {
-            e.printStackTrace();
             throw new CalendarLoadException(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
             throw new CalendarLoadException(e.getMessage());
         }
 
