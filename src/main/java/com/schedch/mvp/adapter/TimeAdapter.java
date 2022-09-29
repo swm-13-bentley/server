@@ -6,10 +6,14 @@ import com.schedch.mvp.model.Schedule;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class TimeAdapter {
@@ -22,6 +26,12 @@ public class TimeAdapter {
     public static LocalTime dateTime2LocalTime(DateTime dateTime) {
         LocalTime localTime = LocalTime.parse(dateTime.toString().substring(11, 19), DateTimeFormatter.ISO_LOCAL_TIME);
         return localTime;
+    }
+
+    public static LocalDateTime dateTime2LocalDateTime(DateTime dateTime) {
+        Matcher matcher = Pattern.compile("(.*).(.*)").matcher(dateTime.toStringRfc3339());
+        LocalDateTime localDateTime = LocalDateTime.parse(matcher.group(1), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        return localDateTime;
     }
 
     public static int localTime2TimeBlockInt(LocalTime localTime) {
@@ -101,5 +111,11 @@ public class TimeAdapter {
             }
         }
         return scheduleList;
+    }
+
+    public static DateTime localDateAndTime2DateTime(LocalDate localDate, LocalTime localTime, String offsetId) {
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, localTime);
+        DateTime dateTime = new DateTime(1000 * localDateTime.toEpochSecond(ZoneOffset.of(offsetId)));
+        return dateTime;
     }
 }
