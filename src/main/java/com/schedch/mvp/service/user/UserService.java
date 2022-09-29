@@ -28,4 +28,8 @@ public class UserService {
     public User getUserByEmail(String userEmail) {
         return userRepository.findByEmail(userEmail).get();
     }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).get();
+    }
 }
