@@ -26,6 +26,7 @@ public interface RoomMapper{
     @Mapping(target = "startTime", expression = "java(lt2int(room.getStartTime(), 30))")
     @Mapping(target = "endTime", expression = "java(endLt2int(room.getStartTime(), room.getEndTime(), 30))")
     @Mapping(target = "dates", expression = "java(rdList2LdList(room.getRoomDates()))")
+    @Mapping(target = "participants", expression = "java(room.getParticipantNames())")
     RoomResponse entity2Res(Room room);
 
     /**

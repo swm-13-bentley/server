@@ -2,7 +2,6 @@ package com.schedch.mvp.mapper;
 
 import com.schedch.mvp.dto.room.DayRoomReq;
 import com.schedch.mvp.dto.room.DayRoomRes;
-import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.RoomDate;
 import org.mapstruct.Mapper;
@@ -21,7 +20,7 @@ public interface DayRoomMapper {
     Room req2Entity(DayRoomReq dayRoomReq);
 
     @Mapping(target = "dates", expression = "java(rdList2LdList(room.getRoomDates()))")
-    @Mapping(target = "participants", expression = "java(getAllParticipants(room))")
+    @Mapping(target = "participants", expression = "java(room.getParticipantNames())")
     DayRoomRes entity2Res(Room room);
 
     /**
@@ -41,11 +40,6 @@ public interface DayRoomMapper {
      */
     default List<LocalDate> rdList2LdList(List<RoomDate> rdList) {
         return rdList.stream().map(RoomDate::getScheduledDate)
-                .collect(Collectors.toList());
-    }
-
-    default List<String> getAllParticipants(Room room) {
-        return room.getParticipantList().stream().map(Participant::getParticipantName)
                 .collect(Collectors.toList());
     }
 }
