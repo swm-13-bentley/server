@@ -44,7 +44,7 @@ public class RoomController {
 
     @GetMapping("/room/{roomUuid}")
     public ResponseEntity getRoomInfo(@PathVariable("roomUuid") String roomUuid) {
-        Room room = roomService.getRoom(roomUuid);
+        Room room = roomService.getRoomWithParticipant(roomUuid);
         RoomResponse roomResponse = roomMapper.entity2Res(room);
 
         log.info("roomUuid: {}", roomUuid);

@@ -16,10 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.PriorityQueue;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,7 +43,7 @@ public class DayRoomController {
 
     @GetMapping("/day/room/{roomUuid}")
     public ResponseEntity dayRoomFind(@PathVariable("roomUuid") String roomUuid) {
-        Room room = roomService.getRoom(roomUuid);
+        Room room = roomService.getRoomWithParticipant(roomUuid);
         DayRoomRes dayRoomRes = dayRoomMapper.entity2Res(room);
 
         log.info("find dayRoomUuid: {}", roomUuid);
