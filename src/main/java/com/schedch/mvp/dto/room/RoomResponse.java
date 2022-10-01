@@ -13,4 +13,5 @@ public class RoomResponse {
     private List<LocalDate> dates = new ArrayList<>();
     private int startTime;
     private int endTime;
+    private List<String> participants = new ArrayList<>();
 }
