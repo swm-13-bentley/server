@@ -36,9 +36,46 @@ public class GoogleProfileService {
         return googleLoginDto;
     }
 
+    public GoogleLoginDto getGoogleProfileByType(String authCode, String type) throws FailedLoginException, JsonProcessingException {
+        ObjectMapper objectMapper = getObjectMapper();
+        GoogleLoginResponse googleLoginResponse = getGoogleLoginResponseByAuthCodeByType(objectMapper, authCode, type);
+        GoogleLoginDto googleLoginDto = getGoogleLoginDto(objectMapper, googleLoginResponse);
+
+        return googleLoginDto;
+    }
+
     public GoogleLoginResponse getGoogleLoginResponseByAuthCode(ObjectMapper objectMapper, String code, boolean isSignIn) throws JsonProcessingException {
         String redirectUri = isSignIn ?
                 googleConfigUtils.getGoogleSignInRedirectUrl() : googleConfigUtils.getGoogleSignOutRedirectUrl();
+
+        RestTemplate restTemplate = new RestTemplate();
+        GoogleLoginRequest requestParams = GoogleLoginRequest.builder()
+                .clientId(googleConfigUtils.getGoogleClientId())
+                .clientSecret(googleConfigUtils.getGoogleSecret())
+                .code(code)
+                .redirectUri(redirectUri)
+                .grantType("authorization_code")
+                .build();
+
+        // Http Header 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<GoogleLoginRequest> httpRequestEntity = new HttpEntity<>(requestParams, headers);
+        ResponseEntity<String> apiResponseJson = restTemplate.postForEntity(googleConfigUtils.getGoogleAuthUrl() + "/token", httpRequestEntity, String.class);
+
+        GoogleLoginResponse googleLoginResponse = objectMapper.readValue(apiResponseJson.getBody(), new TypeReference<GoogleLoginResponse>() {});
+
+        return googleLoginResponse;
+
+    }
+
+    public GoogleLoginResponse getGoogleLoginResponseByAuthCodeByType(ObjectMapper objectMapper, String code, String type) throws JsonProcessingException {
+        String redirectUri = "";
+        switch (type) {
+            case "addCalendar":
+                redirectUri = googleConfigUtils.getGoogleAddCalendarRedirectUrl();
+                break;
+        }
 
         RestTemplate restTemplate = new RestTemplate();
         GoogleLoginRequest requestParams = GoogleLoginRequest.builder()

@@ -5,11 +5,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.schedch.mvp.config.JwtConfig;
 import com.schedch.mvp.config.oauth.OAuthConfigUtils;
+import com.schedch.mvp.exception.CalendarLoadException;
 import com.schedch.mvp.model.User;
 import com.schedch.mvp.service.oauth.OAuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,47 +65,47 @@ public class SignController {
                     + accessToken;
             headers.setLocation(new URI(uri));
 
-            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
+            return new ResponseEntity(headers, HttpStatus.SEE_OTHER); //redirect with accessToken
 
-        } catch (IllegalArgumentException e) { //이미 회원 가입된 이메일인 경우
-            //TO함DO: error url로 변경
+        } catch (CalendarLoadException e) {
+            //TODO: error url로 변경
             headers.setLocation(new URI(oAuthConfigUtils.getFailurePageUrl()));
-            log.warn("login failed");
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
         }
+
     }
 
     @GetMapping(value = "/sign/in/redirect/google", params = {"error"})
-    public ResponseEntity signInFailure(@RequestParam(value = "error") String error) throws URISyntaxException, FailedLoginException, JsonProcessingException {
+    public ResponseEntity googleSignInFailure(@RequestParam(value = "error") String error) throws URISyntaxException, FailedLoginException, JsonProcessingException {
+        log.warn("login failed due to user cancellation: {}", error);
         HttpHeaders headers = new HttpHeaders();
-        log.warn("login failed due to user cancellation");
         headers.setLocation(new URI(oAuthConfigUtils.getFailurePageUrl()));
         return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
     }
 
-    @GetMapping("/sign/in/redirect/kakao")
-    public ResponseEntity redirectKakaoSignIn(@RequestParam(value = "code") String authCode) throws URISyntaxException, JsonProcessingException, ParseException {
-        HttpHeaders headers = new HttpHeaders();
-
-        try {
-            User user = oAuthService.kakaoSignIn(authCode);
-            String accessToken = jwtConfig.createAccessTokenByUser(user);
-            String refreshToken = jwtConfig.createRefreshToken();
-            oAuthService.saveToken(user.getEmail(), accessToken, refreshToken);
-
-            String uri = jwtConfig.getFrontSuccessRedirect()
-                    + "?accessToken="
-                    + accessToken;
-            headers.setLocation(new URI(uri));
-
-            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
-
-        } catch (IllegalArgumentException e) {
-            //TODO: error url로 변경
-            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
-            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
-        }
-    }
+//    @GetMapping("/sign/in/redirect/kakao")
+//    public ResponseEntity redirectKakaoSignIn(@RequestParam(value = "code") String authCode) throws URISyntaxException, JsonProcessingException, ParseException {
+//        HttpHeaders headers = new HttpHeaders();
+//
+//        try {
+//            User user = oAuthService.kakaoSignIn(authCode);
+//            String accessToken = jwtConfig.createAccessTokenByUser(user);
+//            String refreshToken = jwtConfig.createRefreshToken();
+//            oAuthService.saveToken(user.getEmail(), accessToken, refreshToken);
+//
+//            String uri = jwtConfig.getFrontSuccessRedirect()
+//                    + "?accessToken="
+//                    + accessToken;
+//            headers.setLocation(new URI(uri));
+//
+//            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
+//
+//        } catch (IllegalArgumentException e) {
+//            //TODO: error url로 변경
+//            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
+//            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
+//        }
+//    }
 
     /**
      * in order to sign out, user must log in first (no matter of jwt token)
@@ -136,29 +136,29 @@ public class SignController {
 
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) { //this email is not signed in
             //TODO: error url로 변경
             headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
         }
     }
 
-    @GetMapping("sign/out/redirect/kakao")
-    public ResponseEntity kakaoSignOut(@RequestParam(value = "code") String authCode) throws URISyntaxException, FailedLoginException, JsonProcessingException, ParseException {
-        HttpHeaders headers = new HttpHeaders();
-
-        try {
-            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
-            String email = oAuthService.kakaoSignOut(authCode);
-
-            oAuthService.deleteToken(email);
-
-            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
-
-        } catch (IllegalArgumentException e) {
-            //TODO: error url로 변경
-            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
-            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
-        }
-    }
+//    @GetMapping("sign/out/redirect/kakao")
+//    public ResponseEntity kakaoSignOut(@RequestParam(value = "code") String authCode) throws URISyntaxException, FailedLoginException, JsonProcessingException, ParseException {
+//        HttpHeaders headers = new HttpHeaders();
+//
+//        try {
+//            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
+//            String email = oAuthService.kakaoSignOut(authCode);
+//
+//            oAuthService.deleteToken(email);
+//
+//            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
+//
+//        } catch (IllegalArgumentException e) {
+//            //TODO: error url로 변경
+//            headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
+//            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
+//        }
+//    }
 }

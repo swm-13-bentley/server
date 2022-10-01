@@ -3,6 +3,7 @@ package com.schedch.mvp.controller.handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.schedch.mvp.exception.CalendarLoadException;
 import com.schedch.mvp.exception.UserNotInRoomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -75,10 +76,18 @@ public class ControllerHandler {
     }
 
     @ExceptionHandler(UserNotInRoomException.class)
-    public ResponseEntity userNotInRoomExceptionHandle(JsonProcessingException e) {
+    public ResponseEntity userNotInRoomExceptionHandle(UserNotInRoomException e) {
         JsonObject errorJson = getErrorJson(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(gson.toJson(errorJson));
+    }
+
+    @ExceptionHandler(CalendarLoadException.class)
+    public ResponseEntity calendarLoadErrorHandle(CalendarLoadException e) {
+        JsonObject errorJson = getErrorJson(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(gson.toJson(errorJson));
     }
 
