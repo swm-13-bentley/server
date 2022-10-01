@@ -84,7 +84,7 @@ class RoomControllerTest {
     @Test
     void get_room_info_failure_test() throws Exception {
         //given
-        given(roomService.getRoomWithParticipant(any(String.class)))
+        given(roomService.getRoom(any(String.class)))
                 .willThrow(new NoSuchElementException("sampleErrMsg"));
 
         //when
