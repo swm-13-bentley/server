@@ -101,4 +101,8 @@ public class Room extends BaseEntity{
     public LocalDate getEndLocalDate() {
         return roomDates.get(roomDates.size() -1).getScheduledDate();
     }
+
+    public List<String> getParticipantNames() {
+        return participantList.stream().map(Participant::getParticipantName).collect(Collectors.toList());
+    }
 }
