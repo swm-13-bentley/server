@@ -43,7 +43,7 @@ public class DayRoomController {
 
     @GetMapping("/day/room/{roomUuid}")
     public ResponseEntity dayRoomFind(@PathVariable("roomUuid") String roomUuid) {
-        Room room = roomService.getRoom(roomUuid);
+        Room room = roomService.getRoomWithParticipants(roomUuid);
         DayRoomRes dayRoomRes = dayRoomMapper.entity2Res(room);
 
         log.info("find dayRoomUuid: {}", roomUuid);
