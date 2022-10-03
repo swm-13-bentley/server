@@ -39,7 +39,14 @@ public class RoomService {
         Room room = roomOptional.orElseThrow(
                 () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid))
         );
-        room.getParticipantList();
+        return room;
+    }
+
+    public Room getRoomWithParticipants(String roomUuid) {
+        Optional<Room> roomOptional = roomRepository.findByUuidJoinFetchParticipant(roomUuid);
+        Room room = roomOptional.orElseThrow(
+                () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid))
+        );
         return room;
     }
 

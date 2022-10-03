@@ -71,7 +71,7 @@ class RoomControllerTest {
     @Test
     void get_room_info_test() throws Exception {
         //given
-        given(roomService.getRoom(any(String.class))).willReturn(null);
+        given(roomService.getRoomWithParticipants(any(String.class))).willReturn(null);
 
         //when
         mockMvc.perform(get("/room/testRoomUuid")
@@ -84,7 +84,7 @@ class RoomControllerTest {
     @Test
     void get_room_info_failure_test() throws Exception {
         //given
-        given(roomService.getRoom(any(String.class)))
+        given(roomService.getRoomWithParticipants(any(String.class)))
                 .willThrow(new NoSuchElementException("sampleErrMsg"));
 
         //when
