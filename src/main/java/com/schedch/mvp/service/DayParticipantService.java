@@ -29,14 +29,14 @@ public class DayParticipantService {
         List<Participant> foundParticipant = room.findUnSignedParticipant(participantName);
 
         if(foundParticipant.isEmpty()) { //신규 유저 -> 유저 등록해야 함
-            log.warn("E: findParticipant / no such participant in room / participantName = {}, roomId = {}", participantName, room.getId());
-            throw new NoSuchElementException(ErrorMessage.participantNameNotInRoom(participantName, room.getId()));
+            log.warn("E: findParticipant / no such participant in room / participantName = {}, roomUuid = {}", participantName, roomUuid);
+            throw new NoSuchElementException(ErrorMessage.participantNameNotInRoom(participantName, roomUuid));
         }
 
         Participant participant = foundParticipant.get(0);
         if(!participant.checkPassword(password)) { //기존 유저가 맞음 -> 기존 시간 돌려주면 됨
             log.warn("E: findParticipant / password is wrong / participantName = {}, password = {}, roomId = {}", participantName, password, room.getId());
-            throw new IllegalAccessException(ErrorMessage.passwordIsWrong(participantName, password, room.getId()));
+            throw new IllegalAccessException(ErrorMessage.passwordIsWrong(participantName, password, roomUuid));
         }
 
         return participant;
@@ -54,8 +54,8 @@ public class DayParticipantService {
 
         participant = participantOptional.get();
         if (!participant.checkPassword(password)) {
-            log.warn("E: findParticipant / password is wrong / participantName = {}, password = {}, roomId = {}", participantName, password, room.getId());
-            throw new IllegalAccessException(ErrorMessage.passwordIsWrong(participantName, password, room.getId()));
+            log.warn("E: findParticipant / password is wrong / participantName = {}, password = {}, roomUuid = {}", participantName, password, roomUuid);
+            throw new IllegalAccessException(ErrorMessage.passwordIsWrong(participantName, password, roomUuid));
         }
         participant.emptySchedules();
 

@@ -49,8 +49,8 @@ public class ParticipantService {
             return new ParticipantResponseDto(participant);
         }
         else { //기존 유저이나, 비밀번호가 틀렸음
-            log.warn("E: findUnSignedParticipantAndValidate / password is wrong / participantName = {}, password = {}, roomId = {}", participantName, password, room.getId());
-            throw new IllegalAccessException(ErrorMessage.passwordIsWrong(participantName, password, room.getId()));
+            log.warn("E: findUnSignedParticipantAndValidate / password is wrong / participantName = {}, password = {}, roomUuid = {}", participantName, password, roomUuid);
+            throw new IllegalAccessException(ErrorMessage.passwordIsWrong(participantName, password, roomUuid));
         }
     }
 
@@ -60,8 +60,8 @@ public class ParticipantService {
 
         Optional<Participant> participantOptional = participantRepository.findParticipantByParticipantNameAndRoomAndIsSignedIn(participantName, room, false);
         if (participantOptional.isEmpty()) {
-            log.warn("E: saveParticipantAvailable / participant name not in room / participantName = {}, roomId = {}", participantName, room.getId());
-            throw new NoSuchElementException(ErrorMessage.participantNameNotInRoom(participantName, room.getId()));
+            log.warn("E: saveParticipantAvailable / participant name not in room / participantName = {}, roomUuid = {}", participantName, roomUuid);
+            throw new NoSuchElementException(ErrorMessage.participantNameNotInRoom(participantName, roomUuid));
         }
 
         Participant participant = participantOptional.get();

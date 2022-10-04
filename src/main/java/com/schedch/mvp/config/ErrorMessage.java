@@ -35,12 +35,12 @@ public class ErrorMessage {
         return String.format("User=%s does not own userCalendar=%s", userId.toString(), userCalendarId.toString());
     }
 
-    public static String participantNameNotInRoom(String participantName, Long roomId) {
-        return String.format("No participant found / participant name = %s, roomId = %s", participantName, roomId.toString());
+    public static String participantNameNotInRoom(String participantName, String roomUuid) {
+        return String.format("No participant found / participant name = %s, roomId = %s", participantName, roomUuid);
     }
 
-    public static String passwordIsWrong(String participantName, String password, Long roomId) {
-        return String.format("Password is wrong / participantName = %s, password = %s, roomId = %s", participantName, password, roomId.toString());
+    public static String passwordIsWrong(String participantName, String password, String roomUuid) {
+        return String.format("Password is wrong / participantName = %s, password = %s, roomUuid = %s", participantName, password, roomUuid);
     }
 
     public static String notSignedInEmail(String email) {
