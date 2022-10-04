@@ -11,6 +11,7 @@ import com.google.api.services.calendar.Calendar;
 import com.schedch.mvp.config.oauth.GoogleConfigUtils;
 import com.schedch.mvp.service.GoogleCalendarService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,6 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class CalendarService {
 
     private final GoogleConfigUtils googleConfigUtils;

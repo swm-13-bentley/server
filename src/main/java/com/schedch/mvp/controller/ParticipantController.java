@@ -29,12 +29,12 @@ public class ParticipantController {
         String participantName = participantRequestDto.getParticipantName();
         String password = participantRequestDto.getPassword();
 
-        log.info("roomUuid: {}, participantName: {}, pwd: {}", roomUuid, participantName, password);
-
+        log.info("P: participantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
         try {
             ParticipantResponseDto participantResponseDto
                     = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
 
+            log.info("S: participantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(gson.toJson(participantResponseDto));
 
@@ -50,8 +50,10 @@ public class ParticipantController {
     @PostMapping("/room/{roomUuid}/participant/available")
     public ResponseEntity participantAvailablePost(@PathVariable String roomUuid,
                                                    @RequestBody AvailableRequestDto availableRequestDto) {
-        log.info("roomUuid: {}, availableRequestDto: {}", roomUuid, gson.toJson(availableRequestDto));
+        log.info("P: participantAvailablePost / roomUuid = {}, availableRequestDto = {}", roomUuid, gson.toJson(availableRequestDto));
         participantService.saveParticipantAvailable(roomUuid, availableRequestDto);
+
+        log.info("S: participantAvailablePost / roomUuid = {}, participantName = {}", roomUuid, availableRequestDto.getParticipantName());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .build();
@@ -59,8 +61,11 @@ public class ParticipantController {
 
     @GetMapping("/room/{roomUuid}/group")
     public ResponseEntity groupSchedulesFind(@PathVariable String roomUuid) {
+        log.info("P: groupSchedulesFind / roomUuid = {}", roomUuid);
+
         List<ParticipantResponseDto> participantResponseDtoList = participantService.findAllParticipantsInRoom(roomUuid);
-        log.info("roomUuid: {}", roomUuid);
+
+        log.info("S: groupSchedulesFind / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(participantResponseDtoList));

@@ -31,12 +31,14 @@ public class RoomController {
 
     @PostMapping("/room")
     public ResponseEntity createRoom(@Valid @RequestBody RoomRequest roomReq) {
+        log.info("P: createRoom / roomReq = {}", gson.toJson(roomReq));
         Room room = roomMapper.req2Entity(roomReq);
         String roomUuid = roomService.createRoom(room);
+
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("roomUuid", roomUuid);
 
-        log.info("created roomUuid: {}, roomInfo: {}", roomUuid, gson.toJson(roomReq));
+        log.info("S: createRoom / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(jsonObject));
@@ -44,10 +46,11 @@ public class RoomController {
 
     @GetMapping("/room/{roomUuid}")
     public ResponseEntity getRoomInfo(@PathVariable("roomUuid") String roomUuid) {
+        log.info("P: getRoomInfo / roomUuid = {}", roomUuid);
         Room room = roomService.getRoomWithParticipants(roomUuid);
         RoomResponse roomResponse = roomMapper.entity2Res(room);
 
-        log.info("roomUuid: {}", roomUuid);
+        log.info("S: getRoomInfo / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(roomResponse));
@@ -56,6 +59,8 @@ public class RoomController {
     @GetMapping("/room/{roomUuid}/top/{max}")
     public ResponseEntity getTopTimes(@PathVariable("roomUuid") String roomUuid,
                                       @PathVariable("max") int max) {
+        log.info("P: getTopTimes / roomUuid = {}, max = {}", roomUuid, max);
+
         List<TopTime> topAvailableTimeAndNames = roomService.getTopAvailableTimeAndNames(roomUuid, max);
         List<TopCountRes> responseList = topAvailableTimeAndNames.stream().map(timeCount -> {
             return TopCountRes.builder()
@@ -67,7 +72,7 @@ public class RoomController {
                     .build();
         }).collect(Collectors.toList());
 
-        log.info("roomUuid: {}, max: {}, foundLen: {}", roomUuid, max, responseList.size());
+        log.info("roomUuid = {}, max = {}, responseList = {}", roomUuid, max, gson.toJson(responseList));
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(responseList));

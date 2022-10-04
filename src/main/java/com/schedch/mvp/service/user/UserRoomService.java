@@ -10,6 +10,7 @@ import com.schedch.mvp.repository.ParticipantRepository;
 import com.schedch.mvp.repository.RoomRepository;
 import com.schedch.mvp.service.RoomService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class UserRoomService {
 
     private final UserService userService;
@@ -38,6 +40,7 @@ public class UserRoomService {
         }
 
         if (!room.canAddMember()) { // Case: room is already full
+            log.warn("E: entry / room is full / roomId = {}", room.getId());
             throw new FullMemberException(ErrorMessage.fullMemberForUuid(roomUuid));
         }
 
@@ -54,6 +57,7 @@ public class UserRoomService {
 
         Optional<Participant> participantOptional = participantRepository.findByUserAndRoom(user, room);
         if (participantOptional.isEmpty()) {
+            log.warn("E: exitRoom / user is not in room / userId = {}, roomId = {}", user.getId(), room.getId());
             throw new UserNotInRoomException(ErrorMessage.userNotInRoom(roomUuid));
         }
 

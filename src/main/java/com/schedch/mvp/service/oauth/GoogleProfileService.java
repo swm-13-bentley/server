@@ -10,6 +10,7 @@ import com.schedch.mvp.dto.GoogleLoginRequest;
 import com.schedch.mvp.dto.GoogleLoginResponse;
 import com.schedch.mvp.dto.oauth.GoogleLoginDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,28 +24,36 @@ import javax.security.auth.login.FailedLoginException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GoogleProfileService {
 
     private final GoogleConfigUtils googleConfigUtils;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public GoogleLoginDto getGoogleProfile(String authCode, boolean isSignIn) throws FailedLoginException, JsonProcessingException {
+        log.info("P: getGoogleProfile / authCode = {}", authCode);
         ObjectMapper objectMapper = getObjectMapper();
         GoogleLoginResponse googleLoginResponse = getGoogleLoginResponseByAuthCode(objectMapper, authCode, isSignIn);
         GoogleLoginDto googleLoginDto = getGoogleLoginDto(objectMapper, googleLoginResponse);
 
+        log.info("S: getGoogleProfile / authCode = {}", authCode);
         return googleLoginDto;
     }
 
     public GoogleLoginDto getGoogleProfileByType(String authCode, String type) throws FailedLoginException, JsonProcessingException {
+        log.info("P: getGoogleProfileByType / authCode = {}", authCode);
+
         ObjectMapper objectMapper = getObjectMapper();
         GoogleLoginResponse googleLoginResponse = getGoogleLoginResponseByAuthCodeByType(objectMapper, authCode, type);
         GoogleLoginDto googleLoginDto = getGoogleLoginDto(objectMapper, googleLoginResponse);
 
+        log.info("S: getGoogleProfileByType / authCode = {}", authCode);
         return googleLoginDto;
     }
 
-    public GoogleLoginResponse getGoogleLoginResponseByAuthCode(ObjectMapper objectMapper, String code, boolean isSignIn) throws JsonProcessingException {
+    public GoogleLoginResponse getGoogleLoginResponseByAuthCode(ObjectMapper objectMapper, String authCode, boolean isSignIn) throws JsonProcessingException {
+        log.info("P: getGoogleLoginResponseByAuthCode / authCode = {}", authCode);
+
         String redirectUri = isSignIn ?
                 googleConfigUtils.getGoogleSignInRedirectUrl() : googleConfigUtils.getGoogleSignOutRedirectUrl();
 
@@ -52,7 +61,7 @@ public class GoogleProfileService {
         GoogleLoginRequest requestParams = GoogleLoginRequest.builder()
                 .clientId(googleConfigUtils.getGoogleClientId())
                 .clientSecret(googleConfigUtils.getGoogleSecret())
-                .code(code)
+                .code(authCode)
                 .redirectUri(redirectUri)
                 .grantType("authorization_code")
                 .build();
@@ -65,11 +74,14 @@ public class GoogleProfileService {
 
         GoogleLoginResponse googleLoginResponse = objectMapper.readValue(apiResponseJson.getBody(), new TypeReference<GoogleLoginResponse>() {});
 
+        log.info("S: getGoogleLoginResponseByAuthCode / authCode = {}", authCode);
         return googleLoginResponse;
 
     }
 
-    public GoogleLoginResponse getGoogleLoginResponseByAuthCodeByType(ObjectMapper objectMapper, String code, String type) throws JsonProcessingException {
+    public GoogleLoginResponse getGoogleLoginResponseByAuthCodeByType(ObjectMapper objectMapper, String authCode, String type) throws JsonProcessingException {
+        log.info("P: getGoogleLoginResponseByAuthCodeByType / authCode = {}", authCode);
+
         String redirectUri = "";
         switch (type) {
             case "addCalendar":
@@ -81,7 +93,7 @@ public class GoogleProfileService {
         GoogleLoginRequest requestParams = GoogleLoginRequest.builder()
                 .clientId(googleConfigUtils.getGoogleClientId())
                 .clientSecret(googleConfigUtils.getGoogleSecret())
-                .code(code)
+                .code(authCode)
                 .redirectUri(redirectUri)
                 .grantType("authorization_code")
                 .build();
@@ -94,11 +106,14 @@ public class GoogleProfileService {
 
         GoogleLoginResponse googleLoginResponse = objectMapper.readValue(apiResponseJson.getBody(), new TypeReference<GoogleLoginResponse>() {});
 
+        log.info("S: getGoogleLoginResponseByAuthCodeByType / authCode = {}", authCode);
         return googleLoginResponse;
 
     }
 
     private GoogleLoginDto getGoogleLoginDto(ObjectMapper objectMapper, GoogleLoginResponse googleLoginResponse) throws FailedLoginException, JsonProcessingException {
+        log.info("P: getGoogleLoginDto");
+
         String jwtToken = googleLoginResponse.getIdToken();
         String requestUrl = UriComponentsBuilder.fromHttpUrl(googleConfigUtils.getGoogleAuthUrl() + "/tokeninfo").queryParam("id_token", jwtToken).toUriString();
         String resultJson = new RestTemplate().getForObject(requestUrl, String.class);
@@ -113,6 +128,7 @@ public class GoogleProfileService {
             return googleLoginDto;
         }
         else {
+            log.error("F: getGoogleLoginDto / google resultJson is null");
             throw new FailedLoginException("Google OAuth failed!");
         }
     }

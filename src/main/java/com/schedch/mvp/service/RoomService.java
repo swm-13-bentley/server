@@ -36,25 +36,32 @@ public class RoomService {
 
     public Room getRoom(String roomUuid) {
         Optional<Room> roomOptional = roomRepository.findByUuid(roomUuid);
-        Room room = roomOptional.orElseThrow(
-                () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid))
-        );
+        Room room = getRoomFromOptional(roomOptional, roomUuid);
+
         return room;
     }
 
     public Room getRoomWithParticipants(String roomUuid) {
         Optional<Room> roomOptional = roomRepository.findByUuidJoinFetchParticipant(roomUuid);
-        Room room = roomOptional.orElseThrow(
-                () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid))
-        );
+        Room room = getRoomFromOptional(roomOptional, roomUuid);
+
         return room;
     }
 
     public Room getRoomWithRoomDates(String roomUuid) {
         Optional<Room> roomOptional = roomRepository.findByUuidJoinFetchRoomDates(roomUuid);
+        Room room = getRoomFromOptional(roomOptional, roomUuid);
+        return room;
+    }
+
+    private Room getRoomFromOptional(Optional<Room> roomOptional, String roomUuid) {
         Room room = roomOptional.orElseThrow(
-                () -> new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid))
+                () -> {
+                    log.warn("E: getRoom(With)(*) / NoSuchElementException / roomUuid = {}", roomUuid);
+                    return new NoSuchElementException(String.format("Room for uuid: %s not found", roomUuid));
+                }
         );
+        log.info("S: getRoom(With)(*) / roomUuid = {}", roomUuid);
         return room;
     }
 
@@ -195,7 +202,7 @@ public class RoomService {
             for (Schedule schedule : scheduleList) {
                 LocalDate availableDate = schedule.getAvailableDate();
                 if (!columnMap.containsKey(availableDate)) {
-                    log.warn("참가자가 입력한 날짜가 방의 날짜 기간을 벗어납니다.");
+                    log.warn("E: fillBoard / participant's date is out of room's range");
                     continue;
                 }
 

@@ -31,11 +31,12 @@ public class DayParticipantController {
                                              @RequestBody ParticipantRequestDto participantRequestDto) throws IllegalAccessException {
         String participantName = participantRequestDto.getParticipantName();
         String password = participantRequestDto.getPassword();
+        log.info("P: dayParticipantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
 
         Participant participant = dayParticipantService.findParticipant(roomUuid, participantName, password);
         DayParticipantRes dayParticipantRes = dayParticipantMapper.entity2Res(participant);
 
-        log.info("roomUuid: {}, pName: {}, pwd: {}", roomUuid, participantName, password);
+        log.info("S: dayParticipantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(dayParticipantRes));
@@ -44,13 +45,14 @@ public class DayParticipantController {
     @PostMapping("day/room/{roomUuid}/participant/available")
     public ResponseEntity saveDayParticipantAvailable(@PathVariable("roomUuid") String roomUuid,
                                                       @Valid @RequestBody DayParticipantReq dayParticipantReq) throws IllegalAccessException{
-
         String participantName = dayParticipantReq.getParticipantName();
         String password = dayParticipantReq.getPassword();
+        log.info("P: saveDayParticipantAvailable / roomUuid = {}, participantName = {}, dayParticipantReq = {}", roomUuid, participantName, gson.toJson(dayParticipantReq));
+
         List<LocalDate> availableDates = dayParticipantReq.getAvailableDates();
         dayParticipantService.saveParticipantAvailable(roomUuid, participantName, password, availableDates);
 
-        log.info("roomUuid: {}, participantName: {}, dates: {}", roomUuid, participantName, gson.toJson(availableDates));
+        log.info("S: saveDayParticipantAvailable / roomUuid = {}, participantName = {}", roomUuid, participantName);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .build();

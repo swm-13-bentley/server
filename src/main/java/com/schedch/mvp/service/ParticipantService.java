@@ -4,37 +4,37 @@ import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.config.ErrorMessage;
 import com.schedch.mvp.dto.AvailableRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
-import com.schedch.mvp.dto.TimeBlockDto;
 import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
-import com.schedch.mvp.model.Schedule;
 import com.schedch.mvp.repository.ParticipantRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ParticipantService {
 
     private final ParticipantRepository participantRepository;
     private final RoomService roomService;
 
-    public ParticipantResponseDto findUnSignedParticipantAndValidate(
-            String roomUuid, String participantName, String password) throws IllegalAccessException {
+    public ParticipantResponseDto findUnSignedParticipantAndValidate(String roomUuid, String participantName, String password) throws IllegalAccessException {
         Room room = roomService.getRoom(roomUuid);
         List<Participant> foundParticipant = room.findUnSignedParticipant(participantName);
 
         if(foundParticipant.isEmpty()) {//신규 유저 -> 유저 등록해야 함
             if(!room.canAddMember()) {//member limit
+                log.warn("E: findUnSignedParticipantAndValidate / room is full / roomId = {}", room.getId());
                 throw new FullMemberException(ErrorMessage.fullMemberForUuid(roomUuid));
             }
 
@@ -49,7 +49,8 @@ public class ParticipantService {
             return new ParticipantResponseDto(participant);
         }
         else { //기존 유저이나, 비밀번호가 틀렸음
-            throw new IllegalAccessException("password is incorrect for participant: " + participantName);
+            log.warn("E: findUnSignedParticipantAndValidate / password is wrong / participantName = {}, password = {}, roomId = {}", participantName, password, room.getId());
+            throw new IllegalAccessException(ErrorMessage.passwordIsWrong(participantName, password, room.getId()));
         }
     }
 
@@ -57,9 +58,13 @@ public class ParticipantService {
         Room room = roomService.getRoom(roomUuid);
         String participantName = availableRequestDto.getParticipantName();
 
-        Participant participant = participantRepository.findParticipantByParticipantNameAndRoomAndIsSignedIn(participantName, room, false)
-                .orElseThrow(() -> new NoSuchElementException(String.format("Participant not found for name: %s", participantName)));
+        Optional<Participant> participantOptional = participantRepository.findParticipantByParticipantNameAndRoomAndIsSignedIn(participantName, room, false);
+        if (participantOptional.isEmpty()) {
+            log.warn("E: saveParticipantAvailable / participant name not in room / participantName = {}, roomId = {}", participantName, room.getId());
+            throw new NoSuchElementException(ErrorMessage.participantNameNotInRoom(participantName, room.getId()));
+        }
 
+        Participant participant = participantOptional.get();
         participant.emptySchedules();
 
         LocalTime roomStartTime = room.getStartTime();

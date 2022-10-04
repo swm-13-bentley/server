@@ -30,4 +30,21 @@ public class ErrorMessage {
     public static String cannotFindMainCalendarError() {
         return String.format("Cannot find main calendar");
     }
+
+    public static String userDoesNotOwnUserCalendar(Long userId, Long userCalendarId) {
+        return String.format("User=%s does not own userCalendar=%s", userId.toString(), userCalendarId.toString());
+    }
+
+    public static String participantNameNotInRoom(String participantName, Long roomId) {
+        return String.format("No participant found / participant name = %s, roomId = %s", participantName, roomId.toString());
+    }
+
+    public static String passwordIsWrong(String participantName, String password, Long roomId) {
+        return String.format("Password is wrong / participantName = %s, password = %s, roomId = %s", participantName, password, roomId.toString());
+    }
+
+    public static String notSignedInEmail(String email) {
+        return String.format("This email is not signed in / email = %s", email);
+    }
+
 }
