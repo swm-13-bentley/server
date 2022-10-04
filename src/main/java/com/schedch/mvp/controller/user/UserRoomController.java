@@ -11,6 +11,7 @@ import com.schedch.mvp.exception.UserNotInRoomException;
 import com.schedch.mvp.mapper.DayRoomMapper;
 import com.schedch.mvp.mapper.RoomMapper;
 import com.schedch.mvp.model.Room;
+import com.schedch.mvp.model.User;
 import com.schedch.mvp.service.RoomService;
 import com.schedch.mvp.service.user.UserRoomService;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +37,14 @@ public class UserRoomController {
 
     @PostMapping("/user/room")
     public ResponseEntity createPremiumRoom(@Valid @RequestBody RoomRequest roomReq) {
+        log.info("P: createPremiumRoom / roomReq = {}", gson.toJson(roomReq));
+
         Room room = roomMapper.req2Entity(roomReq);
         String roomUuid = roomService.createPremiumRoom(room);
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("roomUuid", roomUuid);
 
-        log.info("created PREMIUM roomUuid: {}, roomInfo: {}", roomUuid, gson.toJson(roomReq));
+        log.info("S: createPremiumRoom / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(jsonObject));
@@ -49,12 +52,14 @@ public class UserRoomController {
 
     @PostMapping("/user/day/room")
     public ResponseEntity createPremiumDayRoom(@Valid @RequestBody DayRoomReq dayRoomReq) {
+        log.info("P: createPremiumDayRoom / dayRoomReq = {}", gson.toJson(dayRoomReq));
+
         Room room = dayRoomMapper.req2Entity(dayRoomReq);
         String roomUuid = roomService.createPremiumRoom(room);
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("roomUuid", roomUuid);
 
-        log.info("created dayRoomUuid: {}, dates: {}", roomUuid, gson.toJson(dayRoomReq.getDates()));
+        log.info("S: createPremiumDayRoom / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(jsonObject));
@@ -62,9 +67,13 @@ public class UserRoomController {
 
     @PostMapping("/user/room/{roomUuid}/entry")
     public ResponseEntity userRoomEntry(@PathVariable String roomUuid, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        User user = principalDetails.getUser();
+        log.info("P: userRoomEntry / userId = {}, roomUuid = {}", user.getId(), roomUuid);
+
         String userEmail = getUserEmail(principalDetails);
         ParticipantResponseDto resDto = userRoomService.entry(userEmail, roomUuid);
 
+        log.info("S: userRoomEntry / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(resDto));
@@ -72,10 +81,14 @@ public class UserRoomController {
 
     @PostMapping("/user/room/{roomUuid}/exit")
     public ResponseEntity userRoomExit(@PathVariable String roomUuid, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        String userEmail = getUserEmail(principalDetails);
+        User user = principalDetails.getUser();
+        log.info("P: userRoomExit / userId = {}, roomUuid = {}", user.getId(), roomUuid);
 
+        String userEmail = getUserEmail(principalDetails);
         try {
             userRoomService.exitRoom(userEmail, roomUuid);
+
+            log.info("S: userRoomExit / userId = {}, roomUuid = {}", user.getId(), roomUuid);
             return ResponseEntity.status(HttpStatus.OK)
                     .build();
 
@@ -87,9 +100,13 @@ public class UserRoomController {
 
     @GetMapping("/user/myRoom/unConfirmed")
     public ResponseEntity getAllUnConfirmedRooms(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        User user = principalDetails.getUser();
+        log.info("P: getAllUnConfirmedRooms / userId = {}", user.getId());
+
         String userEmail = getUserEmail(principalDetails);
         List<UserParticipatingRoomRes> resList = userRoomService.getAllRooms(userEmail, false);
 
+        log.info("S: getAllUnConfirmedRooms / userId = {}", user.getId());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(resList));
@@ -97,9 +114,13 @@ public class UserRoomController {
 
     @GetMapping("/user/myRoom/confirmed")
     public ResponseEntity getAllConfirmedRooms(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        User user = principalDetails.getUser();
+        log.info("P: getAllConfirmedRooms / userId = {}", user.getId());
+
         String userEmail = getUserEmail(principalDetails);
         List<UserParticipatingRoomRes> resList = userRoomService.getAllRooms(userEmail, true);
 
+        log.info("S: getAllConfirmedRooms / userId = {}", user.getId());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(resList));

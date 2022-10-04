@@ -30,12 +30,14 @@ public class DayRoomController {
 
     @PostMapping("/day/room")
     public ResponseEntity dayRoomCreate(@Valid @RequestBody DayRoomReq dayRoomReq) {
+        log.info("P: dayRoomCreate / dayRoomReq = {}", dayRoomReq);
+
         Room room = dayRoomMapper.req2Entity(dayRoomReq);
         String roomUuid = roomService.createRoom(room);
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("roomUuid", roomUuid);
 
-        log.info("created dayRoomUuid: {}, dates: {}", roomUuid, gson.toJson(dayRoomReq.getDates()));
+        log.info("S: dayRoomCreate / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(jsonObject));
@@ -43,10 +45,12 @@ public class DayRoomController {
 
     @GetMapping("/day/room/{roomUuid}")
     public ResponseEntity dayRoomFind(@PathVariable("roomUuid") String roomUuid) {
+        log.info("P: dayRoomCreate / roomUuid = {}", roomUuid);
+
         Room room = roomService.getRoomWithParticipants(roomUuid);
         DayRoomRes dayRoomRes = dayRoomMapper.entity2Res(room);
 
-        log.info("find dayRoomUuid: {}", roomUuid);
+        log.info("S: dayRoomCreate / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(dayRoomRes));
@@ -55,9 +59,11 @@ public class DayRoomController {
     @GetMapping("day/room/{roomUuid}/top/{max}")
     public ResponseEntity dayRoomTopFind(@PathVariable("roomUuid") String roomUuid,
                                          @PathVariable("max") int max) {
+        log.info("P: dayRoomTopFind / roomUuid = {}, max = {}", roomUuid, max);
+
         List<DayRoomTopRes> dayRoomTopResList = dayRoomService.getTopAvailableDate(roomUuid, max);
 
-        log.info("find top list for roomUuid: {}, max: {}", roomUuid, max);
+        log.info("S: dayRoomTopFind / dayRoomTopResList.size() = {}", dayRoomTopResList.size());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(dayRoomTopResList));

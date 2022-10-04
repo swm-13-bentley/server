@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.schedch.mvp.exception.CalendarLoadException;
 import com.schedch.mvp.exception.UserNotInRoomException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,6 +19,7 @@ import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
+@Slf4j
 public class ControllerHandler {
 
     private final Gson gson;

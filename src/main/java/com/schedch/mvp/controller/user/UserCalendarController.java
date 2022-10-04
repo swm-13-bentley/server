@@ -17,6 +17,7 @@ import com.schedch.mvp.service.RoomService;
 import com.schedch.mvp.service.user.UserCalendarService;
 import com.schedch.mvp.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class UserCalendarController {
 
     private final UserService userService;
@@ -44,31 +46,35 @@ public class UserCalendarController {
     public ResponseEntity userAddCalendar(@AuthenticationPrincipal PrincipalDetails principalDetails) throws URISyntaxException {
         String userEmail = principalDetails.getUsername();
         User user = userService.getUserByEmail(userEmail);
+        log.info("P: userAddCalendar / userId = {}", user.getId());
 
         String redirectUri = oAuthConfigUtils.getUserCalendarAddAuthUrl(user.getId(), "google");
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(new URI(redirectUri));
 
+        log.info("S: userAddCalendar() / userId = {}", user.getId());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(redirectUri);
-//        return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
     }
 
     @GetMapping("/calendar/redirect/google")
     public ResponseEntity getAddCalendarRedirect(@RequestParam(value = "code") String authCode,
                                                  @RequestParam(value = "state") Long userId) throws FailedLoginException, JsonProcessingException, URISyntaxException {
-
+        log.info("P: getAddCalendarRedirect() / authCode received for userId = {}", userId);
         userCalendarService.addCalendar(userId, authCode);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(new URI(oAuthConfigUtils.getMainPageUrl()));
 
+        log.info("S: getAddCalendarRedirect() / userId = {}", userId);
         return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
     }
 
     @GetMapping("/user/calendar")
     public ResponseEntity loadUserCalendarEvents(@RequestParam(value = "roomUuid") String roomUuid,
                                               @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        User user = principalDetails.getUser();
+        log.info("P: loadUserCalendarEvents() / userId = {}", user.getId());
 
         String userEmail = principalDetails.getUsername();
         Room room = roomService.getRoomWithRoomDates(roomUuid);
@@ -78,10 +84,12 @@ public class UserCalendarController {
 
         try {
             List<UserCalendarLoadRes> response = userCalendarService.loadCalendarEvents(userEmail, startDateTime, endDateTime);
+            log.info("S: loadUserCalendarEvents() / userId = {}, roomUuid = {}", user.getId(), roomUuid);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(gson.toJson(response));
 
         } catch (NoSuchElementException e) {
+            log.warn("E: loadUserCalendarEvents() / No main calendar / userId = {}", user.getId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
         }
@@ -89,6 +97,8 @@ public class UserCalendarController {
 
     @GetMapping("/user/calendar/all")
     public ResponseEntity findAllUserCalendar(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        User user = principalDetails.getUser();
+        log.info("P: findAllUserCalendar() / userId = {}", user.getId());
 
         String userEmail = principalDetails.getUsername();
         List<UserCalendar> userCalendarList = userCalendarService.getAllUserCalendar(userEmail);
@@ -102,19 +112,25 @@ public class UserCalendarController {
                     }
                 }
         );
-
+        log.info("S: findAllUserCalendar() / userId = {}", user.getId());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(gson.toJson(response));
     }
 
     @DeleteMapping("/user/calendar")
-    public ResponseEntity deleteUserCalendar(@RequestParam("calendarId") Long calendarId) {
+    public ResponseEntity deleteUserCalendar(@RequestParam("calendarId") Long calendarId,
+                                             @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        User user = principalDetails.getUser();
+        log.info("P: findAllUserCalendar / userId = {}", user.getId());
+
         try {
-            userCalendarService.deleteUserCalendar(calendarId);
+            userCalendarService.deleteUserCalendar(user.getId(), calendarId);
+
+            log.info("S: findAllUserCalendar / userId = {}", user.getId());
             return ResponseEntity.status(HttpStatus.OK)
                     .build();
 
-        } catch (IllegalArgumentException e) { //no such calendar exists for this user
+        } catch (IllegalArgumentException e) { //user does not own userCalendar, userCalendarId does not exist in db
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
 
@@ -128,10 +144,14 @@ public class UserCalendarController {
     @PatchMapping("/user/calendar/main")
     public ResponseEntity patchMainCalendar(@RequestParam("newMainCalendarId") Long newMainCalendarId,
                                             @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        String userEmail = principalDetails.getUsername();
+        User user = principalDetails.getUser();
+        log.info("P: patchMainCalendar / userId = {}", user.getId());
 
+        String userEmail = principalDetails.getUsername();
         try {
             userCalendarService.changeMainUserCalendar(userEmail, newMainCalendarId);
+
+            log.info("S: patchMainCalendar / userId = {}, newMainCalendarId = {}", user.getId(), newMainCalendarId);
             return ResponseEntity.status(HttpStatus.OK)
                     .build();
 
@@ -144,10 +164,14 @@ public class UserCalendarController {
     @PutMapping("/user/calendar/selected")
     public ResponseEntity changeSelectedSubCalendar(@RequestBody UserCalendarReq userCalendarReq,
                                                     @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        User user = principalDetails.getUser();
+        log.info("P: changeSelectedSubCalendar / userId = {}", user.getId());
         String userEmail = principalDetails.getUsername();
 
         try {
             userCalendarService.changeSelectedSubCalendar(userEmail, userCalendarReq);
+
+            log.info("S: changeSelectedSubCalendar / userId = {}", user.getId());
             return ResponseEntity.status(HttpStatus.OK)
                     .build();
 

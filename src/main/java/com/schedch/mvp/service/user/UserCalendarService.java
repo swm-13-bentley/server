@@ -50,7 +50,7 @@ public class UserCalendarService {
 
         Optional<UserCalendar> userCalendarOptional = userCalendarRepository.findByCalendarEmailAndUser(calendarEmail, user);
         if (userCalendarOptional.isPresent()) {
-            log.info("User added already existing calendar for email : {}", calendarEmail);
+            log.info("E: addCalendar() /  User added already existing calendar / userCalendarId = {}", userCalendarOptional.get().getId());
             return;
         }
 
@@ -82,14 +82,16 @@ public class UserCalendarService {
                 userCalendar.addSubCalendar(subCalendar);
             });
 
-            log.info("calendar added for userId = {}, subCalendarSize = {}", user.getId(), items.size());
             return userCalendar;
 
         } catch (GeneralSecurityException e) {
+            log.error("F: addCalendarToUser() / GeneralSecurityException / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
             throw new CalendarLoadException(e.getMessage());
         } catch (IOException e) {
+            log.error("F: addCalendarToUser() / IOException / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
             throw new CalendarLoadException(e.getMessage());
         } catch (Exception e) {
+            log.error("F: addCalendarToUser() / Google calendar load error / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
             throw new CalendarLoadException(e.getMessage());
         }
     }
@@ -97,7 +99,6 @@ public class UserCalendarService {
     public List<UserCalendar> getAllUserCalendar(String userEmail) {
         User user = userService.getUserByEmail(userEmail);
         List<UserCalendar> userCalendarList = userCalendarRepository.findAllByUserJoinFetchSubCalendar(user);
-        log.info("getAllUserCalendar for userId = {}, size = {}", user.getId(), userCalendarList.size());
 
         return userCalendarList;
     }
@@ -147,26 +148,37 @@ public class UserCalendarService {
                 }
 
             }
-
             return userCalendarLoadResList;
 
         } catch (GeneralSecurityException e) {
+            log.error("F: getAllUserCalendar / GeneralSecurityException / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
             throw new CalendarLoadException(e.getMessage());
         } catch (IOException e) {
+            log.error("F: getAllUserCalendar / IOException / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
+            throw new CalendarLoadException(e.getMessage());
+        } catch (Exception e) {
+            log.error("F: getAllUserCalendar / calendar load error / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
             throw new CalendarLoadException(e.getMessage());
         }
 
     }
 
-    public void deleteUserCalendar(Long userCalendarId) {
+    public void deleteUserCalendar(Long userId, Long userCalendarId) {
         Optional<UserCalendar> userCalendarOptional = userCalendarRepository.findById(userCalendarId);
 
         if (userCalendarOptional.isEmpty()) {
+            log.warn("E: deleteUserCalendar / userCalendar does not exist in db / userCalendarId = {}", userCalendarId);
             throw new IllegalArgumentException(ErrorMessage.userCalendarNotFound(userCalendarId));
         }
 
         UserCalendar userCalendar = userCalendarOptional.get();
+
+        if(userCalendar.getUser().getId() != userId) {
+            log.warn("E: deleteUserCalendar / user does not own userCalendar / userId = {}, userCalendarId = {}", userId, userCalendarId);
+            throw new IllegalArgumentException(ErrorMessage.userDoesNotOwnUserCalendar(userId, userCalendarId));
+        }
         if (userCalendar.isMainCalendar()) {
+            log.warn("E: deleteUserCalendar / userCalendar is main calendar / userCalendarId = {}", userCalendarId);
             throw new IllegalStateException(ErrorMessage.cannotDeleteMainCalendar());
         }
 
@@ -179,7 +191,7 @@ public class UserCalendarService {
         boolean success = user.changeMainCalendarTo(newMainCalendarId);
 
         if (success == false) {
-            log.warn("cannot find currentMainCal or newMainCal for userId = {}, newMainCalendarId = {}", user.getId(), newMainCalendarId);
+            log.warn("E: changeMainUserCalendar / cannot find currentMainCal or newMainCal / userId = {}, newMainCalendarId = {}", user.getId(), newMainCalendarId);
             throw new IllegalArgumentException(ErrorMessage.cannotChangeMainCalendarError());
         }
 
@@ -191,6 +203,7 @@ public class UserCalendarService {
         Optional<UserCalendar> userCalendarOptional = userCalendarRepository.findByUserAndIdJoinFetchSubCalendar(user, userCalendarId);
 
         if (userCalendarOptional.isEmpty()) {
+            log.warn("E: deleteUserCalendar / userCalendar does not exist in db / userCalendarId = {}", userCalendarId);
             throw new NoSuchElementException(ErrorMessage.userCalendarNotFound(userCalendarId));
         }
 
@@ -206,7 +219,7 @@ public class UserCalendarService {
                 subCalendar.setSelected(selectedMap.get(subCalendar.getId()));
                 continue;
             }
-            log.warn("Request contains subCalendar that is not in database for subCalendarId = {}", subCalendarId);
+            log.warn("E: changeSelectedSubCalendar / Request contains subCalendar that is not in database / subCalendarId = {}", subCalendarId);
         }
     }
 }

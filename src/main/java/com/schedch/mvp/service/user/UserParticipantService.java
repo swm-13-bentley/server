@@ -13,6 +13,7 @@ import com.schedch.mvp.model.User;
 import com.schedch.mvp.repository.ParticipantRepository;
 import com.schedch.mvp.service.RoomService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,6 +24,7 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class UserParticipantService {
 
     private final RoomService roomService;
@@ -81,6 +83,7 @@ public class UserParticipantService {
     public Participant getParticipant(User user, Room room) {
         Optional<Participant> participantOptional = participantRepository.findByUserAndRoom(user, room);
         if (participantOptional.isEmpty()) {
+            log.warn("E: getParticipant / user is not in room / userId = {}, roomId = {}", user.getId(), room.getId());
             throw new UserNotInRoomException(ErrorMessage.userNotInRoom(room.getUuid()));
         }
 
