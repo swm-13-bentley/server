@@ -68,11 +68,11 @@ class ParticipantServiceTest {
                 .thenReturn(createTestRoom());
 
         //when
-        ParticipantResponseDto participantResponseDto = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+        Participant participant = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
 
         //then
-        assertThat(participantResponseDto.getParticipantName()).isEqualTo(participantName);
-        assertThat(participantResponseDto.getAvailable().isEmpty()).isTrue();
+        assertThat(participant.getParticipantName()).isEqualTo(participantName);
+        assertThat(participant.getScheduleList().isEmpty()).isTrue();
     }
 
     @Test
@@ -99,22 +99,22 @@ class ParticipantServiceTest {
 
     @Test
     void user_password_match_test() throws Exception {
+        //given
         Participant participant = new Participant(participantName, password, false);
         participant.addSchedule(new Schedule(
                 LocalDate.of(2022, 4, 1),
                 LocalTime.of(4, 30, 0),
                 LocalTime.of(6, 0, 0)));
         Room room = createTestRoom();
-
         room.addParticipant(participant);
-        when(roomService.getRoom(roomUuid))
-                .thenReturn(room);
+        given(roomService.getRoom(roomUuid)).willReturn(room);
 
-        ParticipantResponseDto participantResponseDto = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+        //when
+        Participant foundParticipant = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
 
         //then
-        assertThat(participantResponseDto.getParticipantName()).isEqualTo(participantName);
-        assertThat(participantResponseDto.getAvailable().size()).isGreaterThan(0);
+        assertThat(foundParticipant.getParticipantName()).isEqualTo(participantName);
+        assertThat(foundParticipant.getScheduleList().size()).isGreaterThan(0);
 
     }
 

@@ -15,7 +15,9 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
             " where p.participantName = :participantName" +
             " and p.room = :room" +
             " and p.isSignedIn = :isSignedIn")
-    Optional<Participant> findParticipantByParticipantNameAndRoomAndIsSignedIn(String participantName, Room room, boolean isSignedIn);
+    Optional<Participant> findParticipantByParticipantNameAndRoomAndIsSignedIn(@Param("participantName") String participantName,
+                                                                               @Param("room") Room room,
+                                                                               @Param("isSignedIn") boolean isSignedIn);
 
     Optional<Participant> findByUserAndRoom(User user, Room room);
 

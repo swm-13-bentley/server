@@ -40,9 +40,10 @@ public class DayRoomService {
 
         List<DayRoomTopRes> dayRoomTopResList = new ArrayList<>();
 
-        countMap.forEach((k, v) -> {
-            if(v.size() > 0) {
-                dayRoomTopResList.add(new DayRoomTopRes(k, v));
+        countMap.forEach((availableDate, participants) -> {
+            if(participants.size() > 0) {
+                int count = participants.size();
+                dayRoomTopResList.add(new DayRoomTopRes(count, availableDate, participants));
             }
         });
 
