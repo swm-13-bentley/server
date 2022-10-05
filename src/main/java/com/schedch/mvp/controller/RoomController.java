@@ -3,10 +3,12 @@ package com.schedch.mvp.controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.schedch.mvp.adapter.TimeAdapter;
+import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.TopCountRes;
 import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.dto.room.RoomResponse;
 import com.schedch.mvp.mapper.RoomMapper;
+import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.TopTime;
 import com.schedch.mvp.service.RoomService;
@@ -78,4 +80,17 @@ public class RoomController {
                 .body(gson.toJson(responseList));
     }
 
+
+    @GetMapping("/room/{roomUuid}/group")
+    public ResponseEntity groupSchedulesFind(@PathVariable String roomUuid) {
+        log.info("P: groupSchedulesFind / roomUuid = {}", roomUuid);
+
+        List<Participant> participants = roomService.getAllParticipantSchedules(roomUuid);
+        List<ParticipantResponseDto> response = participants.stream().map(ParticipantResponseDto::new).collect(Collectors.toList());
+
+        log.info("S: groupSchedulesFind / roomUuid = {}", roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(response));
+    }
 }
