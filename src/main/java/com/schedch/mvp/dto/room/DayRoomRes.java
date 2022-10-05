@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor @AllArgsConstructor
 public class DayRoomRes {
+    private int count;
     private String title;
     private List<LocalDate> dates = new ArrayList<>();
     private List<String> participants = new ArrayList<>();
