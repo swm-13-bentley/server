@@ -3,7 +3,6 @@ package com.schedch.mvp.service;
 import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.config.ErrorMessage;
 import com.schedch.mvp.dto.AvailableRequestDto;
-import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
@@ -19,7 +18,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -92,14 +90,5 @@ public class ParticipantService {
         localDateList.stream().forEach(localDate -> {
             finalParticipant.addSchedule(new Schedule(localDate));
         });
-    }
-
-    public List<ParticipantResponseDto> findAllParticipantsInRoom(String roomUuid) {
-        Room room = roomService.getRoom(roomUuid);
-        List<Participant> participantList = room.getParticipantList();
-
-        return participantList.stream()
-                .map(participant -> new ParticipantResponseDto(participant))
-                .collect(Collectors.toList());
     }
 }
