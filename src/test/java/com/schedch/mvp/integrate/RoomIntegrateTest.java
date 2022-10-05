@@ -1,11 +1,7 @@
 package com.schedch.mvp.integrate;
 
 import com.schedch.mvp.controller.RoomController;
-import com.schedch.mvp.model.Participant;
-import com.schedch.mvp.model.Room;
-import com.schedch.mvp.model.RoomDate;
-import com.schedch.mvp.model.Schedule;
-import com.schedch.mvp.model.TopTime;
+import com.schedch.mvp.model.*;
 import com.schedch.mvp.repository.RoomRepository;
 import com.schedch.mvp.service.RoomService;
 import org.junit.jupiter.api.Test;
@@ -97,5 +93,43 @@ public class RoomIntegrateTest {
         assertThat(topAvailableTimeAndNames.get(2).getLen()).isEqualTo(5);
         assertThat(topAvailableTimeAndNames.get(2).getParticipantSize()).isEqualTo(3);
 
+    }
+
+
+    @Test
+    public void 참가자_전원_불러오기() throws Exception {
+        //given
+        Room room = createRoom();
+        Participant participant1 = new Participant("p1", "", false);
+        Participant participant2 = new Participant("p2", "", false);
+        Participant participant3 = new Participant("p3", "", false);
+        room.addParticipant(participant1); room.addParticipant(participant2); room.addParticipant(participant3);
+
+        participant1.addSchedule(new Schedule(LocalDate.of(2022, 2, 2), LocalTime.of(2, 30, 0), LocalTime.of(4, 0, 0)));
+        participant1.addSchedule(new Schedule(LocalDate.of(2022, 2, 2), LocalTime.of(6, 30, 0), LocalTime.of(10, 0, 0)));
+
+        participant2.addSchedule(new Schedule(LocalDate.of(2022, 4, 1), LocalTime.of(2, 30, 0), LocalTime.of(10, 0, 0)));
+
+        em.persist(room);
+
+        //when
+        List<Participant> participants = roomService.getAllParticipantSchedules(room.getUuid());
+
+        //then
+        assertThat(participants.size()).isEqualTo(3);
+    }
+
+    private Room createRoom() {
+        String title = "testTitle";
+        List<RoomDate> roomDates = new ArrayList<>();
+        roomDates.add(new RoomDate(LocalDate.of(2022, 06, 01)));
+        roomDates.add(new RoomDate(LocalDate.of(2022, 06, 01)));
+        roomDates.add(new RoomDate(LocalDate.of(2022, 06, 01)));
+
+        LocalTime startTime = LocalTime.of(16, 00);
+        LocalTime endTime   = LocalTime.of(23, 00);
+
+        //when
+        return new Room(title, roomDates, startTime, endTime);
     }
 }

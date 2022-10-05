@@ -65,6 +65,13 @@ public class RoomService {
         return room;
     }
 
+    public List<Participant> getAllParticipantSchedules(String roomUuid) {
+        Room room = getRoom(roomUuid);
+
+        List<Participant> participants = participantRepository.findAllByRoomJoinFetchSchedules(room);
+        return participants;
+    }
+
     public List<TopTime> getTopAvailableTimeAndNames(String roomUuid, int max) {
         Room room = getRoom(roomUuid);
         List<RoomDate> roomDates = room.getRoomDates();

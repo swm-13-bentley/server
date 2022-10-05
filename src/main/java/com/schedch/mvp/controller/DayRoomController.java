@@ -2,10 +2,12 @@ package com.schedch.mvp.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.schedch.mvp.dto.room.DayParticipantRes;
 import com.schedch.mvp.dto.room.DayRoomReq;
 import com.schedch.mvp.dto.room.DayRoomRes;
 import com.schedch.mvp.dto.room.DayRoomTopRes;
 import com.schedch.mvp.mapper.DayRoomMapper;
+import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.service.DayRoomService;
 import com.schedch.mvp.service.RoomService;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,5 +71,18 @@ public class DayRoomController {
                 .status(HttpStatus.OK)
                 .body(gson.toJson(dayRoomTopResList));
 
+    }
+
+    @GetMapping("day/room/{roomUuid}/group")
+    public ResponseEntity dayRoomGroup(@PathVariable("roomUuid") String roomUuid) {
+        log.info("P: dayRoomGroup / roomUuid = {}", roomUuid);
+
+        List<Participant> participants = roomService.getAllParticipantSchedules(roomUuid);
+        List<DayParticipantRes> response = participants.stream().map(DayParticipantRes::new).collect(Collectors.toList());
+
+        log.info("S: dayRoomGroup / roomUuid = {}", roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(response));
     }
 }
