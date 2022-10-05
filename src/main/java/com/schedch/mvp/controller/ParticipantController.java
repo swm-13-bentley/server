@@ -6,6 +6,7 @@ import com.schedch.mvp.dto.AvailableRequestDto;
 import com.schedch.mvp.dto.ParticipantRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.exception.FullMemberException;
+import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.service.ParticipantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +32,8 @@ public class ParticipantController {
 
         log.info("P: participantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
         try {
-            ParticipantResponseDto participantResponseDto
-                    = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+            Participant participant = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+            ParticipantResponseDto participantResponseDto = new ParticipantResponseDto(participant);
 
             log.info("S: participantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
             return ResponseEntity.status(HttpStatus.OK)

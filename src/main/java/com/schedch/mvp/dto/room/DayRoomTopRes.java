@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DayRoomTopRes {
+    private int count;
     private LocalDate availableDate;
     private PriorityQueue<String> participants;
 }
