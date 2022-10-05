@@ -19,6 +19,7 @@ public interface DayRoomMapper {
     @Mapping(target = "roomDates", expression = "java(ldList2RdList(dayRoomReq.getDates()))")
     Room req2Entity(DayRoomReq dayRoomReq);
 
+    @Mapping(target = "count", expression = "java(room.getParticipantList().size())")
     @Mapping(target = "dates", expression = "java(rdList2LdList(room.getRoomDates()))")
     @Mapping(target = "participants", expression = "java(room.getParticipantNames())")
     DayRoomRes entity2Res(Room room);
