@@ -47,7 +47,7 @@ public class UserParticipatingRoomRes {
                 .availableDate(topTime.getAvailableDate())
                 .startTime(TimeAdapter.startBlock2Str(topTime.getStart()))
                 .endTime(TimeAdapter.endBlock2Str(topTime.getStart() + topTime.getLen() - 1))
-                .participantNames(topTime.getParticipantNames())
+                .participants(topTime.getParticipantNames())
                 .build();
     }
 }
