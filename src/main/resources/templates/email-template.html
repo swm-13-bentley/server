@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:remove="all">이메일 기본 템플릿</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div style="outline:0;box-sizing:border-box;color:#131416;border:0;font:inherit;vertical-align:baseline;background:#f4f8ff;width:100%;padding:50px 30px;margin:0 auto;overflow:auto;display:block">
+    <u></u>
+    <div style="max-width:500px;margin:0 auto">
+        <section style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:block;width:200px;margin-bottom:15px;margin-left:18px">
+            <img src="https://ci4.googleusercontent.com/proxy/tOGdD98ZaGO3YeJqyk5LL9ttLVx25-UVdTkeFVYIcN7jGxdyBMPDOhYCEeIJJ1e5zq-KIQnsEDzAlGq79cXLpHh3b_4a9KUFzYFfkg=s0-d-e1-ft#https://storage.meetime.io/images/logos/sendtime_logo.png" style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;width:200px" class="CToWUd a6T" data-bit="iit" tabindex="0"><div class="a6S" dir="ltr" style="opacity: 0.01; left: 442px; top: 43px;"><div id=":qj" class="T-I J-J5-Ji aQv T-I-ax7 L3 a5q" role="button" tabindex="0" aria-label="첨부파일() 다운로드" data-tooltip-class="a1V" data-tooltip="다운로드"><div class="akn"><div class="aSK J-J5-Ji aYr"></div></div></div></div>
+        </section>
+
+        <section style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:block;background:#fff;border-radius:10px">
+            <div style="outline:0;box-sizing:border-box;color:#131416;margin:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;padding:40px 30px;background:#fff;border-radius:0 0 10px 10px">
+                <h1 style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font:inherit;vertical-align:baseline;font-size:25px;font-weight:600"><img alt="🎉" aria-label="🎉" src="https://ci3.googleusercontent.com/proxy/Ut17AlMUVCzF-LT4yjER_u27k_u05UsicIoVsqU5Zw7ZGhHQLjNn6jhYONpywcwO3gd-5vgKRAEIA1w0HjU7MaLKcOTvg7MbyrZ7KA=s0-d-e1-ft#https://fonts.gstatic.com/s/e/notoemoji/14.0/1f389/32.png" class="CToWUd" data-bit="iit"> 약속이 확정되었습니다</h1>
+
+                <section style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:block">
+                    <div style="outline:0;box-sizing:border-box;color:#131416;border:0;font-size:100%;color:#5194ff;font:inherit;vertical-align:baseline;background:#f4f8ff;font-weight:500;width:fit-content;padding:4px 10px;border-radius:6px;margin:20px 0">약속 정보</div>
+
+                    <div style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:flex;line-height:1.8;font-weight:700">
+                        <span style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:inline-block;min-width:fit-content;margin-right:8px">약속 이름:</span>
+                        <span th:text="${roomTitle}" style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:inline-block"></span>
+                    </div>
+
+                    <div style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:flex;line-height:1.8;font-weight:700">
+                        <span style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:inline-block;min-width:fit-content;margin-right:8px">약속 일시:</span>
+                        <span th:text="${timeString}" style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:inline-block">2022년 9월 30일(금) 16시 30분 ~ 17시 00분</span>
+                    </div>
+                    <div style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:flex;line-height:1.8;font-weight:700">
+                        <div style="margin-top:20px;margin-bottom:40px;box-sizing:border-box;color:#131416;width:100%;display:flex;font-size:100%;font:inherit;vertical-align:baseline">
+                            <a th:href="${link}" style="outline:0;text-decoration:none;box-sizing:border-box;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;border-radius:30px;padding:10px 30px;background:#5194ff;color:#fff;margin:0 auto">
+                                약속 링크로 이동
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:flex;line-height:1.8">
+
+                            <span style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:inline-block"></span>
+                        </div>
+                        <div style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:flex;line-height:1.8">
+
+                            <span style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:inline-block"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <div></div>
+                <section style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:block">
+                    <div style="outline:0;box-sizing:border-box;color:#131416;border:0;font-size:100%;color:#5194ff;font:inherit;vertical-align:baseline;background:#f4f8ff;font-weight:500;width:fit-content;padding:4px 10px;border-radius:6px;margin:20px 0">언제만나에 알려주세요</div>
+
+                    <div style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:flex;line-height:1.8">
+                        <span style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:inline-block;min-width:fit-content;margin-right:8px">공식 이메일:</span>
+                        <span style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:inline-block">
+                                    <a href="mailto:manna.time.2022@gmail.com" target="_blank">manna.time.2022@gmail.com</a>
+                                </span>
+                    </div>
+                    <div style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:flex;line-height:1.8">
+                        <span style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:inline-block;min-width:fit-content;margin-right:8px">서비스 피드백:</span>
+                        <span style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:inline-block">
+                                    <a href="https://mannatime.io" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://mannatime.io&amp;source=gmail&amp;ust=1665204523639000&amp;usg=AOvVaw0-v8HX_wEyiu99dPZg3j0v">언제만나 서비스 피드백 하러가기</a>
+                                </span>
+                    </div>
+
+                    <div style="text-align:center;outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline">
+                        <div style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;margin-top:40px;line-height:1.8">
+                            <hr style="margin:0;padding:0;outline:0;box-sizing:border-box;color:#131416;border:0.5px solid #ccd5e1">
+                        </div>
+                    </div>
+                    <div style="margin-top:40px;box-sizing:border-box;color:#131416;width:100%;display:flex;font-size:100%;font:inherit;vertical-align:baseline">
+                                    <span style="outline:0;box-sizing:border-box;color:#131416;margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;display:inline-block">
+                                        <a href="https://mannatime.io" target="_blank" data-saferedirecturl="https://www.google.com/url?q=https://mannatime.io&amp;source=gmail&amp;ust=1665204523639000&amp;usg=AOvVaw0-v8HX_wEyiu99dPZg3j0v">언제만나 홈페이지 방문하기</a>
+                                     </span>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </div>
+    <u></u><div class="yj6qo"></div><div class="adL"></div><div class="adL">
+</div></div>
+</body>
+</html>
