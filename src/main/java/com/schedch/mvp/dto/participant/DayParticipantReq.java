@@ -15,8 +15,5 @@ public class DayParticipantReq {
     @NotNull(message = "participantName cannot be empty")
     private String participantName;
 
-    @NotNull(message = "password cannot be empty")
-    private String password;
-
     private List<LocalDate> availableDates;
 }
