@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.schedch.mvp.config.auth.PrincipalDetails;
 import com.schedch.mvp.dto.user.UserAvailableDayReq;
 import com.schedch.mvp.dto.user.UserAvailableTimeReq;
+import com.schedch.mvp.dto.user.UserEmailReq;
 import com.schedch.mvp.exception.UserNotInRoomException;
 import com.schedch.mvp.model.User;
 import com.schedch.mvp.service.user.UserParticipantService;
@@ -12,10 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -81,6 +79,23 @@ public class UserParticipantController {
         String userEmail = getUserEmail(principalDetails);
         userParticipantService.changeRoomTitle(userEmail, roomUuid, changedTitle);
 
+        log.info("S: changeRoomTitle / userId = {}, changedTitle = {}", user.getId(), changedTitle);
+        return ResponseEntity.status(HttpStatus.OK)
+                .build();
+    }
+
+    @PostMapping("/user/room/{roomUuid}/alarmEmail")
+    public ResponseEntity userAlarmEmailPatch(@PathVariable String roomUuid,
+                                              @RequestBody UserEmailReq userEmailReq,
+                                              @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        User user = principalDetails.getUser();
+        log.info("P: userAlarmEmailPatch / userId = {}", user.getId());
+
+        String userEmail = getUserEmail(principalDetails);
+        String alarmEmail = userEmailReq.getAlarmEmail();
+        userParticipantService.registerAlarmEmail(userEmail, roomUuid, alarmEmail);
+
+        log.info("S: userAlarmEmailPatch / userId = {}", user.getId());
         return ResponseEntity.status(HttpStatus.OK)
                 .build();
     }

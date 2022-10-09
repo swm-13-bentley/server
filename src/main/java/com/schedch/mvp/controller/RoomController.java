@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.TopCountRes;
+import com.schedch.mvp.dto.room.RoomConfirmReq;
 import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.dto.room.RoomResponse;
 import com.schedch.mvp.mapper.RoomMapper;
@@ -19,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -93,4 +96,22 @@ public class RoomController {
                 .status(HttpStatus.OK)
                 .body(gson.toJson(response));
     }
+
+    @PatchMapping("/room/{roomUuid}/confirm")
+    public ResponseEntity patchRoomConfirm(@PathVariable String roomUuid,
+                                           @Valid @RequestBody RoomConfirmReq roomConfirmReq) {
+        log.info("P: patchRoomConfirm / roomUuid = {}", roomUuid);
+
+        LocalDate confirmedDate = roomConfirmReq.getConfirmedDate();
+        LocalTime startTime = roomConfirmReq.getStartTime();
+        LocalTime endTime = roomConfirmReq.getEndTime();
+
+        roomService.confirmRoom(roomUuid, confirmedDate, startTime, endTime);
+
+        log.info("S: patchRoomConfirm / roomUuid = {}", roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
+    }
+
 }

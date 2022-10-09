@@ -79,19 +79,16 @@ public class Room extends BaseEntity{
         this.participantLimit = participantLimit;
     }
 
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = true;
+    }
+
     public boolean canAddMember() {
         if(participantList.size() >= participantLimit) {
             return false;
         } else {
             return true;
         }
-    }
-
-    public boolean contains(User user) {
-        List<Participant> collect = participantList.stream().filter(participant -> participant.isSignedIn())
-                .filter(participant -> participant.getUser() == user).collect(Collectors.toList());
-
-        return !collect.isEmpty();
     }
 
     public LocalDate getStartLocalDate() {
