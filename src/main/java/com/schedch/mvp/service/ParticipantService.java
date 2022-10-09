@@ -2,7 +2,7 @@ package com.schedch.mvp.service;
 
 import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.config.ErrorMessage;
-import com.schedch.mvp.dto.AvailableRequestDto;
+import com.schedch.mvp.dto.TimeBlockDto;
 import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
@@ -17,7 +17,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +28,7 @@ public class ParticipantService {
     private final RoomService roomService;
 
     public Participant findUnSignedParticipantAndValidate(String roomUuid, String participantName, String password) throws IllegalAccessException {
-        Room room = roomService.getRoom(roomUuid);
+        Room room = roomService.getRoomWithParticipants(roomUuid);
         List<Participant> foundParticipant = room.findUnSignedParticipant(participantName);
 
         if(foundParticipant.isEmpty()) {//신규 유저 -> 유저 등록해야 함
@@ -52,43 +51,47 @@ public class ParticipantService {
         return participant;
     }
 
-    public void saveParticipantAvailable(String roomUuid, AvailableRequestDto availableRequestDto) {
-        Room room = roomService.getRoom(roomUuid);
-        String participantName = availableRequestDto.getParticipantName();
+    public void saveParticipantAvailable(String roomUuid, String participantName, List<TimeBlockDto> available) {
+        Room room = roomService.getRoomWithParticipants(roomUuid);
 
-        Optional<Participant> participantOptional = participantRepository.findParticipantByParticipantNameAndRoomAndIsSignedIn(participantName, room, false);
-        if (participantOptional.isEmpty()) {
-            log.warn("E: saveParticipantAvailable / participant name not in room / participantName = {}, roomUuid = {}", participantName, roomUuid);
-            throw new NoSuchElementException(ErrorMessage.participantNameNotInRoom(participantName, roomUuid));
-        }
-
-        Participant participant = participantOptional.get();
+        Participant participant = getUnSignedParticipantFromRoom(room, participantName);
         participant.emptySchedules();
 
         LocalTime roomStartTime = room.getStartTime();
-        availableRequestDto.getAvailable().stream()
+        available.stream()
                 .forEach(timeBlockDto -> {
                     TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime).stream()
                             .forEach(schedule -> participant.addSchedule(schedule));
-
                 });
     }
 
     public void saveDayParticipantAvailable(String roomUuid, String participantName, List<LocalDate> localDateList) {
-        Room room = roomService.getRoom(roomUuid);
+        Room room = roomService.getRoomWithParticipants(roomUuid);
 
-        Optional<Participant> participantOptional = participantRepository.findParticipantByParticipantNameAndRoomAndIsSignedIn(participantName, room, false);
-        if (participantOptional.isEmpty()) {
-            log.warn("E: saveParticipantAvailable / participant name not in room / participantName = {}, roomUuid = {}", participantName, roomUuid);
-            throw new NoSuchElementException(ErrorMessage.participantNameNotInRoom(participantName, roomUuid));
-        }
-
-        Participant participant = participantOptional.get();
+        Participant participant = getUnSignedParticipantFromRoom(room, participantName);
         participant.emptySchedules();
 
         Participant finalParticipant = participant;
         localDateList.stream().forEach(localDate -> {
             finalParticipant.addSchedule(new Schedule(localDate));
         });
+    }
+
+    public void registerAlarmEmail(String roomUuid, String participantName, String alarmEmail) {
+        Room room = roomService.getRoomWithParticipants(roomUuid);
+        Participant participant = getUnSignedParticipantFromRoom(room, participantName);
+
+        participant.setAlarmEmail(alarmEmail);
+    }
+
+    private Participant getUnSignedParticipantFromRoom(Room room, String participantName) {
+        List<Participant> participantList = room.findUnSignedParticipant(participantName);
+        if (participantList.isEmpty()) {
+            String roomUuid = room.getUuid();
+            log.warn("E: saveParticipantAvailable / participant name not in room / participantName = {}, roomUuid = {}", participantName, roomUuid);
+            throw new NoSuchElementException(ErrorMessage.participantNameNotInRoom(participantName, roomUuid));
+        }
+
+        return participantList.get(0);
     }
 }

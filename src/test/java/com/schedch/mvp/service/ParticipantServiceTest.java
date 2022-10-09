@@ -47,7 +47,7 @@ class ParticipantServiceTest {
     @Test
     void no_room_for_uuid_test() throws Exception {
         //given
-        when(roomService.getRoom(roomUuid))
+        when(roomService.getRoomWithParticipants(roomUuid))
                 .thenThrow(new NoSuchElementException());
 
         //when
@@ -64,7 +64,7 @@ class ParticipantServiceTest {
     @Test
     void new_user_registration_test() throws Exception {
         //given
-        when(roomService.getRoom(roomUuid))
+        when(roomService.getRoomWithParticipants(roomUuid))
                 .thenReturn(createTestRoom());
 
         //when
@@ -82,7 +82,7 @@ class ParticipantServiceTest {
         Room room = createTestRoom();
         room.addParticipant(participant);
 
-        when(roomService.getRoom(roomUuid))
+        when(roomService.getRoomWithParticipants(roomUuid))
                 .thenReturn(room);
 
         //when
@@ -107,7 +107,7 @@ class ParticipantServiceTest {
                 LocalTime.of(6, 0, 0)));
         Room room = createTestRoom();
         room.addParticipant(participant);
-        given(roomService.getRoom(roomUuid)).willReturn(room);
+        given(roomService.getRoomWithParticipants(roomUuid)).willReturn(room);
 
         //when
         Participant foundParticipant = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
@@ -123,7 +123,7 @@ class ParticipantServiceTest {
         //given
         Room room = createTestRoom();
         room.setParticipantLimit(5);
-        given(roomService.getRoom(roomUuid)).willReturn(room);
+        given(roomService.getRoomWithParticipants(roomUuid)).willReturn(room);
         for (int i = 1; i <= 5; i++) {
             room.addParticipant(new Participant("p" + i, "", false));
         }

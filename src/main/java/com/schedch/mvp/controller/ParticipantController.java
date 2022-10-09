@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.schedch.mvp.dto.AvailableRequestDto;
 import com.schedch.mvp.dto.ParticipantRequestDto;
 import com.schedch.mvp.dto.ParticipantResponseDto;
+import com.schedch.mvp.dto.TimeBlockDto;
+import com.schedch.mvp.dto.participant.ParticipantAlarmEmailReq;
 import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.service.ParticipantService;
@@ -12,10 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,12 +55,29 @@ public class ParticipantController {
     public ResponseEntity participantAvailablePost(@PathVariable String roomUuid,
                                                    @RequestBody AvailableRequestDto availableRequestDto) {
         log.info("P: participantAvailablePost / roomUuid = {}, availableRequestDto = {}", roomUuid, gson.toJson(availableRequestDto));
-        participantService.saveParticipantAvailable(roomUuid, availableRequestDto);
 
-        log.info("S: participantAvailablePost / roomUuid = {}, participantName = {}", roomUuid, availableRequestDto.getParticipantName());
+        String participantName = availableRequestDto.getParticipantName();
+        List<TimeBlockDto> available = availableRequestDto.getAvailable();
+        participantService.saveParticipantAvailable(roomUuid, participantName, available);
+
+        log.info("S: participantAvailablePost / roomUuid = {}, participantName = {}", roomUuid, participantName);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .build();
     }
 
+    @PatchMapping("/room/{roomUuid}/participant/alarmEmail")
+    public ResponseEntity patchParticipantAlarmEmail(@PathVariable String roomUuid,
+                                                     @Valid @RequestBody ParticipantAlarmEmailReq participantAlarmEmailReq) {
+        log.info("P: patchParticipantAlarmEmail / roomUuid = {}", roomUuid);
+
+        String participantName = participantAlarmEmailReq.getParticipantName();
+        String alarmEmail = participantAlarmEmailReq.getAlarmEmail();
+        participantService.registerAlarmEmail(roomUuid, participantName, alarmEmail);
+
+        log.info("S: patchParticipantAlarmEmail / roomUuid = {}", roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
+    }
 }
