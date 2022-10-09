@@ -1,6 +1,5 @@
 package com.schedch.mvp.model;
 
-import com.schedch.mvp.dto.TimeBlockDto;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,13 +47,6 @@ public class Schedule extends BaseEntity{
         this.startTime = startTime;
         this.endTime = endTime;
         this.roomStartTime = roomStartTime;
-    }
-
-    public TimeBlockDto toTimeBlockDto(int unit) {
-        return TimeBlockDto.builder()
-                .availableDate(this.availableDate)
-                .availableTimeList(cutTime(unit))
-                .build();
     }
 
     public List<Integer> cutTime(int unit) {

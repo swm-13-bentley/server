@@ -16,7 +16,7 @@ import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.*;
 import com.schedch.mvp.adapter.TimeAdapter;
-import com.schedch.mvp.config.GoogleConfigUtils;
+import com.schedch.mvp.config.oauth.GoogleConfigUtils;
 import com.schedch.mvp.dto.CalendarResponse;
 import com.schedch.mvp.dto.CalendarScheduleDto;
 import com.schedch.mvp.dto.GoogleLoginRequest;
@@ -25,7 +25,6 @@ import com.schedch.mvp.model.GToken;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.RoomDate;
 import com.schedch.mvp.repository.GTokenRepository;
-import com.schedch.mvp.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -54,7 +53,6 @@ public class GoogleCalendarService {
     private final GoogleConfigUtils googleConfigUtils;
     private final GTokenRepository gTokenRepository;
     private final RoomService roomService;
-    private final TimeAdapter timeAdapter;
 
     public void save(GToken gToken) {
         GToken save = gTokenRepository.save(gToken);
@@ -147,14 +145,14 @@ public class GoogleCalendarService {
     }
 
     private void addToMap(HashMap<LocalDate, HashSet<Integer>> map, DateTime start, DateTime end, int roomStartTimeBlockInt, int roomEndTimeBlockInt) {
-        LocalDate startDate = timeAdapter.dateTime2LocalDate(start);
-        LocalTime startTime = timeAdapter.dateTime2LocalTime(start);
+        LocalDate startDate = TimeAdapter.dateTime2LocalDate(start);
+        LocalTime startTime = TimeAdapter.dateTime2LocalTime(start);
 
-        LocalDate endDate = timeAdapter.dateTime2LocalDate(end);
-        LocalTime endTime = timeAdapter.dateTime2LocalTime(end);
+        LocalDate endDate = TimeAdapter.dateTime2LocalDate(end);
+        LocalTime endTime = TimeAdapter.dateTime2LocalTime(end);
 
-        int startTimeBlockInt = timeAdapter.localTime2TimeBlockInt(startTime);
-        int endTimeBlockInt = timeAdapter.localTime2TimeBlockInt(endTime);
+        int startTimeBlockInt = TimeAdapter.localTime2TimeBlockInt(startTime);
+        int endTimeBlockInt = TimeAdapter.localTime2TimeBlockInt(endTime);
 
         startTimeBlockInt = Math.max(startTimeBlockInt, roomStartTimeBlockInt);
         endTimeBlockInt = Math.min(endTimeBlockInt, roomEndTimeBlockInt);
@@ -203,7 +201,7 @@ public class GoogleCalendarService {
                 .clientId(googleConfigUtils.getGoogleClientId())
                 .clientSecret(googleConfigUtils.getGoogleSecret())
                 .code(code)
-                .redirectUri(googleConfigUtils.getGoogleRedirectUrl())
+                .redirectUri(googleConfigUtils.getGoogleSignInRedirectUrl())
                 .grantType("authorization_code")
                 .build();
 

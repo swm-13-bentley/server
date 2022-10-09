@@ -24,8 +24,11 @@ public class Room extends BaseEntity{
     @Column(nullable = false)
     private String uuid;
 
-    @NotNull(message = "Room title is empty")
+    @NotNull(message = "Room: title cannot be empty")
     private String title;
+
+    @NotNull(message = "Room: participant_limit cannot be empty")
+    private int participantLimit;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "room")
     @OrderBy(value = "scheduledDate ASC")
@@ -35,13 +38,17 @@ public class Room extends BaseEntity{
 
     private LocalTime endTime;
 
+    private boolean confirmed;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "room")
+    @OrderBy(value = "participantName ASC")
     private List<Participant> participantList = new ArrayList<>();
 
     //연관관계 편의 메서드
     public void addParticipant(Participant participant) {
         participantList.add(participant);
         participant.setRoom(this);
+        participant.setRoomTitle(this.title);
     }
 
     public List<Participant> findUnSignedParticipant(String participantName) {
@@ -62,9 +69,37 @@ public class Room extends BaseEntity{
         this.roomDates = roomDates;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.confirmed = false;
 
         //연관관계 맺어주기
         roomDates.stream().forEach(roomDate -> roomDate.setRoom(this));
     }
 
+    public void setParticipantLimit(int participantLimit) {
+        this.participantLimit = participantLimit;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = true;
+    }
+
+    public boolean canAddMember() {
+        if(participantList.size() >= participantLimit) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public LocalDate getStartLocalDate() {
+        return roomDates.get(0).getScheduledDate();
+    }
+
+    public LocalDate getEndLocalDate() {
+        return roomDates.get(roomDates.size() -1).getScheduledDate();
+    }
+
+    public List<String> getParticipantNames() {
+        return participantList.stream().map(Participant::getParticipantName).collect(Collectors.toList());
+    }
 }

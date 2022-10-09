@@ -1,107 +1,97 @@
 package com.schedch.mvp.service;
 
 import com.schedch.mvp.adapter.TimeAdapter;
-import com.schedch.mvp.dto.AvailableRequestDto;
-import com.schedch.mvp.dto.ParticipantResponseDto;
+import com.schedch.mvp.config.ErrorMessage;
 import com.schedch.mvp.dto.TimeBlockDto;
+import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.Schedule;
 import com.schedch.mvp.repository.ParticipantRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class ParticipantService {
 
     private final ParticipantRepository participantRepository;
     private final RoomService roomService;
-    private final TimeAdapter timeAdapter;
 
-    public ParticipantResponseDto findUnSignedParticipantAndValidate(
-            String roomUuid, String participantName, String password) throws IllegalAccessException {
-        Room room = roomService.getRoom(roomUuid);
+    public Participant findUnSignedParticipantAndValidate(String roomUuid, String participantName, String password) throws IllegalAccessException {
+        Room room = roomService.getRoomWithParticipants(roomUuid);
         List<Participant> foundParticipant = room.findUnSignedParticipant(participantName);
 
-        if(foundParticipant.isEmpty()) {
-            //신규 유저 -> 유저 등록해야 함
+        if(foundParticipant.isEmpty()) {//신규 유저 -> 유저 등록해야 함
+            if(!room.canAddMember()) {//member limit
+                log.warn("E: findUnSignedParticipantAndValidate / room is full / roomId = {}", room.getId());
+                throw new FullMemberException(ErrorMessage.fullMemberForUuid(roomUuid));
+            }
+
             Participant newParticipant = new Participant(participantName, password, false);
             room.addParticipant(newParticipant);
-            return new ParticipantResponseDto(newParticipant);
+            return newParticipant;
         }
 
         Participant participant = foundParticipant.get(0);
+        if(!participant.checkPassword(password)) { //기존 유저가 맞음 -> 기존 시간 돌려주면 됨
+            log.warn("E: findUnSignedParticipantAndValidate / password is wrong / participantName = {}, password = {}, roomUuid = {}", participantName, password, roomUuid);
+            throw new IllegalAccessException(ErrorMessage.passwordIsWrong(participantName, password, roomUuid));
+        }
 
-        if(participant.checkPassword(password)) { //기존 유저가 맞음 -> 기존 시간 돌려주면 됨
-            return new ParticipantResponseDto(participant);
-        }
-        else { //기존 유저이나, 비밀번호가 틀렸음
-            throw new IllegalAccessException("password is incorrect for participant: " + participantName);
-        }
+        return participant;
     }
 
-    public void saveParticipantAvailable(String roomUuid, AvailableRequestDto availableRequestDto) {
-        Room room = roomService.getRoom(roomUuid);
-        String participantName = availableRequestDto.getParticipantName();
+    public void saveParticipantAvailable(String roomUuid, String participantName, List<TimeBlockDto> available) {
+        Room room = roomService.getRoomWithParticipants(roomUuid);
 
-        Participant participant = participantRepository.findParticipantByParticipantNameAndRoom(participantName, room)
-                .orElseThrow(() -> new NoSuchElementException(String.format("Participant not found for name: %s", participantName)));
-
+        Participant participant = getUnSignedParticipantFromRoom(room, participantName);
         participant.emptySchedules();
 
         LocalTime roomStartTime = room.getStartTime();
-        availableRequestDto.getAvailable().stream()
+        available.stream()
                 .forEach(timeBlockDto -> {
-                    changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime).stream()
+                    TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime).stream()
                             .forEach(schedule -> participant.addSchedule(schedule));
-
                 });
     }
 
-    /**
-     * 같은 날짜에 이어져있는 time int들을 비연속적이라면, 분리해서 schedule로 변환
-     * @param timeBlockDto
-     * @return
-     */
-    public List<Schedule> changeTimeBlockDtoToSchedule(TimeBlockDto timeBlockDto, LocalTime roomStartTime) {
-        List<Schedule> scheduleList = new ArrayList<>();
-        LocalDate availableDate = timeBlockDto.getAvailableDate();
-        List<Integer> availableTimeList = timeBlockDto.getAvailableTimeList();
-        if(!availableTimeList.isEmpty()) {
-            int start = availableTimeList.get(0);
-            int end = start;
+    public void saveDayParticipantAvailable(String roomUuid, String participantName, List<LocalDate> localDateList) {
+        Room room = roomService.getRoomWithParticipants(roomUuid);
 
-            for (int i = 1; i <= availableTimeList.size(); i++) {
-                if(i == availableTimeList.size()) {
-                    LocalTime startTime = timeAdapter.startBlock2lt(start);
-                    scheduleList.add(new Schedule(availableDate, startTime, timeAdapter.endBlock2lt(end), roomStartTime));
-                    return scheduleList;
-                }
-                if (availableTimeList.get(i) != end + 1) {//불연속 or 마지막
-                    scheduleList.add(new Schedule(availableDate, timeAdapter.startBlock2lt(start), timeAdapter.endBlock2lt(end), roomStartTime));
-                    start = availableTimeList.get(i);
-                }
-                end = availableTimeList.get(i);
-            }
-        }
-        return scheduleList;
+        Participant participant = getUnSignedParticipantFromRoom(room, participantName);
+        participant.emptySchedules();
+
+        Participant finalParticipant = participant;
+        localDateList.stream().forEach(localDate -> {
+            finalParticipant.addSchedule(new Schedule(localDate));
+        });
     }
 
-    public List<ParticipantResponseDto> findAllParticipantsInRoom(String roomUuid) {
-        Room room = roomService.getRoom(roomUuid);
-        List<Participant> participantList = room.getParticipantList();
+    public void registerAlarmEmail(String roomUuid, String participantName, String alarmEmail) {
+        Room room = roomService.getRoomWithParticipants(roomUuid);
+        Participant participant = getUnSignedParticipantFromRoom(room, participantName);
 
-        return participantList.stream()
-                .map(participant -> new ParticipantResponseDto(participant))
-                .collect(Collectors.toList());
+        participant.setAlarmEmail(alarmEmail);
+    }
+
+    private Participant getUnSignedParticipantFromRoom(Room room, String participantName) {
+        List<Participant> participantList = room.findUnSignedParticipant(participantName);
+        if (participantList.isEmpty()) {
+            String roomUuid = room.getUuid();
+            log.warn("E: saveParticipantAvailable / participant name not in room / participantName = {}, roomUuid = {}", participantName, roomUuid);
+            throw new NoSuchElementException(ErrorMessage.participantNameNotInRoom(participantName, roomUuid));
+        }
+
+        return participantList.get(0);
     }
 }

@@ -33,16 +33,17 @@ public class DayRoomService {
                     PriorityQueue<String> pq = countMap.get(availableDate);
                     pq.add(participant.getParticipantName());
                 } else {
-                    log.warn("참가자가 입력한 날짜가 방 기간을 벗어납니다.");
+                    log.warn("E: getTopAvailableDate / participant's day is out of room's range");
                 }
             });
         });
 
         List<DayRoomTopRes> dayRoomTopResList = new ArrayList<>();
 
-        countMap.forEach((k, v) -> {
-            if(v.size() > 0) {
-                dayRoomTopResList.add(new DayRoomTopRes(k, v));
+        countMap.forEach((availableDate, participants) -> {
+            if(participants.size() > 0) {
+                int count = participants.size();
+                dayRoomTopResList.add(new DayRoomTopRes(count, availableDate, participants));
             }
         });
 

@@ -2,10 +2,12 @@ package com.schedch.mvp.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.schedch.mvp.dto.room.DayParticipantRes;
 import com.schedch.mvp.dto.room.DayRoomReq;
 import com.schedch.mvp.dto.room.DayRoomRes;
 import com.schedch.mvp.dto.room.DayRoomTopRes;
 import com.schedch.mvp.mapper.DayRoomMapper;
+import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.service.DayRoomService;
 import com.schedch.mvp.service.RoomService;
@@ -16,10 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.PriorityQueue;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,12 +33,14 @@ public class DayRoomController {
 
     @PostMapping("/day/room")
     public ResponseEntity dayRoomCreate(@Valid @RequestBody DayRoomReq dayRoomReq) {
+        log.info("P: dayRoomCreate / dayRoomReq = {}", dayRoomReq);
+
         Room room = dayRoomMapper.req2Entity(dayRoomReq);
         String roomUuid = roomService.createRoom(room);
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("roomUuid", roomUuid);
 
-        log.info("created dayRoomUuid: {}, dates: {}", roomUuid, gson.toJson(dayRoomReq.getDates()));
+        log.info("S: dayRoomCreate / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(jsonObject));
@@ -46,10 +48,12 @@ public class DayRoomController {
 
     @GetMapping("/day/room/{roomUuid}")
     public ResponseEntity dayRoomFind(@PathVariable("roomUuid") String roomUuid) {
-        Room room = roomService.getRoom(roomUuid);
+        log.info("P: dayRoomCreate / roomUuid = {}", roomUuid);
+
+        Room room = roomService.getRoomWithParticipants(roomUuid);
         DayRoomRes dayRoomRes = dayRoomMapper.entity2Res(room);
 
-        log.info("find dayRoomUuid: {}", roomUuid);
+        log.info("S: dayRoomCreate / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(dayRoomRes));
@@ -58,12 +62,27 @@ public class DayRoomController {
     @GetMapping("day/room/{roomUuid}/top/{max}")
     public ResponseEntity dayRoomTopFind(@PathVariable("roomUuid") String roomUuid,
                                          @PathVariable("max") int max) {
+        log.info("P: dayRoomTopFind / roomUuid = {}, max = {}", roomUuid, max);
+
         List<DayRoomTopRes> dayRoomTopResList = dayRoomService.getTopAvailableDate(roomUuid, max);
 
-        log.info("find top list for roomUuid: {}, max: {}", roomUuid, max);
+        log.info("S: dayRoomTopFind / dayRoomTopResList.size() = {}", dayRoomTopResList.size());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(dayRoomTopResList));
 
+    }
+
+    @GetMapping("day/room/{roomUuid}/group")
+    public ResponseEntity dayRoomGroup(@PathVariable("roomUuid") String roomUuid) {
+        log.info("P: dayRoomGroup / roomUuid = {}", roomUuid);
+
+        List<Participant> participants = roomService.getAllParticipantSchedules(roomUuid);
+        List<DayParticipantRes> response = participants.stream().map(DayParticipantRes::new).collect(Collectors.toList());
+
+        log.info("S: dayRoomGroup / roomUuid = {}", roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(response));
     }
 }

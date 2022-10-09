@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.TimeBlockDto;
+import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.RoomDate;
@@ -33,8 +34,6 @@ class ParticipantServiceTest {
 
     @Autowired
     ParticipantService participantService;
-    @Autowired
-    TimeAdapter timeAdapter;
     @MockBean
     ParticipantRepository participantRepository;
     @MockBean
@@ -48,7 +47,7 @@ class ParticipantServiceTest {
     @Test
     void no_room_for_uuid_test() throws Exception {
         //given
-        when(roomService.getRoom(roomUuid))
+        when(roomService.getRoomWithParticipants(roomUuid))
                 .thenThrow(new NoSuchElementException());
 
         //when
@@ -65,25 +64,25 @@ class ParticipantServiceTest {
     @Test
     void new_user_registration_test() throws Exception {
         //given
-        when(roomService.getRoom(roomUuid))
-                .thenReturn(getRoom());
+        when(roomService.getRoomWithParticipants(roomUuid))
+                .thenReturn(createTestRoom());
 
         //when
-        ParticipantResponseDto participantResponseDto = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+        Participant participant = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
 
         //then
-        assertThat(participantResponseDto.getParticipantName()).isEqualTo(participantName);
-        assertThat(participantResponseDto.getAvailable().isEmpty()).isTrue();
+        assertThat(participant.getParticipantName()).isEqualTo(participantName);
+        assertThat(participant.getScheduleList().isEmpty()).isTrue();
     }
 
     @Test
     void user_password_mismatch_test() throws Exception {
         //given
         Participant participant = new Participant(participantName, password, false);
-        Room room = getRoom();
+        Room room = createTestRoom();
         room.addParticipant(participant);
 
-        when(roomService.getRoom(roomUuid))
+        when(roomService.getRoomWithParticipants(roomUuid))
                 .thenReturn(room);
 
         //when
@@ -100,23 +99,46 @@ class ParticipantServiceTest {
 
     @Test
     void user_password_match_test() throws Exception {
+        //given
         Participant participant = new Participant(participantName, password, false);
         participant.addSchedule(new Schedule(
                 LocalDate.of(2022, 4, 1),
                 LocalTime.of(4, 30, 0),
                 LocalTime.of(6, 0, 0)));
-        Room room = getRoom();
-
+        Room room = createTestRoom();
         room.addParticipant(participant);
-        when(roomService.getRoom(roomUuid))
-                .thenReturn(room);
+        given(roomService.getRoomWithParticipants(roomUuid)).willReturn(room);
 
-        ParticipantResponseDto participantResponseDto = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+        //when
+        Participant foundParticipant = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
 
         //then
-        assertThat(participantResponseDto.getParticipantName()).isEqualTo(participantName);
-        assertThat(participantResponseDto.getAvailable().size()).isGreaterThan(0);
+        assertThat(foundParticipant.getParticipantName()).isEqualTo(participantName);
+        assertThat(foundParticipant.getScheduleList().size()).isGreaterThan(0);
 
+    }
+
+    @Test
+    void 약속_인원_제한_테스트() throws Exception {
+        //given
+        Room room = createTestRoom();
+        room.setParticipantLimit(5);
+        given(roomService.getRoomWithParticipants(roomUuid)).willReturn(room);
+        for (int i = 1; i <= 5; i++) {
+            room.addParticipant(new Participant("p" + i, "", false));
+        }
+
+        //when
+        try {
+            participantService.findUnSignedParticipantAndValidate(roomUuid, "p6", "");
+        }
+
+        //then
+        catch (FullMemberException e){
+            return;
+        }
+
+        Assertions.fail("should not reach here");
     }
 
     @Test
@@ -140,9 +162,9 @@ class ParticipantServiceTest {
         LocalTime roomStartTime = LocalTime.of(0, 0);
 
         //when
-        List<Schedule> scheduleList1 = participantService.changeTimeBlockDtoToSchedule(timeBlockDto1, roomStartTime);
-        List<Schedule> scheduleList2 = participantService.changeTimeBlockDtoToSchedule(timeBlockDto2, roomStartTime);
-        List<Schedule> scheduleList3 = participantService.changeTimeBlockDtoToSchedule(timeBlockDto3, roomStartTime);
+        List<Schedule> scheduleList1 = TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto1, roomStartTime);
+        List<Schedule> scheduleList2 = TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto2, roomStartTime);
+        List<Schedule> scheduleList3 = TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto3, roomStartTime);
 
         //then
         assertThat(scheduleList1.size()).isEqualTo(3);
@@ -163,7 +185,7 @@ class ParticipantServiceTest {
         LocalTime roomStartTime = LocalTime.of(20, 0);
 
         //when
-        List<Schedule> scheduleList = participantService.changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime);
+        List<Schedule> scheduleList = TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime);
 
         //then
         assertThat(scheduleList.size()).isEqualTo(2);
@@ -195,7 +217,7 @@ class ParticipantServiceTest {
         assertThat(new Gson().toJson(availableTimeList)).isEqualTo("[42,43,46,47,48,49,50,51,52,53,54,55,56,64,65]");
     }
 
-    private Room getRoom() {
+    private Room createTestRoom() {
         String title = "test title";
         LocalTime startTime = LocalTime.of(4, 30, 0);
         LocalTime endTime = LocalTime.of(23, 0, 0);
@@ -204,6 +226,7 @@ class ParticipantServiceTest {
         roomDateList.add(new RoomDate(LocalDate.of(2022, 04, 02)));
 
         Room room = new Room(title, roomDateList, startTime, endTime);
+        room.setParticipantLimit(5);
 
         return room;
     }

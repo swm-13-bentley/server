@@ -12,14 +12,14 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 public class RoomRequest {
 
-    @NotNull(message = "Room title cannot be empty")
+    @NotNull(message = "Room: title cannot be empty")
     String title;
 
     List<LocalDate> dates = new ArrayList<>();
 
-    @NotNull(message = "room startTime cannot be empty")
+    @NotNull(message = "Room: startTime cannot be empty")
     String startTime;
 
-    @NotNull(message = "room endTime cannot be empty")
+    @NotNull(message = "Room: endTime cannot be empty")
     String endTime;
 }

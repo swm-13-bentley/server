@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,5 +17,5 @@ public class TopCountRes {
     private LocalDate availableDate;
     private String startTime;
     private String endTime;
-    private List<String> participantNames;
+    private List<String> participants;
 }
