@@ -46,5 +46,6 @@ src/main/resources/jwt.yaml
 src/main/resources/static
 src/main/resources/Credentials.json
 /src/main/resources/oauth.yaml
+/src/main/resources/aws.yaml
 /logs/
 /src/main/generated/com/schedch/mvp/mapper/
