@@ -37,4 +37,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
             " order by p.participantName")
     List<Participant> findAllByRoomJoinFetchSchedules(@Param("room") Room room);
 
+    List<Participant> findAllByIdIn(List<Long> idList);
+
 }
