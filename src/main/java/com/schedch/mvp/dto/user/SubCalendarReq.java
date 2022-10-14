@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SubCalendarReq {
 
-    private Long id;
+    private Long subCalendarId;
     private boolean selected;
 
 }

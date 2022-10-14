@@ -9,7 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 public class UserCalendarRes {
 
-    private Long id;
+    private Long calendarId;
     private String calendarEmail;
     private boolean mainCalendar;
     private String calendarChannel;
