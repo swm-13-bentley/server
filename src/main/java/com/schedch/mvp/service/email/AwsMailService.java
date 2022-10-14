@@ -36,7 +36,6 @@ public class AwsMailService{
     private final TemplateEngine templateEngine;
 
     public void sendEmailBySes(EmailReq emailReq) {
-        log.info("P: sendEmailBySes / emailReq.mailTo = {}", emailReq.getMailTo());
         try {
             SendRawEmailRequest sendRawEmailRequestV2 = getSendRawEmailRequest(emailReq);
             amazonSimpleEmailService.sendRawEmail(sendRawEmailRequestV2);
@@ -45,6 +44,7 @@ public class AwsMailService{
                     emailReq.getRoomLink(), emailReq.getMailTo(), e.getMessage());
 
         }
+        log.info("S: sendEmailBySes / emailReq.mailTo = {}", emailReq.getMailTo());
     }
 
     public SendRawEmailRequest getSendRawEmailRequest(EmailReq emailReq) throws MessagingException, IOException {
