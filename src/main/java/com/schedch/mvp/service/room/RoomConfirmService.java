@@ -99,6 +99,7 @@ public class RoomConfirmService {
                 .roomLink("https://mannatime.io/ko/entry/" + roomUuid)
                 .sequence("0")
                 .uid(UUID.randomUUID().toString())
+                .location("미정")
                 .build();
     }
 
@@ -110,6 +111,7 @@ public class RoomConfirmService {
                 .roomLink("https://mannatime.io/ko/entry/" + roomUuid)
                 .sequence("0")
                 .uid(UUID.randomUUID().toString())
+                .location("미정")
                 .build();
     }
 
