@@ -35,13 +35,13 @@ public class AwsMailService{
     private final AmazonSimpleEmailService amazonSimpleEmailService;
     private final TemplateEngine templateEngine;
 
-    public void sendEmail(EmailReq emailReq) {
-        log.info("P: sendEmail / emailReq.mailTo = {}", emailReq.getMailTo());
+    public void sendEmailBySes(EmailReq emailReq) {
+        log.info("P: sendEmailBySes / emailReq.mailTo = {}", emailReq.getMailTo());
         try {
             SendRawEmailRequest sendRawEmailRequestV2 = getSendRawEmailRequest(emailReq);
             amazonSimpleEmailService.sendRawEmail(sendRawEmailRequestV2);
-        }catch (Exception e){
-            log.info("F: sendEmail / email send error / roomLink = {}, emailReq.mailTo = {}, errorMsg = {}",
+        } catch (Exception e){
+            log.info("F: sendEmailBySes / email send error / roomLink = {}, emailReq.mailTo = {}, errorMsg = {}",
                     emailReq.getRoomLink(), emailReq.getMailTo(), e.getMessage());
 
         }
@@ -156,7 +156,8 @@ public class AwsMailService{
 
         Context context = new Context();
         context.setVariable("roomTitle", roomTitle);
-        context.setVariable("timeString", getTimeString(start, end));
+        context.setVariable("timeString",
+                emailReq.isDateOnly() ? getDayString(start) : getTimeString(start, end));
         context.setVariable("link", link);
 
         return templateEngine.process("email-template", context);
@@ -190,5 +191,14 @@ public class AwsMailService{
                 end.getHour(),
                 end.getMinute()
         );
+    }
+
+    private String getDayString(LocalDateTime start) {
+        return String.format("%d년 %d월 %d일(%s) - 하루 종일",
+                start.getYear(),
+                start.getMonthValue(),
+                start.getDayOfMonth(),
+                start.getDayOfWeek().getDisplayName(TextStyle.NARROW, Locale.KOREAN)
+            );
     }
 }
