@@ -7,6 +7,7 @@ import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.service.room.RoomConfirmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +28,9 @@ public class RoomConfirmController {
 
     @GetMapping("/room/{roomUuid}/confirm")
     public ResponseEntity getParticipantInRange(@PathVariable String roomUuid,
-                                                @RequestParam("availableDate") LocalDate availableDate,
-                                                @RequestParam(value = "startTime", required = false) LocalTime startTime,
-                                                @RequestParam(value = "endTime", required = false) LocalTime endTime) {
+                                                @RequestParam("availableDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate availableDate,
+                                                @RequestParam(value = "startTime", required = false) @DateTimeFormat(pattern = "HH:mm:ss") LocalTime startTime,
+                                                @RequestParam(value = "endTime", required = false) @DateTimeFormat(pattern = "HH:mm:ss") LocalTime endTime) {
 
         log.info("P: getParticipantInRange / roomUuid = {}, availableDate = {}, startTime = {}, endTime = {}", roomUuid, availableDate, startTime, endTime);
 
