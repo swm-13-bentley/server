@@ -2,7 +2,8 @@ package com.schedch.mvp.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.schedch.mvp.dto.room.DayParticipantRes;
+import com.schedch.mvp.dto.participant.DayParticipantRes;
+import com.schedch.mvp.dto.room.DayGroupSeperateRes;
 import com.schedch.mvp.dto.room.DayRoomReq;
 import com.schedch.mvp.dto.room.DayRoomRes;
 import com.schedch.mvp.dto.room.DayRoomTopRes;
@@ -84,5 +85,19 @@ public class DayRoomController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(response));
+    }
+
+    @GetMapping("day/room/{roomUuid}/group/seperate/{participantName}")
+    public ResponseEntity dayRoomGroupSeperateParticipant(@PathVariable("roomUuid") String roomUuid,
+                                                          @PathVariable String participantName) {
+        log.info("P: dayRoomGroupSeperateParticipant / roomUuid = {}", roomUuid);
+
+        List<Participant> participantList = roomService.getAllParticipantSchedules(roomUuid);
+        DayGroupSeperateRes dayGroupSeperateRes = new DayGroupSeperateRes(participantList, participantName);
+
+        log.info("S: dayRoomGroupSeperateParticipant / roomUuid = {}", roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(dayGroupSeperateRes));
     }
 }
