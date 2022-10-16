@@ -65,6 +65,20 @@ public class UserRoomService {
         participantRepository.delete(participant);
     }
 
+    public Long getParticipantIdInRoom(String userEmail, String roomUuid) {
+        Room room = roomService.getRoom(roomUuid);
+        User user = userService.getUserByEmail(userEmail);
+
+        Optional<Participant> participantOptional = participantRepository.findByUserAndRoom(user, room);
+        if (participantOptional.isEmpty()) {
+            log.warn("E: exitRoom / user is not in room / userId = {}, roomId = {}", user.getId(), room.getId());
+            return null;
+        }
+
+        Participant participant = participantOptional.get();
+        return participant.getId();
+    }
+
     public List<UserParticipatingRoomRes> getAllRooms(String userEmail, boolean confirmed) {
         List<UserParticipatingRoomRes> resList = new ArrayList<>();
         List<Participant> participantList = participantRepository.findAllByUserEmailJoinFetchRoom(userEmail);
