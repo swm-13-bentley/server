@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,7 +18,7 @@ public class RoomConfirmReq {
 
     private LocalTime endTime;
 
-    @NotNull(message = "participantIdList cannot be empty")
-    private List<Long> participantIdList;
+//    @NotNull(message = "participantIdList cannot be empty")
+//    private List<Long> participantIdList;
 
 }
