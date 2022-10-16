@@ -4,12 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.schedch.mvp.config.auth.PrincipalDetails;
 import com.schedch.mvp.dto.ParticipantResponseDto;
+import com.schedch.mvp.dto.room.DayGroupSeperateRes;
 import com.schedch.mvp.dto.room.DayRoomReq;
+import com.schedch.mvp.dto.room.GroupSeperateRes;
 import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.dto.user.UserParticipatingRoomRes;
 import com.schedch.mvp.exception.UserNotInRoomException;
 import com.schedch.mvp.mapper.DayRoomMapper;
 import com.schedch.mvp.mapper.RoomMapper;
+import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.User;
 import com.schedch.mvp.service.RoomService;
@@ -96,6 +99,38 @@ public class UserRoomController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(e.getMessage());
         }
+    }
+
+    @GetMapping("user/room/{roomUuid}/group/seperate")
+    public ResponseEntity roomGroupWithoutUser(@PathVariable String roomUuid,
+                                               @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        log.info("P: roomGroupWithoutUser / roomUuid = {}", roomUuid);
+
+        String userEmail = principalDetails.getUsername();
+        Long participantId = userRoomService.getParticipantIdInRoom(userEmail, roomUuid);
+        List<Participant> participantList = roomService.getAllParticipantSchedules(roomUuid);
+        GroupSeperateRes groupSeperateRes = new GroupSeperateRes(participantList, participantId);
+
+        log.info("S: roomGroupWithoutUser / roomUuid = {}", roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(groupSeperateRes));
+    }
+
+    @GetMapping("user/day/room/{roomUuid}/group/seperate")
+    public ResponseEntity dayRoomGroupWithoutUser(@PathVariable("roomUuid") String roomUuid,
+                                                  @AuthenticationPrincipal PrincipalDetails principalDetails)  {
+        log.info("P: dayRoomGroupWithoutUser / roomUuid = {}", roomUuid);
+
+        String userEmail = principalDetails.getUsername();
+        Long participantId = userRoomService.getParticipantIdInRoom(userEmail, roomUuid);
+        List<Participant> participantList = roomService.getAllParticipantSchedules(roomUuid);
+        DayGroupSeperateRes dayGroupSeperateRes = new DayGroupSeperateRes(participantList, participantId);
+
+        log.info("S: dayRoomGroupWithoutUser / roomUuid = {}", roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(dayGroupSeperateRes));
     }
 
     @GetMapping("/user/myRoom/unConfirmed")
