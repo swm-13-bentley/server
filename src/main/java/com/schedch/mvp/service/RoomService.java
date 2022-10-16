@@ -72,19 +72,6 @@ public class RoomService {
         return participants;
     }
 
-    public void confirmRoom(String roomUuid, LocalDate confirmedDate, LocalTime startTime, LocalTime endTime) {
-        Room room = getRoom(roomUuid);
-        List<Participant> participantList = participantRepository.findAllByRoomJoinFetchSchedules(room);
-
-        //확정된 날짜와 시간 안에 들어있는 사람들 찾기
-
-
-        //그 사람들 중 이메일 등록한 사람들에게 메일 발송
-
-        room.setConfirmed(true);
-
-    }
-
     public List<TopTime> getTopAvailableTimeAndNames(String roomUuid, int max) {
         Room room = getRoom(roomUuid);
         List<RoomDate> roomDates = room.getRoomDates();

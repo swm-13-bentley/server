@@ -15,6 +15,10 @@ public class RoomConfirmReq {
     private LocalDate confirmedDate;
 
     private LocalTime startTime;
+
     private LocalTime endTime;
+
+//    @NotNull(message = "participantIdList cannot be empty")
+//    private List<Long> participantIdList;
 
 }

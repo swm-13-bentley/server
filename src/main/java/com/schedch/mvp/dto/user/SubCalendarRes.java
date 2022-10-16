@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SubCalendarRes {
 
-    private Long id;
+    private Long subCalendarRes;
     private String subCalendarName;
     private boolean selected;
 

@@ -6,8 +6,11 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -78,9 +81,32 @@ public class Participant extends BaseEntity{
         this.participantName = user.getUsername();
         this.password = "";
         this.isSignedIn = true;
+        this.alarmEmail = user.getEmail();
     }
 
     public boolean checkPassword(String inputPassword) {
         return this.password.equals(inputPassword);
+    }
+
+    public boolean findInTimeRangeSchedule(LocalDate confirmedDate, LocalTime startTime, LocalTime endTime) {
+        LocalTime setEndTime = endTime.minusMinutes(1); //schedule endTime -> 일분씩 앞당겨서 저장되어 있음. 따라서 endTime도 일분 앞당겨서 비교
+
+        List<Schedule> collect = scheduleList.stream()
+                .filter(schedule -> schedule.getAvailableDate().isEqual(confirmedDate))
+                .filter(schedule -> (
+                        (schedule.getStartTime().compareTo(startTime) <= 0) && (schedule.getEndTime().compareTo(setEndTime) >= 0)))
+                .collect(Collectors.toList());
+
+        return collect.size() > 0;
+    }
+
+    public boolean findInDayRangeSchedule(LocalDate confirmedDate) {
+        List<Schedule> collect = scheduleList.stream()
+                .filter(schedule -> {
+                    return schedule.getAvailableDate().isEqual(confirmedDate);
+                })
+                .collect(Collectors.toList());
+
+        return collect.size() > 0;
     }
 }
