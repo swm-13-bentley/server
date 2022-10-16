@@ -121,7 +121,7 @@ public class AwsMailService{
                         "BEGIN:VEVENT\n" +
                         "DTSTAMP:%s\n" +
                         "ATTENDEE;CN=\"%s\";ROLE=REQ-PARTICIPANT;RSVP=TRUE:MAILTO:%s\n" +
-                        "ORGANIZER;CN=\"언제만나(Mannatime)\":MAILTO:manna.time.2022@gmail.com\n" +
+                        "ORGANIZER;CN=\"%s\":MAILTO:manna.time.2022@gmail.com\n" +
                         "DTSTART;TZID=Asia/Seoul:%s\n" +
                         "DTEND;TZID=Asia/Seoul:%s\n" +
                         "LOCATION:%s\n" +
@@ -136,6 +136,7 @@ public class AwsMailService{
                 LocalDateTime.now(), //DTSTAMP: 메일 작성된 시간 (ex_20220924T000951Z)
                 emailReq.getAttendeeName(), //ATTENDEE: 참석자 이름
                 emailReq.getMailTo(), //MAILTO: 참석자 이메일
+                emailReq.getAttendeeName(), //ORGANIZER: 원래는 주관자 이름인데, 이메일 표시를 위해 참석자 이름으로 대체
                 emailReq.getStartDateTimeString(), //DTSTART: 일정 시작 시간(ex_20220924T130000)
                 emailReq.getEndDateTimeString(), //DTEND: 일정 끝나는 시간(ex_20220924T160000)
                 emailReq.getLocation(), //LOCATION: 장소
