@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.TopCountRes;
+import com.schedch.mvp.dto.room.GroupSeperateRes;
 import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.dto.room.RoomResponse;
 import com.schedch.mvp.mapper.RoomMapper;
@@ -92,6 +93,21 @@ public class RoomController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(response));
+    }
+
+    @GetMapping("/room/{roomUuid}/group/seperate/{participantName}")
+    public ResponseEntity roomGroupFindSeperateParticipant(@PathVariable String roomUuid,
+                                                           @PathVariable String participantName) {
+        log.info("P: roomGroupFindSeperateParticipant / roomUuid = {}", roomUuid);
+
+        List<Participant> participantList = roomService.getAllParticipantSchedules(roomUuid);
+        GroupSeperateRes groupSeperateRes = new GroupSeperateRes(participantList, participantName);
+
+
+        log.info("S: roomGroupFindSeperateParticipant / roomUuid = {}", roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(groupSeperateRes));
     }
 
 }
