@@ -54,9 +54,9 @@ public class RoomConfirmController {
         LocalDate confirmedDate = roomConfirmReq.getConfirmedDate();
         LocalTime startTime = roomConfirmReq.getStartTime();
         LocalTime endTime = roomConfirmReq.getEndTime();
-        List<Long> participantIdList = roomConfirmReq.getParticipantIdList();
 
-        roomConfirmService.confirmRoom(roomUuid, confirmedDate, startTime, endTime, participantIdList);
+        //participantIdList is null in RoomConfirmAllSendImplementation implementation
+        roomConfirmService.confirmRoom(roomUuid, confirmedDate, startTime, endTime, null);
 
         log.info("S: patchRoomConfirm / roomUuid = {}", roomUuid);
         return ResponseEntity
