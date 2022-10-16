@@ -81,6 +81,7 @@ public class Participant extends BaseEntity{
         this.participantName = user.getUsername();
         this.password = "";
         this.isSignedIn = true;
+        this.alarmEmail = user.getEmail();
     }
 
     public boolean checkPassword(String inputPassword) {
