@@ -15,7 +15,10 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,8 +74,8 @@ public class UserRoomService {
 
         Optional<Participant> participantOptional = participantRepository.findByUserAndRoom(user, room);
         if (participantOptional.isEmpty()) {
-            log.warn("E: exitRoom / user is not in room / userId = {}, roomId = {}", user.getId(), room.getId());
-            return null;
+            log.warn("E: getParticipantIdInRoom / user is not in room / userId = {}, roomId = {}", user.getId(), room.getId());
+            throw new UserNotInRoomException(ErrorMessage.userNotInRoom(roomUuid));
         }
 
         Participant participant = participantOptional.get();
