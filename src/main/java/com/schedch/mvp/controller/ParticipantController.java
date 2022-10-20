@@ -35,7 +35,7 @@ public class ParticipantController {
 
         log.info("P: participantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
         try {
-            Participant participant = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+            Participant participant = participantService.getParticipant(roomUuid, participantName, password);
             ParticipantResponseDto participantResponseDto = new ParticipantResponseDto(participant);
 
             log.info("S: participantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
