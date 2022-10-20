@@ -53,6 +53,14 @@ public class ControllerHandler {
                 .body(gson.toJson(errorJson));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity illegalArgumentExceptionHandler(IllegalArgumentException e) {
+        JsonObject errorJson = getErrorJson(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(gson.toJson(errorJson));
+    }
+
     @ExceptionHandler(URISyntaxException.class)
     public ResponseEntity handleUriSyntaxException(URISyntaxException e) {
         JsonObject errorJson = getErrorJson(e.getMessage());
