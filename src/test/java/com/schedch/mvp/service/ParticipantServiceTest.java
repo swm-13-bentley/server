@@ -12,9 +12,10 @@ import com.schedch.mvp.model.Schedule;
 import com.schedch.mvp.repository.ParticipantRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDate;
@@ -26,17 +27,17 @@ import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
-@WebMvcTest(ParticipantService.class)
+@ExtendWith(MockitoExtension.class)
 @Import(TimeAdapter.class)
 class ParticipantServiceTest {
 
-    @Autowired
+    @InjectMocks
     ParticipantService participantService;
-    @MockBean
+    @Mock
     ParticipantRepository participantRepository;
-    @MockBean
+    @Mock
     RoomService roomService;
 
 
@@ -47,12 +48,12 @@ class ParticipantServiceTest {
     @Test
     void no_room_for_uuid_test() throws Exception {
         //given
-        when(roomService.getRoomWithParticipants(roomUuid))
+        when(roomService.getRoom(roomUuid))
                 .thenThrow(new NoSuchElementException());
 
         //when
         try {
-            participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+            participantService.getParticipant(roomUuid, participantName, password);
         }
         //then
         catch (NoSuchElementException e) {
@@ -64,11 +65,11 @@ class ParticipantServiceTest {
     @Test
     void new_user_registration_test() throws Exception {
         //given
-        when(roomService.getRoomWithParticipants(roomUuid))
+        when(roomService.getRoom(roomUuid))
                 .thenReturn(createTestRoom());
 
         //when
-        Participant participant = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+        Participant participant = participantService.getParticipant(roomUuid, participantName, password);
 
         //then
         assertThat(participant.getParticipantName()).isEqualTo(participantName);
@@ -82,12 +83,14 @@ class ParticipantServiceTest {
         Room room = createTestRoom();
         room.addParticipant(participant);
 
-        when(roomService.getRoomWithParticipants(roomUuid))
-                .thenReturn(room);
+        given(roomService.getRoom(roomUuid))
+                .willReturn(room);
+        given(participantRepository.findParticipantByRoomAndParticipantNameWithSchedules(room, participantName))
+                .willReturn(List.of(participant));
 
         //when
         try {
-            participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, "wrongPassword");
+            participantService.getParticipant(roomUuid, participantName, "wrongPassword");
         }
         //then
         catch (IllegalAccessException e) {
@@ -107,10 +110,12 @@ class ParticipantServiceTest {
                 LocalTime.of(6, 0, 0)));
         Room room = createTestRoom();
         room.addParticipant(participant);
-        given(roomService.getRoomWithParticipants(roomUuid)).willReturn(room);
+        given(roomService.getRoom(roomUuid)).willReturn(room);
+        given(participantRepository.findParticipantByRoomAndParticipantNameWithSchedules(room, participantName))
+                .willReturn(List.of(participant));
 
         //when
-        Participant foundParticipant = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+        Participant foundParticipant = participantService.getParticipant(roomUuid, participantName, password);
 
         //then
         assertThat(foundParticipant.getParticipantName()).isEqualTo(participantName);
@@ -123,14 +128,15 @@ class ParticipantServiceTest {
         //given
         Room room = createTestRoom();
         room.setParticipantLimit(5);
-        given(roomService.getRoomWithParticipants(roomUuid)).willReturn(room);
+        given(roomService.getRoom(roomUuid)).willReturn(room);
+
         for (int i = 1; i <= 5; i++) {
             room.addParticipant(new Participant("p" + i, "", false));
         }
 
         //when
         try {
-            participantService.findUnSignedParticipantAndValidate(roomUuid, "p6", "");
+            participantService.getParticipant(roomUuid, "p6", "");
         }
 
         //then
