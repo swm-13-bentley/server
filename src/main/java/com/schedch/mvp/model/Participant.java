@@ -79,7 +79,7 @@ public class Participant extends BaseEntity{
 
     public Participant(User user) {
         this.participantName = user.getUsername();
-        this.password = "";
+        this.password = user.getPassword();
         this.isSignedIn = true;
         this.alarmEmail = user.getEmail();
     }
