@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +28,13 @@ public class ParticipantService {
     private final ParticipantRepository participantRepository;
     private final RoomService roomService;
 
-    public Participant findUnSignedParticipantAndValidate(String roomUuid, String participantName, String password) throws IllegalAccessException {
-        Room room = roomService.getRoomWithParticipants(roomUuid);
-        List<Participant> foundParticipant = room.findUnSignedParticipant(participantName);
+    public Participant getParticipant(String roomUuid, String participantName, String password) throws IllegalAccessException {
+        Room room = roomService.getRoom(roomUuid);
+        Optional<Participant> participantOptional = findOptionalParticipantByRoomAndName(room, participantName, true);
 
-        if(foundParticipant.isEmpty()) {//신규 유저 -> 유저 등록해야 함
+        if(participantOptional.isEmpty()) {//신규 유저 -> 유저 등록해야 함
             if(!room.canAddMember()) {//member limit
-                log.warn("E: findUnSignedParticipantAndValidate / room is full / roomId = {}", room.getId());
+                log.warn("E: findParticipantByName / room is full / roomId = {}", room.getId());
                 throw new FullMemberException(ErrorMessage.fullMemberForUuid(roomUuid));
             }
 
@@ -42,56 +43,97 @@ public class ParticipantService {
             return newParticipant;
         }
 
-        Participant participant = foundParticipant.get(0);
-        if(!participant.checkPassword(password)) { //기존 유저가 맞음 -> 기존 시간 돌려주면 됨
-            log.warn("E: findUnSignedParticipantAndValidate / password is wrong / participantName = {}, password = {}, roomUuid = {}", participantName, password, roomUuid);
+        Participant participant = participantOptional.get();
+        if(!participant.checkPassword(password)) {  //존재하는 유저지만, 비밀번호가 다르다.
+            log.warn("E: findParticipantByName / password is wrong / participantName = {}, password = {}, roomUuid = {}", participantName, password, roomUuid);
             throw new IllegalAccessException(ErrorMessage.passwordIsWrong(participantName, password, roomUuid));
         }
 
-        return participant;
+        return participant; //기존 유저가 맞음 -> 기존 시간 돌려주면 됨
     }
 
     public void saveParticipantAvailable(String roomUuid, String participantName, List<TimeBlockDto> available) {
-        Room room = roomService.getRoomWithParticipants(roomUuid);
-
-        Participant participant = getUnSignedParticipantFromRoom(room, participantName);
+        Room room = roomService.getRoom(roomUuid);
+        Participant participant = findParticipantByRoomAndName(room, participantName, true);
         participant.emptySchedules();
 
         LocalTime roomStartTime = room.getStartTime();
-        available.stream()
-                .forEach(timeBlockDto -> {
-                    TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime).stream()
-                            .forEach(schedule -> participant.addSchedule(schedule));
-                });
+        for (TimeBlockDto timeBlockDto : available) {
+            List<Schedule> scheduleList = TimeAdapter.changeTimeBlockDtoToSchedule(timeBlockDto, roomStartTime);
+            for (Schedule schedule : scheduleList) {
+                participant.addSchedule(schedule);
+            }
+        }
     }
 
     public void saveDayParticipantAvailable(String roomUuid, String participantName, List<LocalDate> localDateList) {
-        Room room = roomService.getRoomWithParticipants(roomUuid);
-
-        Participant participant = getUnSignedParticipantFromRoom(room, participantName);
+        Room room = roomService.getRoom(roomUuid);
+        Participant participant = findParticipantByRoomAndName(room, participantName, true);
         participant.emptySchedules();
 
-        Participant finalParticipant = participant;
-        localDateList.stream().forEach(localDate -> {
-            finalParticipant.addSchedule(new Schedule(localDate));
-        });
+        for (LocalDate localDate : localDateList) {
+            participant.addSchedule(new Schedule(localDate));
+        }
     }
 
     public void registerAlarmEmail(String roomUuid, String participantName, String alarmEmail) {
-        Room room = roomService.getRoomWithParticipants(roomUuid);
-        Participant participant = getUnSignedParticipantFromRoom(room, participantName);
+        Room room = roomService.getRoom(roomUuid);
+        Participant participant = findParticipantByRoomAndName(room, participantName, false);
 
         participant.setAlarmEmail(alarmEmail);
     }
 
-    private Participant getUnSignedParticipantFromRoom(Room room, String participantName) {
-        List<Participant> participantList = room.findUnSignedParticipant(participantName);
-        if (participantList.isEmpty()) {
-            String roomUuid = room.getUuid();
-            log.warn("E: saveParticipantAvailable / participant name not in room / participantName = {}, roomUuid = {}", participantName, roomUuid);
-            throw new NoSuchElementException(ErrorMessage.participantNameNotInRoom(participantName, roomUuid));
+    /**
+     * 방, 이름으로 참석자를 조회. 참석자가 없을 경우 예외를 던짐.
+     * @param room
+     * @param participantName
+     * @param withSchedule - Schedule join fetch 여부
+     * @return Participant - 참석자
+     * @throws NoSuchElementException - 약속 방에 해당 이름의 참석자가 존재하지 않음
+     */
+    public Participant findParticipantByRoomAndName(Room room, String participantName, boolean withSchedule) {
+        List<Participant> foundParticipant;
+        if( withSchedule )
+            foundParticipant = participantRepository.findParticipantByRoomAndParticipantNameWithSchedules(room, participantName);
+        else
+            foundParticipant = participantRepository.findParticipantByRoomAndParticipantName(room, participantName);
+
+        if(foundParticipant.isEmpty()) {//해당 이름의 유저는 없음
+            log.warn("E: findParticipantByRoomAndName / NoSuchElementException / roomUuid = {}, participantName = {}", room.getUuid(), participantName);
+            throw new NoSuchElementException(ErrorMessage.participantNameNotInRoom(participantName, room.getUuid()));
         }
 
-        return participantList.get(0);
+        if(foundParticipant.size() >= 2) { //중복 유저가 존재
+            log.error("E: findParticipantByRoomAndName / roomUuid = {}, participantName = {}", room.getUuid(), participantName);
+        }
+
+        Participant participant = foundParticipant.get(0);
+        return participant;
+    }
+
+    /**
+     * 방, 이름으로 참석자를 조회. 참석자가 없을 경우 Optional.empty()를 반환.
+     * @param room
+     * @param participantName
+     * @param withSchedule
+     * @return
+     */
+    public Optional<Participant> findOptionalParticipantByRoomAndName(Room room, String participantName, boolean withSchedule) {
+        List<Participant> foundParticipant;
+        if( withSchedule )
+            foundParticipant = participantRepository.findParticipantByRoomAndParticipantNameWithSchedules(room, participantName);
+        else
+            foundParticipant = participantRepository.findParticipantByRoomAndParticipantName(room, participantName);
+
+        if(foundParticipant.isEmpty()) {//신규 유저 -> 유저 등록해야 함
+            return Optional.empty();
+        }
+
+        if(foundParticipant.size() >= 2) { //중복 유저가 존재
+            log.error("E: findOptionalParticipantByRoomAndName / roomUuid = {}, participantName = {}", room.getUuid(), participantName);
+        }
+
+        Participant participant = foundParticipant.get(0);
+        return Optional.of(participant);
     }
 }
