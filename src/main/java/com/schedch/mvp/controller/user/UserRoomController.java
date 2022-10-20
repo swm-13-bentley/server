@@ -69,7 +69,7 @@ public class UserRoomController {
     }
 
     @PostMapping("/user/room/{roomUuid}/entry")
-    public ResponseEntity userRoomEntry(@PathVariable String roomUuid, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+    public ResponseEntity userRoomEntry(@PathVariable String roomUuid, @AuthenticationPrincipal PrincipalDetails principalDetails) throws IllegalAccessException{
         User user = principalDetails.getUser();
         log.info("P: userRoomEntry / userId = {}, roomUuid = {}", user.getId(), roomUuid);
 

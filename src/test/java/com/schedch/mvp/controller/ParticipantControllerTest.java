@@ -38,7 +38,7 @@ class ParticipantControllerTest {
     public void room_participant_password_match_test() throws Exception {
         //given
         ParticipantRequestDto participantRequestDto = new ParticipantRequestDto(participantName, password);
-        when(participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password))
+        when(participantService.getParticipant(roomUuid, participantName, password))
                 .thenReturn(new Participant(participantName, password, false));
 
         //when
@@ -59,7 +59,7 @@ class ParticipantControllerTest {
     public void room_participant_password_mismatch_test() throws Exception {
         //given
         ParticipantRequestDto participantRequestDto = new ParticipantRequestDto(participantName, password);
-        when(participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password))
+        when(participantService.getParticipant(roomUuid, participantName, password))
                 .thenThrow(new IllegalAccessException("password is wrong"));
 
         //when
@@ -78,7 +78,7 @@ class ParticipantControllerTest {
     public void room_not_found_test() throws Exception {
         //given
         ParticipantRequestDto participantRequestDto = new ParticipantRequestDto(participantName, password);
-        when(participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password))
+        when(participantService.getParticipant(roomUuid, participantName, password))
                 .thenThrow(new NoSuchElementException("no such element"));
 
         //when
@@ -96,7 +96,7 @@ class ParticipantControllerTest {
     public void 인원_제한_예외처리_테스트() throws Exception {
         //given
         ParticipantRequestDto participantRequestDto = new ParticipantRequestDto(participantName, password);
-        given(participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password))
+        given(participantService.getParticipant(roomUuid, participantName, password))
                 .willThrow(new FullMemberException("room is full"));
 
         //when

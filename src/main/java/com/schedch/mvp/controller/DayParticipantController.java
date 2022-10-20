@@ -36,7 +36,7 @@ public class DayParticipantController {
         String password = participantRequestDto.getPassword();
         log.info("P: dayParticipantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
 
-        Participant participant = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+        Participant participant = participantService.getParticipant(roomUuid, participantName, password);
         DayParticipantRes dayParticipantRes = dayParticipantMapper.entity2Res(participant);
 
         log.info("S: dayParticipantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
