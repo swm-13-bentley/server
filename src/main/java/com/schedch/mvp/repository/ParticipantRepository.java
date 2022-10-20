@@ -18,6 +18,14 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     Optional<Participant> findParticipantByParticipantNameAndRoomAndIsSignedIn(@Param("participantName") String participantName,
                                                                                @Param("room") Room room,
                                                                                @Param("isSignedIn") boolean isSignedIn);
+    @Query("select distinct p from Participant p" +
+            " left join fetch p.scheduleList" +
+            " where p.room = :room" +
+            " and p.participantName = :participantName")
+    List<Participant> findParticipantByRoomAndParticipantNameWithSchedules(@Param("room") Room room,
+                                                                           @Param("participantName") String participantName);
+
+    List<Participant> findParticipantByRoomAndParticipantName(Room room, String participantName);
 
     Optional<Participant> findByUserAndRoom(User user, Room room);
 
