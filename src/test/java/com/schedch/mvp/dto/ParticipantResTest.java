@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.schedch.mvp.adapter.LocalDateAdapter;
 import com.schedch.mvp.adapter.LocalTimeAdapter;
+import com.schedch.mvp.dto.participant.ParticipantRes;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Schedule;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,7 @@ import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.*;
 
-class ParticipantResponseDtoTest {
+class ParticipantResTest {
     Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
@@ -25,7 +26,7 @@ class ParticipantResponseDtoTest {
         Participant participant = getParticipant();
 
         //when
-        ParticipantResponseDto dto = new ParticipantResponseDto(participant);
+        ParticipantRes dto = new ParticipantRes(participant);
 
         //then
         assertThat(dto.getAvailable().size()).isEqualTo(2);

@@ -1,7 +1,6 @@
 package com.schedch.mvp.service.user;
 
 import com.schedch.mvp.config.ErrorMessage;
-import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.user.UserParticipatingRoomRes;
 import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.exception.UserNotInRoomException;
@@ -34,14 +33,14 @@ public class UserRoomService {
     private final ParticipantService participantService;
     private final ParticipantRepository participantRepository;
 
-    public ParticipantResponseDto entry(String userEmail, String roomUuid) {
+    public Participant entry(String userEmail, String roomUuid) {
         Room room = roomService.getRoom(roomUuid);
         User user = userService.getUserByEmail(userEmail);
 
         Optional<Participant> participantOptional = participantRepository.findByUserAndRoom(user, room);
         if (participantOptional.isPresent()) {// Case 1: user is already in room
             Participant participant = participantOptional.get();
-            return new ParticipantResponseDto(participant);
+            return participant;
         }
 
         if (!room.canAddMember()) { // Case 2: room is already full
@@ -61,7 +60,7 @@ public class UserRoomService {
         Participant participant = new Participant(user);
         user.addParticipant(participant);
         room.addParticipant(participant);
-        return new ParticipantResponseDto(participant);
+        return participant;
     }
 
     public void exitRoom(String userEmail, String roomUuid) {

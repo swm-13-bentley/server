@@ -3,8 +3,8 @@ package com.schedch.mvp.controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.schedch.mvp.dto.AvailableRequestDto;
-import com.schedch.mvp.dto.ParticipantRequestDto;
-import com.schedch.mvp.dto.ParticipantResponseDto;
+import com.schedch.mvp.dto.participant.ParticipantReq;
+import com.schedch.mvp.dto.participant.ParticipantRes;
 import com.schedch.mvp.dto.TimeBlockDto;
 import com.schedch.mvp.dto.participant.ParticipantAlarmEmailReq;
 import com.schedch.mvp.exception.FullMemberException;
@@ -29,18 +29,18 @@ public class ParticipantController {
 
     @PostMapping("/room/{roomUuid}/participant/entry")
     public ResponseEntity participantFind(@PathVariable String roomUuid,
-                                          @RequestBody ParticipantRequestDto participantRequestDto) throws IllegalAccessException {
-        String participantName = participantRequestDto.getParticipantName();
-        String password = participantRequestDto.getPassword();
+                                          @RequestBody ParticipantReq participantReq) throws IllegalAccessException {
+        String participantName = participantReq.getParticipantName();
+        String password = participantReq.getPassword();
 
         log.info("P: participantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
         try {
             Participant participant = participantService.getParticipant(roomUuid, participantName, password);
-            ParticipantResponseDto participantResponseDto = new ParticipantResponseDto(participant);
+            ParticipantRes participantRes = new ParticipantRes(participant);
 
             log.info("S: participantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(gson.toJson(participantResponseDto));
+                    .body(gson.toJson(participantRes));
 
         } catch (FullMemberException e) {
             JsonObject errorJson = new JsonObject();

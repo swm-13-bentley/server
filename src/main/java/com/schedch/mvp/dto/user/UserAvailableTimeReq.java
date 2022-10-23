@@ -10,6 +10,5 @@ import java.util.List;
 @NoArgsConstructor
 public class UserAvailableTimeReq {
 
-    private String participantName;
     private List<TimeBlockDto> available;
 }
