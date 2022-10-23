@@ -9,7 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 public class UserCalendarReq {
 
-    private Long id;
+    private Long calendarId;
     private String calendarEmail;
     private List<SubCalendarReq> subCalendarList;
 

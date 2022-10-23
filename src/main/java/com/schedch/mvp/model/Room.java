@@ -51,12 +51,6 @@ public class Room extends BaseEntity{
         participant.setRoomTitle(this.title);
     }
 
-    public List<Participant> findUnSignedParticipant(String participantName) {
-        return getParticipantList().stream()
-                .filter(p -> p.isSignedIn() == false && p.getParticipantName().equals(participantName))
-                .collect(Collectors.toList());
-    }
-
     public List<LocalDate> getLocalDateList() {
         return roomDates.stream().map(RoomDate::getScheduledDate)
                 .collect(Collectors.toList());

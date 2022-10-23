@@ -3,9 +3,9 @@ package com.schedch.mvp.controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.schedch.mvp.adapter.TimeAdapter;
-import com.schedch.mvp.dto.ParticipantResponseDto;
+import com.schedch.mvp.dto.participant.ParticipantRes;
 import com.schedch.mvp.dto.TopCountRes;
-import com.schedch.mvp.dto.room.RoomConfirmReq;
+import com.schedch.mvp.dto.room.GroupSeperateRes;
 import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.dto.room.RoomResponse;
 import com.schedch.mvp.mapper.RoomMapper;
@@ -20,8 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,7 +87,7 @@ public class RoomController {
         log.info("P: groupSchedulesFind / roomUuid = {}", roomUuid);
 
         List<Participant> participants = roomService.getAllParticipantSchedules(roomUuid);
-        List<ParticipantResponseDto> response = participants.stream().map(ParticipantResponseDto::new).collect(Collectors.toList());
+        List<ParticipantRes> response = participants.stream().map(ParticipantRes::new).collect(Collectors.toList());
 
         log.info("S: groupSchedulesFind / roomUuid = {}", roomUuid);
         return ResponseEntity
@@ -97,21 +95,19 @@ public class RoomController {
                 .body(gson.toJson(response));
     }
 
-    @PatchMapping("/room/{roomUuid}/confirm")
-    public ResponseEntity patchRoomConfirm(@PathVariable String roomUuid,
-                                           @Valid @RequestBody RoomConfirmReq roomConfirmReq) {
-        log.info("P: patchRoomConfirm / roomUuid = {}", roomUuid);
+    @GetMapping("/room/{roomUuid}/group/seperate/{participantName}")
+    public ResponseEntity roomGroupFindSeperateParticipant(@PathVariable String roomUuid,
+                                                           @PathVariable String participantName) {
+        log.info("P: roomGroupFindSeperateParticipant / roomUuid = {}", roomUuid);
 
-        LocalDate confirmedDate = roomConfirmReq.getConfirmedDate();
-        LocalTime startTime = roomConfirmReq.getStartTime();
-        LocalTime endTime = roomConfirmReq.getEndTime();
+        List<Participant> participantList = roomService.getAllParticipantSchedules(roomUuid);
+        GroupSeperateRes groupSeperateRes = new GroupSeperateRes(participantList, participantName);
 
-        roomService.confirmRoom(roomUuid, confirmedDate, startTime, endTime);
 
-        log.info("S: patchRoomConfirm / roomUuid = {}", roomUuid);
+        log.info("S: roomGroupFindSeperateParticipant / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .build();
+                .body(gson.toJson(groupSeperateRes));
     }
 
 }

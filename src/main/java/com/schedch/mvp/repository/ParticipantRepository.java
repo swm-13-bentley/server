@@ -18,8 +18,21 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     Optional<Participant> findParticipantByParticipantNameAndRoomAndIsSignedIn(@Param("participantName") String participantName,
                                                                                @Param("room") Room room,
                                                                                @Param("isSignedIn") boolean isSignedIn);
+    @Query("select distinct p from Participant p" +
+            " left join fetch p.scheduleList" +
+            " where p.room = :room" +
+            " and p.participantName = :participantName")
+    List<Participant> findParticipantByRoomAndParticipantNameWithSchedules(@Param("room") Room room,
+                                                                           @Param("participantName") String participantName);
 
-    Optional<Participant> findByUserAndRoom(User user, Room room);
+    List<Participant> findParticipantByRoomAndParticipantName(Room room, String participantName);
+
+    @Query("select distinct p from Participant p" +
+            " left join fetch p.scheduleList" +
+            " where p.user = :user" +
+            " and p.room = :room")
+    Optional<Participant> findByUserAndRoom(@Param("user") User user,
+                                            @Param("room") Room room);
 
     @Query("select distinct p from Participant p" +
             " join fetch p.room" +
@@ -36,5 +49,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
             " where p.room = :room" +
             " order by p.participantName")
     List<Participant> findAllByRoomJoinFetchSchedules(@Param("room") Room room);
+
+    List<Participant> findAllByIdIn(List<Long> idList);
 
 }

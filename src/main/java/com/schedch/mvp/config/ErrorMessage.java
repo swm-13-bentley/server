@@ -47,4 +47,8 @@ public class ErrorMessage {
         return String.format("This email is not signed in / email = %s", email);
     }
 
+    public static String alreadyExistingParticipantName(String participantName) {
+        return String.format("Already existing participantName / participantName = %s", participantName);
+
+    }
 }

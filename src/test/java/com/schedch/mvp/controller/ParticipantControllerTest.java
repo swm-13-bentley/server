@@ -2,7 +2,7 @@ package com.schedch.mvp.controller;
 
 import com.google.gson.Gson;
 import com.schedch.mvp.dto.AvailableRequestDto;
-import com.schedch.mvp.dto.ParticipantRequestDto;
+import com.schedch.mvp.dto.participant.ParticipantReq;
 import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.service.ParticipantService;
@@ -37,8 +37,8 @@ class ParticipantControllerTest {
     @Test
     public void room_participant_password_match_test() throws Exception {
         //given
-        ParticipantRequestDto participantRequestDto = new ParticipantRequestDto(participantName, password);
-        when(participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password))
+        ParticipantReq participantReq = new ParticipantReq(participantName, password);
+        when(participantService.getParticipant(roomUuid, participantName, password))
                 .thenReturn(new Participant(participantName, password, false));
 
         //when
@@ -46,7 +46,7 @@ class ParticipantControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .param("roomUuid", roomUuid)
-                .content(gson.toJson(participantRequestDto))
+                .content(gson.toJson(participantReq))
         )
         //then
                 .andExpect(status().isOk())
@@ -58,8 +58,8 @@ class ParticipantControllerTest {
     @Test
     public void room_participant_password_mismatch_test() throws Exception {
         //given
-        ParticipantRequestDto participantRequestDto = new ParticipantRequestDto(participantName, password);
-        when(participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password))
+        ParticipantReq participantReq = new ParticipantReq(participantName, password);
+        when(participantService.getParticipant(roomUuid, participantName, password))
                 .thenThrow(new IllegalAccessException("password is wrong"));
 
         //when
@@ -67,7 +67,7 @@ class ParticipantControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .param("roomUuid", roomUuid)
-                .content(gson.toJson(participantRequestDto))
+                .content(gson.toJson(participantReq))
         )
         //then
                 .andExpect(status().isUnauthorized())
@@ -77,8 +77,8 @@ class ParticipantControllerTest {
     @Test
     public void room_not_found_test() throws Exception {
         //given
-        ParticipantRequestDto participantRequestDto = new ParticipantRequestDto(participantName, password);
-        when(participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password))
+        ParticipantReq participantReq = new ParticipantReq(participantName, password);
+        when(participantService.getParticipant(roomUuid, participantName, password))
                 .thenThrow(new NoSuchElementException("no such element"));
 
         //when
@@ -86,7 +86,7 @@ class ParticipantControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .param("roomUuid", roomUuid)
-                        .content(gson.toJson(participantRequestDto))
+                        .content(gson.toJson(participantReq))
                 )
         //then
                 .andExpect(status().isNotFound())
@@ -95,8 +95,8 @@ class ParticipantControllerTest {
     @Test
     public void 인원_제한_예외처리_테스트() throws Exception {
         //given
-        ParticipantRequestDto participantRequestDto = new ParticipantRequestDto(participantName, password);
-        given(participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password))
+        ParticipantReq participantReq = new ParticipantReq(participantName, password);
+        given(participantService.getParticipant(roomUuid, participantName, password))
                 .willThrow(new FullMemberException("room is full"));
 
         //when
@@ -104,7 +104,7 @@ class ParticipantControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .param("roomUuid", roomUuid)
-                .content(gson.toJson(participantRequestDto))
+                .content(gson.toJson(participantReq))
         )
         //then
                 .andExpect(status().isBadRequest());

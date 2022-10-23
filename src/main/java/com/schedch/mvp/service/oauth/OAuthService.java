@@ -42,14 +42,15 @@ public class OAuthService {
 
         if(userOptional.isEmpty() == false) { //user for this email exists
             User user = userOptional.get();
-            log.info("S: googleSignIn / user already exists / userId = {}", user.getId());
-            return userOptional.get();
+            log.info("S: googleSignIn / user logs in / userId = {}", user.getId());
+            return user;
         }
 
         UserCalendar userCalendar = userCalendarService.addCalendarToUser(googleLoginDto, mappedUser);
         userCalendar.setMainCalendar(true); //첫 캘린더임으로, 메인 캘린더로 추가
 
         User user = userRepository.save(mappedUser);
+        log.info("S: googleSignIn / user signs in / userId = {}", user.getId());
         return user;
     }
 

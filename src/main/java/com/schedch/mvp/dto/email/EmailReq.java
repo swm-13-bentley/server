@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 @Data
 @NoArgsConstructor
 public class EmailReq {
+    private boolean dateOnly;
     private String emailTitle;
     private String roomTitle;
     private String roomLink;
@@ -24,7 +25,8 @@ public class EmailReq {
     private String summary;
 
     @Builder
-    public EmailReq(String emailTitle, String roomTitle, String roomLink, String attendeeName, String mailTo, LocalDateTime startDateTime, LocalDateTime endDateTime, String location, String sequence, String uid, String summary) {
+    public EmailReq(boolean dateOnly, String emailTitle, String roomTitle, String roomLink, String attendeeName, String mailTo, LocalDateTime startDateTime, LocalDateTime endDateTime, String location, String sequence, String uid, String summary) {
+        this.dateOnly = dateOnly;
         this.emailTitle = emailTitle;
         this.roomTitle = roomTitle;
         this.roomLink = roomLink;

@@ -35,16 +35,16 @@ public class AwsMailService{
     private final AmazonSimpleEmailService amazonSimpleEmailService;
     private final TemplateEngine templateEngine;
 
-    public void sendEmail(EmailReq emailReq) {
-        log.info("P: sendEmail / emailReq.mailTo = {}", emailReq.getMailTo());
+    public void sendEmailBySes(EmailReq emailReq) {
         try {
             SendRawEmailRequest sendRawEmailRequestV2 = getSendRawEmailRequest(emailReq);
             amazonSimpleEmailService.sendRawEmail(sendRawEmailRequestV2);
-        }catch (Exception e){
-            log.info("F: sendEmail / email send error / roomLink = {}, emailReq.mailTo = {}, errorMsg = {}",
+        } catch (Exception e){
+            log.info("F: sendEmailBySes / email send error / roomLink = {}, emailReq.mailTo = {}, errorMsg = {}",
                     emailReq.getRoomLink(), emailReq.getMailTo(), e.getMessage());
 
         }
+        log.info("S: sendEmailBySes / emailReq.mailTo = {}", emailReq.getMailTo());
     }
 
     public SendRawEmailRequest getSendRawEmailRequest(EmailReq emailReq) throws MessagingException, IOException {
@@ -121,7 +121,7 @@ public class AwsMailService{
                         "BEGIN:VEVENT\n" +
                         "DTSTAMP:%s\n" +
                         "ATTENDEE;CN=\"%s\";ROLE=REQ-PARTICIPANT;RSVP=TRUE:MAILTO:%s\n" +
-                        "ORGANIZER;CN=\"언제만나(Mannatime)\":MAILTO:manna.time.2022@gmail.com\n" +
+                        "ORGANIZER;CN=\"%s\":MAILTO:manna.time.2022@gmail.com\n" +
                         "DTSTART;TZID=Asia/Seoul:%s\n" +
                         "DTEND;TZID=Asia/Seoul:%s\n" +
                         "LOCATION:%s\n" +
@@ -136,6 +136,7 @@ public class AwsMailService{
                 LocalDateTime.now(), //DTSTAMP: 메일 작성된 시간 (ex_20220924T000951Z)
                 emailReq.getAttendeeName(), //ATTENDEE: 참석자 이름
                 emailReq.getMailTo(), //MAILTO: 참석자 이메일
+                emailReq.getAttendeeName(), //ORGANIZER: 원래는 주관자 이름인데, 이메일 표시를 위해 참석자 이름으로 대체
                 emailReq.getStartDateTimeString(), //DTSTART: 일정 시작 시간(ex_20220924T130000)
                 emailReq.getEndDateTimeString(), //DTEND: 일정 끝나는 시간(ex_20220924T160000)
                 emailReq.getLocation(), //LOCATION: 장소
@@ -156,7 +157,8 @@ public class AwsMailService{
 
         Context context = new Context();
         context.setVariable("roomTitle", roomTitle);
-        context.setVariable("timeString", getTimeString(start, end));
+        context.setVariable("timeString",
+                emailReq.isDateOnly() ? getDayString(start) : getTimeString(start, end));
         context.setVariable("link", link);
 
         return templateEngine.process("email-template", context);
@@ -190,5 +192,14 @@ public class AwsMailService{
                 end.getHour(),
                 end.getMinute()
         );
+    }
+
+    private String getDayString(LocalDateTime start) {
+        return String.format("%d년 %d월 %d일(%s) - 하루 종일",
+                start.getYear(),
+                start.getMonthValue(),
+                start.getDayOfMonth(),
+                start.getDayOfWeek().getDisplayName(TextStyle.NARROW, Locale.KOREAN)
+            );
     }
 }

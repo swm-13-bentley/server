@@ -19,7 +19,7 @@ public class JwtConfig {
     private String SECRET; // 우리 서버만 알고 있는 비밀값
 
     @Value("${expiration.time}")
-    private Integer EXPIRATION_TIME; // 10분 (1000: millisecond -> second)
+    private Long EXPIRATION_TIME; // 10분 (1000: millisecond -> second)
 
     @Value("${expiration.time.refresh}")
     private Long REFRESH_EXPIRATION_TIME; // 10분 (1000: millisecond -> second)

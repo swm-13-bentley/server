@@ -1,13 +1,13 @@
 package com.schedch.mvp.service.user;
 
 import com.schedch.mvp.config.ErrorMessage;
-import com.schedch.mvp.dto.ParticipantResponseDto;
 import com.schedch.mvp.dto.user.UserParticipatingRoomRes;
 import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.exception.UserNotInRoomException;
 import com.schedch.mvp.model.*;
 import com.schedch.mvp.repository.ParticipantRepository;
 import com.schedch.mvp.repository.RoomRepository;
+import com.schedch.mvp.service.ParticipantService;
 import com.schedch.mvp.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,10 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,30 +28,39 @@ import java.util.stream.Collectors;
 public class UserRoomService {
 
     private final UserService userService;
-    private final ParticipantRepository participantRepository;
-    private final RoomRepository roomRepository;
     private final RoomService roomService;
+    private final RoomRepository roomRepository;
+    private final ParticipantService participantService;
+    private final ParticipantRepository participantRepository;
 
-    public ParticipantResponseDto entry(String userEmail, String roomUuid) {
+    public Participant entry(String userEmail, String roomUuid) {
         Room room = roomService.getRoom(roomUuid);
         User user = userService.getUserByEmail(userEmail);
 
         Optional<Participant> participantOptional = participantRepository.findByUserAndRoom(user, room);
-        if (participantOptional.isPresent()) {// Case: user is already in room
+        if (participantOptional.isPresent()) {// Case 1: user is already in room
             Participant participant = participantOptional.get();
-            return new ParticipantResponseDto(participant);
+            return participant;
         }
 
-        if (!room.canAddMember()) { // Case: room is already full
+        if (!room.canAddMember()) { // Case 2: room is already full
             log.warn("E: entry / room is full / roomId = {}", room.getId());
             throw new FullMemberException(ErrorMessage.fullMemberForUuid(roomUuid));
         }
 
-        // Case: new user enters room
+        // Case 3: new user enters room
+        String participantName = user.getUsername();
+        Optional<Participant> existingNameOptional = participantService.findOptionalParticipantByRoomAndName(room, participantName, false);
+        if (existingNameOptional.isPresent()) { //Case 3-1: participantName already exists
+            log.info("E: entry / already existing name / userId = {}, roomUuid = {}, participantName = {}", user.getId(), roomUuid, participantName);
+            throw new IllegalArgumentException(ErrorMessage.alreadyExistingParticipantName(participantName));
+        }
+
+        // Case 3-2: create new user
         Participant participant = new Participant(user);
         user.addParticipant(participant);
         room.addParticipant(participant);
-        return new ParticipantResponseDto(participant);
+        return participant;
     }
 
     public void exitRoom(String userEmail, String roomUuid) {
@@ -63,6 +75,20 @@ public class UserRoomService {
 
         Participant participant = participantOptional.get();
         participantRepository.delete(participant);
+    }
+
+    public Long getParticipantIdInRoom(String userEmail, String roomUuid) {
+        Room room = roomService.getRoom(roomUuid);
+        User user = userService.getUserByEmail(userEmail);
+
+        Optional<Participant> participantOptional = participantRepository.findByUserAndRoom(user, room);
+        if (participantOptional.isEmpty()) {
+            log.warn("E: getParticipantIdInRoom / user is not in room / userId = {}, roomId = {}", user.getId(), room.getId());
+            throw new UserNotInRoomException(ErrorMessage.userNotInRoom(roomUuid));
+        }
+
+        Participant participant = participantOptional.get();
+        return participant.getId();
     }
 
     public List<UserParticipatingRoomRes> getAllRooms(String userEmail, boolean confirmed) {

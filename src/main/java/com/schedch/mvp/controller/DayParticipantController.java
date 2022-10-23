@@ -1,7 +1,7 @@
 package com.schedch.mvp.controller;
 
 import com.google.gson.Gson;
-import com.schedch.mvp.dto.ParticipantRequestDto;
+import com.schedch.mvp.dto.participant.ParticipantReq;
 import com.schedch.mvp.dto.participant.DayParticipantReq;
 import com.schedch.mvp.dto.participant.DayParticipantRes;
 import com.schedch.mvp.mapper.DayParticipantMapper;
@@ -31,12 +31,12 @@ public class DayParticipantController {
 
     @PostMapping("day/room/{roomUuid}/participant/entry")
     public ResponseEntity dayParticipantFind(@PathVariable("roomUuid") String roomUuid,
-                                             @RequestBody ParticipantRequestDto participantRequestDto) throws IllegalAccessException {
-        String participantName = participantRequestDto.getParticipantName();
-        String password = participantRequestDto.getPassword();
+                                             @RequestBody ParticipantReq participantReq) throws IllegalAccessException {
+        String participantName = participantReq.getParticipantName();
+        String password = participantReq.getPassword();
         log.info("P: dayParticipantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
 
-        Participant participant = participantService.findUnSignedParticipantAndValidate(roomUuid, participantName, password);
+        Participant participant = participantService.getParticipant(roomUuid, participantName, password);
         DayParticipantRes dayParticipantRes = dayParticipantMapper.entity2Res(participant);
 
         log.info("S: dayParticipantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);

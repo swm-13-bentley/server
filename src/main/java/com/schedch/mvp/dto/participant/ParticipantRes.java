@@ -1,5 +1,6 @@
-package com.schedch.mvp.dto;
+package com.schedch.mvp.dto.participant;
 
+import com.schedch.mvp.dto.TimeBlockDto;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Schedule;
 import lombok.Data;
@@ -11,12 +12,12 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-public class ParticipantResponseDto {
+public class ParticipantRes {
 
     private String participantName;
     private List<TimeBlockDto> available = new ArrayList<>();
 
-    public ParticipantResponseDto(Participant participant) {
+    public ParticipantRes(Participant participant) {
         this.participantName = participant.getParticipantName();
 
         participant.getScheduleList().stream()

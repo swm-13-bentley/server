@@ -199,7 +199,7 @@ public class UserCalendarService {
 
     public void changeSelectedSubCalendar(String userEmail, UserCalendarReq userCalendarReq) throws NoSuchElementException{
         User user = userService.getUserByEmail(userEmail);
-        Long userCalendarId = userCalendarReq.getId();
+        Long userCalendarId = userCalendarReq.getCalendarId();
         Optional<UserCalendar> userCalendarOptional = userCalendarRepository.findByUserAndIdJoinFetchSubCalendar(user, userCalendarId);
 
         if (userCalendarOptional.isEmpty()) {
@@ -210,7 +210,7 @@ public class UserCalendarService {
         UserCalendar userCalendar = userCalendarOptional.get();
         List<SubCalendar> subCalendarList = userCalendar.getSubCalendarList();
         Map<Long, Boolean> selectedMap = userCalendarReq.getSubCalendarList().stream().collect(Collectors.toMap(
-                SubCalendarReq::getId, SubCalendarReq::isSelected
+                SubCalendarReq::getSubCalendarId, SubCalendarReq::isSelected
         ));
 
         for (SubCalendar subCalendar : subCalendarList) {

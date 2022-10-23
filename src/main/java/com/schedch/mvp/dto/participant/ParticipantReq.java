@@ -1,18 +1,16 @@
-package com.schedch.mvp.dto;
+package com.schedch.mvp.dto.participant;
 
-import com.google.gson.Gson;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ParticipantRequestDto {
+public class ParticipantReq {
 
     private String participantName;
     private String password;
 
-    public ParticipantRequestDto(String participantName, String password) {
+    public ParticipantReq(String participantName, String password) {
         this.participantName = participantName;
         this.password = password;
     }

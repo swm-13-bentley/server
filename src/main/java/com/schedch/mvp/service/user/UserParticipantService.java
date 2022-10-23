@@ -37,7 +37,6 @@ public class UserParticipantService {
         Participant participant = getParticipant(user, room);
 
         participant.emptySchedules();
-        participant.setParticipantName(userAvailableTimeReq.getParticipantName());
 
         List<TimeBlockDto> timeBlockDtoList = userAvailableTimeReq.getAvailable();
         timeBlockDtoList.stream().forEach(
@@ -52,7 +51,6 @@ public class UserParticipantService {
         Participant participant = getParticipant(userEmail, roomUuid);
 
         participant.emptySchedules();
-        participant.setParticipantName(userAvailableDayReq.getParticipantName());
 
         List<LocalDate> availableDates = userAvailableDayReq.getAvailableDates();
         availableDates.stream().forEach(
