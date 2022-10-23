@@ -3,7 +3,8 @@ package com.schedch.mvp.controller.user;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.schedch.mvp.config.auth.PrincipalDetails;
-import com.schedch.mvp.dto.ParticipantResponseDto;
+import com.schedch.mvp.dto.participant.DayParticipantRes;
+import com.schedch.mvp.dto.participant.ParticipantRes;
 import com.schedch.mvp.dto.room.DayGroupSeperateRes;
 import com.schedch.mvp.dto.room.DayRoomReq;
 import com.schedch.mvp.dto.room.GroupSeperateRes;
@@ -74,12 +75,28 @@ public class UserRoomController {
         log.info("P: userRoomEntry / userId = {}, roomUuid = {}", user.getId(), roomUuid);
 
         String userEmail = getUserEmail(principalDetails);
-        ParticipantResponseDto resDto = userRoomService.entry(userEmail, roomUuid);
+        Participant participant = userRoomService.entry(userEmail, roomUuid);
+        ParticipantRes participantRes = new ParticipantRes(participant);
 
         log.info("S: userRoomEntry / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(gson.toJson(resDto));
+                .body(gson.toJson(participantRes));
+    }
+
+    @PostMapping("/user/day/room/{roomUuid}/entry")
+    public ResponseEntity userDayRoomEntry(@PathVariable String roomUuid, @AuthenticationPrincipal PrincipalDetails principalDetails) throws IllegalAccessException{
+        User user = principalDetails.getUser();
+        log.info("P: userDayRoomEntry / userId = {}, roomUuid = {}", user.getId(), roomUuid);
+
+        String userEmail = getUserEmail(principalDetails);
+        Participant participant = userRoomService.entry(userEmail, roomUuid);
+        DayParticipantRes dayParticipantRes = new DayParticipantRes(participant);
+
+        log.info("S: userRoomEntry / roomUuid = {}", roomUuid);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(dayParticipantRes));
     }
 
     @PostMapping("/user/room/{roomUuid}/exit")

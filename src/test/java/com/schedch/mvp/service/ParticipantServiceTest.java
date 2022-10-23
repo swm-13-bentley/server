@@ -2,7 +2,7 @@ package com.schedch.mvp.service;
 
 import com.google.gson.Gson;
 import com.schedch.mvp.adapter.TimeAdapter;
-import com.schedch.mvp.dto.ParticipantResponseDto;
+import com.schedch.mvp.dto.participant.ParticipantRes;
 import com.schedch.mvp.dto.TimeBlockDto;
 import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
@@ -213,7 +213,7 @@ class ParticipantServiceTest {
         participant.addSchedule(new Schedule(availableDate, LocalTime.of(8, 0), LocalTime.of(8, 59), roomStartTime)); //64 ~ 65, 2
 
         //when
-        ParticipantResponseDto res = new ParticipantResponseDto(participant);
+        ParticipantRes res = new ParticipantRes(participant);
 
         //then
         assertThat(res.getAvailable().size()).isEqualTo(1);

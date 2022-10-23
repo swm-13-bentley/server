@@ -27,7 +27,12 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     List<Participant> findParticipantByRoomAndParticipantName(Room room, String participantName);
 
-    Optional<Participant> findByUserAndRoom(User user, Room room);
+    @Query("select distinct p from Participant p" +
+            " left join fetch p.scheduleList" +
+            " where p.user = :user" +
+            " and p.room = :room")
+    Optional<Participant> findByUserAndRoom(@Param("user") User user,
+                                            @Param("room") Room room);
 
     @Query("select distinct p from Participant p" +
             " join fetch p.room" +
