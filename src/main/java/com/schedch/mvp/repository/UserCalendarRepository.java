@@ -27,6 +27,7 @@ public interface UserCalendarRepository extends JpaRepository<UserCalendar, Long
 
     @Query("select distinct c from UserCalendar c" +
             " join fetch c.subCalendarList" +
-            " where c.mainCalendar = true")
-    Optional<UserCalendar> findMainCalendarByUserJoinFetchSubCalendar(User user);
+            " where c.mainCalendar = true" +
+            " and c.user = :user")
+    Optional<UserCalendar> findMainCalendarByUserJoinFetchSubCalendar(@Param("user") User user);
 }
