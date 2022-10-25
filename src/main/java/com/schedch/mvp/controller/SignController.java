@@ -67,7 +67,7 @@ public class SignController {
         try {
 
             User user = oAuthService.googleSignIn(authCode);
-            if(participantId != null) {
+            if (participantId != null) {
                 log.info("P: redirectGoogleSignIn / add participant to user / userId = {}, participantId = {}", user.getId(), participantId);
                 participantService.addParticipantToUser(participantId, user);
             }
@@ -85,6 +85,10 @@ public class SignController {
 
         } catch (CalendarLoadException e) {
             //TODO: error url로 변경
+            headers.setLocation(new URI(oAuthConfigUtils.getFailurePageUrl()));
+            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
+
+        } catch (IllegalArgumentException e) {
             headers.setLocation(new URI(oAuthConfigUtils.getFailurePageUrl()));
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
         }
