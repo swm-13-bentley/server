@@ -7,6 +7,7 @@ import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.Schedule;
+import com.schedch.mvp.model.User;
 import com.schedch.mvp.repository.ParticipantRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,16 @@ public class ParticipantService {
 
     private final ParticipantRepository participantRepository;
     private final RoomService roomService;
+
+    public Participant getParticipant(Long participantId) {
+        Optional<Participant> participantOptional = participantRepository.findById(participantId);
+        if(participantOptional.isEmpty()) {//해당 이름의 유저는 없음
+            log.warn("E: findParticipantByRoomAndName / NoSuchElementException / participantId = {}", participantId);
+            throw new NoSuchElementException(ErrorMessage.noParticipantForId(participantId));
+        }
+
+        return participantOptional.get();
+    }
 
     public Participant getParticipant(String roomUuid, String participantName, String password) throws IllegalAccessException {
         Room room = roomService.getRoom(roomUuid);
@@ -83,6 +94,17 @@ public class ParticipantService {
         participant.setAlarmEmail(alarmEmail);
     }
 
+    public void addParticipantToUser(Long participantId, User user) {
+        Participant participant = getParticipant(participantId);
+        if(participant.isSignedIn() == true) {
+            log.warn("E: addParticipantToUser / this participant is already logged in / participantId = {}", participantId);
+        }
+        participant.setIsSignedIn(true);
+        participant.setPassword(user.getPassword());
+        participant.setAlarmEmail(user.getEmail());
+        user.addParticipant(participant);
+    }
+
     /**
      * 방, 이름으로 참석자를 조회. 참석자가 없을 경우 예외를 던짐.
      * @param room
@@ -135,5 +157,11 @@ public class ParticipantService {
 
         Participant participant = foundParticipant.get(0);
         return Optional.of(participant);
+    }
+
+    public Long findParticipantIdByRoomAndName(String roomUuid, String participantName) {
+        Room room = roomService.getRoom(roomUuid);
+        Participant participant = findParticipantByRoomAndName(room, participantName, false);
+        return participant.getId();
     }
 }

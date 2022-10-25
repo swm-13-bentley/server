@@ -50,6 +50,15 @@ public class OAuthConfigUtils {
         throw new InvalidParameterException(String.format("%s는 올바른 OAuth channel이 아닙니다", channel));
     }
 
+    public String getUserFromParticipantAuthUrl(Long participantId, String channel) {
+        switch (channel) {
+            case "google":
+                return googleConfigUtils.googleSignInInitUrl(participantId.toString());
+        }
+
+        throw new InvalidParameterException(String.format("%s는 올바른 OAuth channel이 아닙니다", channel));
+    }
+
     public String getMainPageUrl() throws URISyntaxException {
         return new URI("https://mannatime.io").toString();
     }
