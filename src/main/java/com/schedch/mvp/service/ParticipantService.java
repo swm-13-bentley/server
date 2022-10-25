@@ -98,17 +98,16 @@ public class ParticipantService {
         Participant participant = getParticipant(participantId);
         Room room = participant.getRoom();
 
-        //유저가 이미 로그인 된 사용자인 경우
+        //참가자가 로그인이 되어 있는 경우
         if(participant.isSignedIn() == true) {
             log.warn("E: addParticipantToUser / this participant is already logged in / participantId = {}", participantId);
-            throw new IllegalArgumentException(String.format("This participant is already signed in / participantId = %s", participantId));
         }
 
         //유저가 그 방에 참여 중인지 확인해야 함
-        Optional<Participant> participantOptional = participantRepository.findByUserAndRoom(user, room);
-        if (participantOptional.isPresent()) {
+        Optional<Participant> alreadyExistingParticipant = participantRepository.findByUserAndRoom(user, room);
+        if (alreadyExistingParticipant.isPresent()) {
             log.warn("E: addParticipantToUser / user is already joining room / userId = {}, roomId = {}", user.getId(), room.getId());
-            throw new IllegalArgumentException(String.format("This user is already in room / userId = %s, roomId = %s", user.getId(), room.getId()));
+            participantRepository.delete(participant);
         }
 
         participant.setIsSignedIn(true);

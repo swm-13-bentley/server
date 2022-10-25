@@ -65,7 +65,6 @@ public class SignController {
         HttpHeaders headers = new HttpHeaders();
 
         try {
-
             User user = oAuthService.googleSignIn(authCode);
             if (participantId != null) {
                 log.info("P: redirectGoogleSignIn / add participant to user / userId = {}, participantId = {}", user.getId(), participantId);
@@ -88,9 +87,6 @@ public class SignController {
             headers.setLocation(new URI(oAuthConfigUtils.getFailurePageUrl()));
             return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
 
-        } catch (IllegalArgumentException e) {
-            headers.setLocation(new URI(oAuthConfigUtils.getFailurePageUrl()));
-            return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
         }
 
     }
