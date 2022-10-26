@@ -55,4 +55,8 @@ public class ErrorMessage {
     public static String noParticipantForId(Long participantId) {
         return String.format("No participant found for id / participantId = %s", participantId);
     }
+
+    public static String participantIsSignedIn(String participantName, String roomUuid) {
+        return String.format("This participant is signed in / participantId = %s, roomUuid = %s", participantName, roomUuid);
+    }
 }
