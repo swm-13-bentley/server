@@ -55,6 +55,11 @@ public class ParticipantService {
         }
 
         Participant participant = participantOptional.get();
+        if(participant.isSignedIn()) { //회원가입 된 유저를 비회원 로그인으로 접근 시도함
+            log.warn("E: findParticipantByName / participant is signed in / participantId = {}, roomId = {}", participant.getId(), room.getId());
+            throw new IllegalStateException(ErrorMessage.participantIsSignedIn(participantName, roomUuid));
+        }
+
         if(!participant.checkPassword(password)) {  //존재하는 유저지만, 비밀번호가 다르다.
             log.warn("E: findParticipantByName / password is wrong / participantName = {}, password = {}, roomUuid = {}", participantName, password, roomUuid);
             throw new IllegalAccessException(ErrorMessage.passwordIsWrong(participantName, password, roomUuid));
