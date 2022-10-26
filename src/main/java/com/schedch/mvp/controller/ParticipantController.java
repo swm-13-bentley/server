@@ -47,6 +47,12 @@ public class ParticipantController {
             errorJson.addProperty("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(gson.toJson(errorJson));
+
+        } catch (IllegalStateException e) { //logged in user
+            JsonObject errorJson = new JsonObject();
+            errorJson.addProperty("message", e.getMessage());
+            return ResponseEntity.status(402)
+                    .body(gson.toJson(errorJson));
         }
 
     }
