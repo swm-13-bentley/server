@@ -42,7 +42,7 @@ public class UserCalendarLoadPerDay {
 
             if (startDate.isEqual(endDate)) { //시작일 == 종료일
                 startBlock = Math.max(startBlock, roomStartBlock);
-                endBlock = Math.max(endBlock, roomEndBlock);
+                endBlock = Math.min(endBlock, roomEndBlock);
                 ScheduleInfo scheduleInfo = new ScheduleInfo(summary, startBlock, endBlock);
                 if(!map.containsKey(startDate)) {
                     map.put(startDate, new SchedulePerDay(startDate));
