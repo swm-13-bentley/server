@@ -65,7 +65,7 @@ public class RoomConfirmServiceSelectImpl implements RoomConfirmService{
 
         //방 상태를 confirm으로 전환
         Room room = roomService.getRoom(roomUuid);
-        room.setConfirmed(true);
+        room.confirmRoom(confirmedDate, startTime, endTime);
 
         //참가자들 중 이메일을 등록한 사람들에게 메일을 발송한다
         List<Participant> emailRegisteredParticipantList = participantList.stream().filter(participant -> participant.getAlarmEmail() != null).collect(Collectors.toList());
