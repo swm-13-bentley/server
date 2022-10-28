@@ -39,7 +39,7 @@ public class RoomConfirmServiceAllSendImpl implements RoomConfirmService{
 
         //방과 참가자들을 불러온다
         Room room = roomService.getRoomWithParticipants(roomUuid);
-        room.setConfirmed(true);
+        room.confirmRoom(confirmedDate, startTime, endTime);
 
         //참가자들 중 이메일을 등록한 사람들에게 메일을 발송한다
         List<Participant> participantList = room.getParticipantList();

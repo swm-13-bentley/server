@@ -18,6 +18,11 @@ import java.util.regex.Pattern;
 @Component
 public class TimeAdapter {
 
+    public static LocalTime str2LocalTime(String str) {
+        Matcher matcher = Pattern.compile("(.*).(.*)").matcher(str);
+        return LocalTime.of(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), 0);
+    }
+
     public static LocalDate dateTime2LocalDate(DateTime dateTime) {
         LocalDate localDate = LocalDate.parse(dateTime.toString().substring(0, 10), DateTimeFormatter.ISO_LOCAL_DATE);
         return localDate;
