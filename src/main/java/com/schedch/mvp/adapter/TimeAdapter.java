@@ -19,8 +19,9 @@ import java.util.regex.Pattern;
 public class TimeAdapter {
 
     public static LocalTime str2LocalTime(String str) {
-        Matcher matcher = Pattern.compile("(.*):(.*):(.*)").matcher(str);
-        return LocalTime.of(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), 0);
+        String hour = str.substring(0, 2);
+        String time = str.substring(3, 5);
+        return LocalTime.of(Integer.parseInt(hour), Integer.parseInt(time), 0);
     }
 
     public static LocalDate dateTime2LocalDate(DateTime dateTime) {
