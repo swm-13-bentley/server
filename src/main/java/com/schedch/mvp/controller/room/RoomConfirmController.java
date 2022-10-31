@@ -1,6 +1,7 @@
 package com.schedch.mvp.controller.room;
 
 import com.google.gson.Gson;
+import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.dto.room.RoomConfirmReq;
 import com.schedch.mvp.dto.room.RoomInRangeRes;
 import com.schedch.mvp.model.Participant;
@@ -52,8 +53,13 @@ public class RoomConfirmController {
         log.info("P: patchRoomConfirm / roomUuid = {}", roomUuid);
 
         LocalDate confirmedDate = roomConfirmReq.getConfirmedDate();
-        LocalTime startTime = roomConfirmReq.getStartTime();
-        LocalTime endTime = roomConfirmReq.getEndTime();
+        LocalTime startTime = TimeAdapter.str2LocalTime(roomConfirmReq.getStartTime());
+        LocalTime endTime;
+        if(roomConfirmReq.getEndTime().equals("24:00:00")) {
+            endTime = LocalTime.of(23, 59, 0);
+        } else {
+            endTime = TimeAdapter.str2LocalTime(roomConfirmReq.getEndTime());
+        }
 
         //participantIdList is null in RoomConfirmAllSendImplementation implementation
         roomConfirmService.confirmRoom(roomUuid, confirmedDate, startTime, endTime, null);

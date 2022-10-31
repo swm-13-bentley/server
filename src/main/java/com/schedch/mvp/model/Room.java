@@ -40,6 +40,10 @@ public class Room extends BaseEntity{
 
     private boolean confirmed;
 
+    private LocalDate confirmedDate;
+    private LocalTime confirmedStartTime;
+    private LocalTime confirmedEndTime;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "room")
     @OrderBy(value = "participantName ASC")
     private List<Participant> participantList = new ArrayList<>();
@@ -73,7 +77,10 @@ public class Room extends BaseEntity{
         this.participantLimit = participantLimit;
     }
 
-    public void setConfirmed(boolean confirmed) {
+    public void confirmRoom(LocalDate date, LocalTime startTime, LocalTime endTime) {
+        this.confirmedDate = date;
+        this.confirmedStartTime = startTime;
+        this.confirmedEndTime = endTime;
         this.confirmed = true;
     }
 
@@ -96,4 +103,5 @@ public class Room extends BaseEntity{
     public List<String> getParticipantNames() {
         return participantList.stream().map(Participant::getParticipantName).collect(Collectors.toList());
     }
+
 }

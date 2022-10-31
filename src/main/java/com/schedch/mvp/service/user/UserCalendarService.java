@@ -156,7 +156,7 @@ public class UserCalendarService {
             log.info("end google transaction, size = {}", eventList.size());
 
             int roomStartBlock = TimeAdapter.localTime2TimeBlockInt(room.getStartTime());
-            int roomEndBlock = TimeAdapter.localTime2TimeBlockInt(room.getEndTime());
+            int roomEndBlock = TimeAdapter.localTime2TimeBlockInt(room.getEndTime()) + 1;
             return new UserCalendarLoadPerDay(eventList, roomStartBlock, roomEndBlock);
 
         } catch (GeneralSecurityException e) {

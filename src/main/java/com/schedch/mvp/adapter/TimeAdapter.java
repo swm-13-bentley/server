@@ -18,6 +18,12 @@ import java.util.regex.Pattern;
 @Component
 public class TimeAdapter {
 
+    public static LocalTime str2LocalTime(String str) {
+        String hour = str.substring(0, 2);
+        String time = str.substring(3, 5);
+        return LocalTime.of(Integer.parseInt(hour), Integer.parseInt(time), 0);
+    }
+
     public static LocalDate dateTime2LocalDate(DateTime dateTime) {
         LocalDate localDate = LocalDate.parse(dateTime.toString().substring(0, 10), DateTimeFormatter.ISO_LOCAL_DATE);
         return localDate;

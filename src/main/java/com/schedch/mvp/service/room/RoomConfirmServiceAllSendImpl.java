@@ -3,7 +3,6 @@ package com.schedch.mvp.service.room;
 import com.schedch.mvp.dto.email.EmailReq;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.model.Room;
-import com.schedch.mvp.repository.ParticipantRepository;
 import com.schedch.mvp.service.RoomService;
 import com.schedch.mvp.service.email.AwsMailService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ public class RoomConfirmServiceAllSendImpl implements RoomConfirmService{
 
     private final AwsMailService awsMailService;
     private final RoomService roomService;
-    private final ParticipantRepository participantRepository;
 
     public Map<String, List> findInRangeParticipantList(String roomUuid, LocalDate confirmedDate, LocalTime startTime, LocalTime endTime) {
         return null;
@@ -39,7 +37,7 @@ public class RoomConfirmServiceAllSendImpl implements RoomConfirmService{
 
         //방과 참가자들을 불러온다
         Room room = roomService.getRoomWithParticipants(roomUuid);
-        room.setConfirmed(true);
+        room.confirmRoom(confirmedDate, startTime, endTime);
 
         //참가자들 중 이메일을 등록한 사람들에게 메일을 발송한다
         List<Participant> participantList = room.getParticipantList();
