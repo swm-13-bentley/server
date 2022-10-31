@@ -53,12 +53,16 @@ public class RoomConfirmController {
         log.info("P: patchRoomConfirm / roomUuid = {}", roomUuid);
 
         LocalDate confirmedDate = roomConfirmReq.getConfirmedDate();
-        LocalTime startTime = TimeAdapter.str2LocalTime(roomConfirmReq.getStartTime());
-        LocalTime endTime;
-        if(roomConfirmReq.getEndTime().equals("24:00:00")) {
-            endTime = LocalTime.of(23, 59, 0);
-        } else {
-            endTime = TimeAdapter.str2LocalTime(roomConfirmReq.getEndTime());
+        LocalTime startTime = null;
+        LocalTime endTime = null;
+
+        if (roomConfirmReq.getStartTime() != null && roomConfirmReq.getEndTime() != null) {
+            startTime = TimeAdapter.str2LocalTime(roomConfirmReq.getStartTime());
+            if (roomConfirmReq.getEndTime().equals("24:00:00")) {
+                endTime = LocalTime.of(23, 59, 0);
+            } else {
+                endTime = TimeAdapter.str2LocalTime(roomConfirmReq.getEndTime());
+            }
         }
 
         //participantIdList is null in RoomConfirmAllSendImplementation implementation
