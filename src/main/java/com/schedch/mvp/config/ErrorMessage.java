@@ -51,4 +51,8 @@ public class ErrorMessage {
         return String.format("Already existing participantName / participantName = %s", participantName);
 
     }
+
+    public static String noParticipantForId(Long participantId) {
+        return String.format("No participant found for id / participantId = %s", participantId);
+    }
 }

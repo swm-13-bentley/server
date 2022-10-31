@@ -1,13 +1,11 @@
 package com.schedch.mvp.controller.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.api.client.util.DateTime;
 import com.google.gson.Gson;
-import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.config.auth.PrincipalDetails;
 import com.schedch.mvp.config.oauth.OAuthConfigUtils;
 import com.schedch.mvp.dto.user.UserCalendarListRes;
-import com.schedch.mvp.dto.user.UserCalendarLoadRes;
+import com.schedch.mvp.dto.user.UserCalendarLoadPerDay;
 import com.schedch.mvp.dto.user.UserCalendarReq;
 import com.schedch.mvp.mapper.UserCalendarMapper;
 import com.schedch.mvp.model.Room;
@@ -79,11 +77,8 @@ public class UserCalendarController {
         String userEmail = principalDetails.getUsername();
         Room room = roomService.getRoomWithRoomDates(roomUuid);
 
-        DateTime startDateTime = TimeAdapter.localDateAndTime2DateTime(room.getStartLocalDate(), room.getStartTime(), "+9");
-        DateTime endDateTime = TimeAdapter.localDateAndTime2DateTime(room.getEndLocalDate(), room.getEndTime(), "+9");
-
         try {
-            List<UserCalendarLoadRes> response = userCalendarService.loadCalendarEvents(userEmail, startDateTime, endDateTime);
+            UserCalendarLoadPerDay response = userCalendarService.loadCalendarEvents(userEmail, room);
             log.info("S: loadUserCalendarEvents() / userId = {}, roomUuid = {}", user.getId(), roomUuid);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(gson.toJson(response));
@@ -91,6 +86,9 @@ public class UserCalendarController {
         } catch (NoSuchElementException e) {
             log.warn("E: loadUserCalendarEvents() / No main calendar / userId = {}", user.getId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());
         }
     }

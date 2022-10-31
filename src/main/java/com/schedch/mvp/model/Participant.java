@@ -88,6 +88,14 @@ public class Participant extends BaseEntity{
         return this.password.equals(inputPassword);
     }
 
+    public void setIsSignedIn(boolean isSignedIn) {
+        this.isSignedIn = isSignedIn;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public boolean findInTimeRangeSchedule(LocalDate confirmedDate, LocalTime startTime, LocalTime endTime) {
         LocalTime setEndTime = endTime.minusMinutes(1); //schedule endTime -> 일분씩 앞당겨서 저장되어 있음. 따라서 endTime도 일분 앞당겨서 비교
 

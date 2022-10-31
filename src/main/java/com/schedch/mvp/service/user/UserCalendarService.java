@@ -8,12 +8,14 @@ import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
+import com.schedch.mvp.adapter.TimeAdapter;
 import com.schedch.mvp.config.ErrorMessage;
 import com.schedch.mvp.dto.oauth.GoogleLoginDto;
 import com.schedch.mvp.dto.user.SubCalendarReq;
-import com.schedch.mvp.dto.user.UserCalendarLoadRes;
+import com.schedch.mvp.dto.user.UserCalendarLoadPerDay;
 import com.schedch.mvp.dto.user.UserCalendarReq;
 import com.schedch.mvp.exception.CalendarLoadException;
+import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.SubCalendar;
 import com.schedch.mvp.model.User;
 import com.schedch.mvp.model.UserCalendar;
@@ -103,7 +105,7 @@ public class UserCalendarService {
         return userCalendarList;
     }
 
-    public List<UserCalendarLoadRes> loadCalendarEvents(String userEmail, DateTime startDateTime, DateTime endDateTime) {
+    public UserCalendarLoadPerDay loadCalendarEvents(String userEmail, Room room) {
         User user = userService.getUserByEmail(userEmail);
         Optional<UserCalendar> mainUserCalendarOptional = userCalendarRepository.findMainCalendarByUserJoinFetchSubCalendar(user);
 
@@ -120,9 +122,12 @@ public class UserCalendarService {
                 .setAccessToken(mainUserCalendar.getCalendarAccessToken())
                 .setRefreshToken(mainUserCalendar.getCalendarRefreshToken());
 
-        //create return entity
-        List<UserCalendarLoadRes> userCalendarLoadResList = new ArrayList<>();
+        //Save items
+        List<Event> eventList = new ArrayList<>();
+        DateTime startDateTime = TimeAdapter.localDateAndTime2DateTime(room.getStartLocalDate(), room.getStartTime(), "+9");
+        DateTime endDateTime = TimeAdapter.localDateAndTime2DateTime(room.getEndLocalDate(), room.getEndTime(), "+9");
 
+        log.info("start google transaction");
         try {
             Calendar gCal = calendarService.getGoogleCalendarByTokenResponse(tokenResponse);
             List<CalendarListEntry> calendarsToShow = gCal.calendarList().list().execute().getItems().stream()
@@ -131,24 +136,28 @@ public class UserCalendarService {
 
             for (CalendarListEntry calendarListEntry : calendarsToShow) {
                 Events events = gCal.events().list(calendarListEntry.getId())
-                        .setTimeMin(startDateTime)
-                        .setTimeMax(endDateTime)
+                        .setTimeMin(startDateTime) //lower bound of end datetime
+                        .setTimeMax(endDateTime) //upper bound of start datetime
                         .setOrderBy("startTime")
                         .setSingleEvents(true)
                         .execute();
 
-                List<Event> eventsItems = events.getItems();
+                List<Event> eventsItems = events.getItems(); // 방 날짜 내, 방 시작 시간 내의 event items
 
                 for (Event eventItem : eventsItems) {
                     if (eventItem.getStart().getDateTime() == null) { //하루 종일로 설정 된 이벤트
                         continue;
                     }
 
-                    userCalendarLoadResList.add(new UserCalendarLoadRes(eventItem));
+                    eventList.add(eventItem);
                 }
 
             }
-            return userCalendarLoadResList;
+            log.info("end google transaction, size = {}", eventList.size());
+
+            int roomStartBlock = TimeAdapter.localTime2TimeBlockInt(room.getStartTime());
+            int roomEndBlock = TimeAdapter.localTime2TimeBlockInt(room.getEndTime());
+            return new UserCalendarLoadPerDay(eventList, roomStartBlock, roomEndBlock);
 
         } catch (GeneralSecurityException e) {
             log.error("F: getAllUserCalendar / GeneralSecurityException / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
