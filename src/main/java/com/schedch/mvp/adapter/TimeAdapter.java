@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 public class TimeAdapter {
 
     public static LocalTime str2LocalTime(String str) {
-        Matcher matcher = Pattern.compile("(.*).(.*)").matcher(str);
+        Matcher matcher = Pattern.compile("(.*):(.*):(.*)").matcher(str);
         return LocalTime.of(Integer.parseInt(matcher.group(1)), Integer.parseInt(matcher.group(2)), 0);
     }
 
