@@ -27,14 +27,6 @@ public class RoomConfirmController {
     private final RoomConfirmService roomConfirmService;
     private final Gson gson;
 
-    /**
-     * 확정하려고 하는 시간 범위 내에 가능한 사람들의 집
-     * @param roomUuid
-     * @param availableDate
-     * @param startTime
-     * @param endTime
-     * @return
-     */
     @GetMapping("/room/{roomUuid}/confirm")
     public ResponseEntity getParticipantInRange(@PathVariable String roomUuid,
                                                 @RequestParam("availableDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate availableDate,
@@ -61,16 +53,12 @@ public class RoomConfirmController {
         log.info("P: patchRoomConfirm / roomUuid = {}", roomUuid);
 
         LocalDate confirmedDate = roomConfirmReq.getConfirmedDate();
-        LocalTime startTime = null;
-        LocalTime endTime = null;
-
-        if (roomConfirmReq.getStartTime() != null && roomConfirmReq.getEndTime() != null) {
-            startTime = TimeAdapter.str2LocalTime(roomConfirmReq.getStartTime());
-            if (roomConfirmReq.getEndTime().equals("24:00:00")) {
-                endTime = LocalTime.of(23, 59, 0);
-            } else {
-                endTime = TimeAdapter.str2LocalTime(roomConfirmReq.getEndTime());
-            }
+        LocalTime startTime = TimeAdapter.str2LocalTime(roomConfirmReq.getStartTime());
+        LocalTime endTime;
+        if(roomConfirmReq.getEndTime().equals("24:00:00")) {
+            endTime = LocalTime.of(23, 59, 0);
+        } else {
+            endTime = TimeAdapter.str2LocalTime(roomConfirmReq.getEndTime());
         }
 
         //participantIdList is null in RoomConfirmAllSendImplementation implementation
