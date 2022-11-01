@@ -1,12 +1,14 @@
 package com.schedch.mvp.service.user;
 
 import com.schedch.mvp.config.ErrorMessage;
+import com.schedch.mvp.dto.room.DayRoomTopRes;
 import com.schedch.mvp.dto.user.UserParticipatingRoomRes;
 import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.exception.UserNotInRoomException;
 import com.schedch.mvp.model.*;
 import com.schedch.mvp.repository.ParticipantRepository;
 import com.schedch.mvp.repository.RoomRepository;
+import com.schedch.mvp.service.DayRoomService;
 import com.schedch.mvp.service.ParticipantService;
 import com.schedch.mvp.service.RoomService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class UserRoomService {
 
     private final UserService userService;
     private final RoomService roomService;
+    private final DayRoomService dayRoomService;
     private final RoomRepository roomRepository;
     private final ParticipantService participantService;
     private final ParticipantRepository participantRepository;
@@ -122,13 +125,22 @@ public class UserRoomService {
 
         participantList.stream().filter(participant -> participant.getRoom().isConfirmed() == confirmed)
                 .forEach(participant -> {
+                    boolean isDayOnly = participant.getRoom().getStartTime() == null;
                     Long roomId = participant.getRoom().getId();
+
                     UserParticipatingRoomRes resItem = new UserParticipatingRoomRes(participant);
                     resItem.setRoomDates(roomDateMap.get(roomId));
                     resItem.setParticipantNames(participantNameMap.get(roomId));
 
-                    List<TopTime> topAvailableTimeAndNames = roomService.getTopAvailableTimeAndNames(participant.getRoom().getUuid(), 1);
-                    resItem.setTopCountResByTopTime(topAvailableTimeAndNames);
+                    if(isDayOnly) {
+                        List<DayRoomTopRes> topAvailableDate = dayRoomService.getTopAvailableDate(participant.getRoom().getUuid(), 1);
+                        resItem.setTopCountResByTopDate(topAvailableDate);
+
+                    }
+                    else {
+                        List<TopTime> topAvailableTimeAndNames = roomService.getTopAvailableTimeAndNames(participant.getRoom().getUuid(), 1);
+                        resItem.setTopCountResByTopTime(topAvailableTimeAndNames);
+                    }
 
                     resList.add(resItem);
                 });
