@@ -74,7 +74,7 @@ public class GoogleProfileService {
 
         GoogleLoginResponse googleLoginResponse = objectMapper.readValue(apiResponseJson.getBody(), new TypeReference<GoogleLoginResponse>() {});
 
-        log.info("S: getGoogleLoginResponseByAuthCode / authCode = {}", authCode);
+        log.info("S: getGoogleLoginResponseByAuthCode / authCode = {}, scope = {}", authCode, googleLoginResponse.getScope());
         return googleLoginResponse;
 
     }
