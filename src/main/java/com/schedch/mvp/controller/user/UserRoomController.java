@@ -9,6 +9,7 @@ import com.schedch.mvp.dto.room.DayGroupSeperateRes;
 import com.schedch.mvp.dto.room.DayRoomReq;
 import com.schedch.mvp.dto.room.GroupSeperateRes;
 import com.schedch.mvp.dto.room.RoomRequest;
+import com.schedch.mvp.dto.user.UserParticipatingRoomConfirmedRes;
 import com.schedch.mvp.dto.user.UserParticipatingRoomRes;
 import com.schedch.mvp.exception.UserNotInRoomException;
 import com.schedch.mvp.mapper.DayRoomMapper;
@@ -170,7 +171,7 @@ public class UserRoomController {
         log.info("P: getAllConfirmedRooms / userId = {}", user.getId());
 
         String userEmail = getUserEmail(principalDetails);
-        List<UserParticipatingRoomRes> resList = userRoomService.getAllRooms(userEmail, true);
+        List<UserParticipatingRoomConfirmedRes> resList = userRoomService.getAllConfirmedRoomInfo(userEmail);
 
         log.info("S: getAllConfirmedRooms / userId = {}", user.getId());
         return ResponseEntity

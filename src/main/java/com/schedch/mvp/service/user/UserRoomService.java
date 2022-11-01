@@ -2,6 +2,7 @@ package com.schedch.mvp.service.user;
 
 import com.schedch.mvp.config.ErrorMessage;
 import com.schedch.mvp.dto.room.DayRoomTopRes;
+import com.schedch.mvp.dto.user.UserParticipatingRoomConfirmedRes;
 import com.schedch.mvp.dto.user.UserParticipatingRoomRes;
 import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.exception.UserNotInRoomException;
@@ -144,6 +145,36 @@ public class UserRoomService {
 
                     resList.add(resItem);
                 });
+
+        return resList;
+    }
+
+    public List<UserParticipatingRoomConfirmedRes> getAllConfirmedRoomInfo(String userEmail) {
+        List<Participant> participantList = participantRepository.findAllByUserEmailJoinFetchRoom(userEmail);
+        List<Participant> confirmedParticipantList = participantList.stream().filter(participant -> participant.getRoom().isConfirmed() == true).collect(Collectors.toList());
+
+        // get room id list
+        List<Long> roomIdList = participantList.stream()
+                .map(participant -> {return participant.getRoom().getId();})
+                .collect(Collectors.toList());
+
+        // join fetch participantName map
+        List<Room> allInIdListJoinFetchParticipantList = roomRepository.findAllInIdListJoinFetchParticipantList(roomIdList);
+        Map<Long, List<String>> participantNameMap = allInIdListJoinFetchParticipantList.stream()
+                .collect(Collectors.toMap(
+                        Room::getId,
+                        room -> {
+                            return room.getParticipantList().stream().map(Participant::getParticipantName).collect(Collectors.toList());
+                        }
+                ));
+
+        List<UserParticipatingRoomConfirmedRes> resList = new ArrayList<>();
+        for (Participant participant : confirmedParticipantList) {
+            Room room = participant.getRoom();
+            List<String> participantNameList = participantNameMap.get(room.getId());
+            UserParticipatingRoomConfirmedRes resItem = new UserParticipatingRoomConfirmedRes(participant.getRoomTitle(), room, participantNameList);
+            resList.add(resItem);
+        }
 
         return resList;
     }
