@@ -130,7 +130,7 @@ public class UserRoomService {
 
                     UserParticipatingRoomRes resItem = new UserParticipatingRoomRes(participant);
                     resItem.setRoomDates(roomDateMap.get(roomId));
-                    resItem.setParticipantNames(participantNameMap.get(roomId));
+                    resItem.setParticipants(participantNameMap.get(roomId));
 
                     if(isDayOnly) {
                         List<DayRoomTopRes> topAvailableDate = dayRoomService.getTopAvailableDate(participant.getRoom().getUuid(), 1);

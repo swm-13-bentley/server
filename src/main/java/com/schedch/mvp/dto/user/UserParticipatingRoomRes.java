@@ -27,7 +27,7 @@ public class UserParticipatingRoomRes {
     private boolean isDayOnly;
     private LocalTime startTime;
     private LocalTime endTime;
-    private List<String> participantNames;
+    private List<String> participants;
     private TopCountRes topOne;
 
     public UserParticipatingRoomRes(Participant participant) {
