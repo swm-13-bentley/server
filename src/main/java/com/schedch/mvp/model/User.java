@@ -34,18 +34,21 @@ public class User extends BaseEntity{
     @NotNull(message = "user role cannot be empty")
     private String role;
 
+    private String scope;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
     private List<UserCalendar> userCalendarList = new ArrayList();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     private List<Participant> participantList = new ArrayList<>();
 
-    public User(String username, String email, String password, String signInChannel) {
+    public User(String username, String email, String password, String signInChannel, String scope) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.signInChannel = signInChannel;
         this.role = "ROLE_USER";
+        this.scope = scope;
     }
     public void addParticipant(Participant participant) {
         participantList.add(participant);
@@ -90,5 +93,9 @@ public class User extends BaseEntity{
         newMainCal.setMainCalendar(true);
 
         return true;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 }

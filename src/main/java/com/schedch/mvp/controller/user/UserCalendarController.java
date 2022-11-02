@@ -87,6 +87,11 @@ public class UserCalendarController {
             log.warn("E: loadUserCalendarEvents() / No main calendar / userId = {}", user.getId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(e.getMessage());
+        } catch (IllegalAccessException e) {
+            log.warn("E: loadCalendarEvents / calendar access is not granted / userId = {}", user.getId());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(e.getMessage());
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(e.getMessage());
