@@ -105,8 +105,13 @@ public class UserCalendarService {
         return userCalendarList;
     }
 
-    public UserCalendarLoadPerDay loadCalendarEvents(String userEmail, Room room) {
+    public UserCalendarLoadPerDay loadCalendarEvents(String userEmail, Room room) throws IllegalAccessException {
         User user = userService.getUserByEmail(userEmail);
+        if (user.getScope().split(" ").length != 4) {
+            //권한 부족함
+            throw new IllegalAccessException("Calendar access not granted");
+        }
+
         Optional<UserCalendar> mainUserCalendarOptional = userCalendarRepository.findMainCalendarByUserJoinFetchSubCalendar(user);
 
         if(mainUserCalendarOptional.isEmpty()) {

@@ -14,6 +14,7 @@ public interface UserMapper {
     @Mapping(target = "username", expression = "java(googleLoginDto.getName())")
     @Mapping(target = "email", expression = "java(googleLoginDto.getEmail())")
     @Mapping(target = "signInChannel", expression = "java(getGoogleString())")
+    @Mapping(target = "scope", expression = "java(googleLoginDto.getScope())")
     User googleLoginDto2User(GoogleLoginDto googleLoginDto);
 
 
