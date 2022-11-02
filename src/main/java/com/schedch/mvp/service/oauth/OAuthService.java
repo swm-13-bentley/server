@@ -45,7 +45,7 @@ public class OAuthService {
 
             if (user.getScope().split(" ").length != 4) {
                 user.setScope(googleLoginDto.getScope());
-                userCalendarService.addCalendarToUser(googleLoginDto, mappedUser);
+                userCalendarService.addCalendarToUser(googleLoginDto, user);
             }
             return user;
         }
