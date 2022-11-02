@@ -3,7 +3,6 @@ package com.schedch.mvp.service.oauth;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.schedch.mvp.config.ErrorMessage;
 import com.schedch.mvp.dto.oauth.GoogleLoginDto;
-import com.schedch.mvp.exception.CalendarLoadException;
 import com.schedch.mvp.mapper.UserMapper;
 import com.schedch.mvp.model.Token;
 import com.schedch.mvp.model.User;
@@ -32,7 +31,7 @@ public class OAuthService {
     private final TokenRepository tokenRepository;
     private final UserMapper userMapper;
 
-    public User googleSignIn(String authCode) throws FailedLoginException, JsonProcessingException, CalendarLoadException {
+    public User googleSignIn(String authCode) throws FailedLoginException, JsonProcessingException {
         log.info("P: googleSignIn / authCode = {}", authCode);
         GoogleLoginDto googleLoginDto = googleProfileService.getGoogleProfile(authCode, true);
         User mappedUser = userMapper.googleLoginDto2User(googleLoginDto);
@@ -43,11 +42,19 @@ public class OAuthService {
         if(userOptional.isEmpty() == false) { //user for this email exists
             User user = userOptional.get();
             log.info("S: googleSignIn / user logs in / userId = {}", user.getId());
+
+            if (user.getScope().split(" ").length != 4) {
+                user.setScope(googleLoginDto.getScope());
+                userCalendarService.addCalendarToUser(googleLoginDto, mappedUser);
+            }
             return user;
         }
 
-        UserCalendar userCalendar = userCalendarService.addCalendarToUser(googleLoginDto, mappedUser);
-        userCalendar.setMainCalendar(true); //첫 캘린더임으로, 메인 캘린더로 추가
+        String[] scopes = googleLoginDto.getScope().split(" ");
+        if (scopes.length == 4) {
+            UserCalendar userCalendar = userCalendarService.addCalendarToUser(googleLoginDto, mappedUser);
+            userCalendar.setMainCalendar(true); //첫 캘린더임으로, 메인 캘린더로 추가
+        }
 
         User user = userRepository.save(mappedUser);
         log.info("S: googleSignIn / user signs in / userId = {}", user.getId());
