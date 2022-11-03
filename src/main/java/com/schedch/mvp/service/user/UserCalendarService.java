@@ -63,7 +63,7 @@ public class UserCalendarService {
     public UserCalendar addCalendarToUser(GoogleLoginDto googleLoginDto, User user) throws CalendarLoadException {
         List<UserCalendar> userCalendarList = user.getUserCalendarList();
         for (UserCalendar userCalendar : userCalendarList) {
-            if(userCalendar.getCalendarEmail() == googleLoginDto.getEmail()) {
+            if(userCalendar.getCalendarEmail().equals(googleLoginDto.getEmail())) {
                 return userCalendar;
             }
         }
