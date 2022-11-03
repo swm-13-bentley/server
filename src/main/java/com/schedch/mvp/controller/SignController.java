@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
@@ -42,11 +43,35 @@ public class SignController {
                                  @Nullable @RequestBody SignFromRoomReq request) {
         log.info("P: signIn / channel = {}, request = {}", channel, request);
 
-        String authUrl = getSignAuthUrl(channel, request);
+        String authUrl;
+        if (request != null) {
+            Long participantId = getParticipantId(request);
+            String stateStr = "participantId " + participantId;
+            authUrl = getSignAuthUrl(channel, stateStr);
+        }
+        else {
+            authUrl = getSignAuthUrl(channel);
+        }
+
         JsonObject bodyJson = new JsonObject();
         bodyJson.addProperty("authUrl", authUrl);
 
         log.info("S: signIn / channel = {}", channel);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(gson.toJson(bodyJson));
+    }
+
+    @PostMapping("/sign/in/{channel}/calendar")
+    public ResponseEntity signInGrantCalendar(@PathVariable String channel) {
+        log.info("P: signInGrantCalendar / channel = {}", channel);
+
+        String authUrl = getSignAuthUrl(channel, "calendarGrant");
+
+        JsonObject bodyJson = new JsonObject();
+        bodyJson.addProperty("authUrl", authUrl);
+
+        log.info("S: signInGrantCalendar / channel = {}", channel);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(bodyJson));
@@ -60,15 +85,30 @@ public class SignController {
      */
     @GetMapping(value = "/sign/in/redirect/google", params = {"code"})
     public ResponseEntity redirectGoogleSignIn(@RequestParam(value = "code") String authCode,
-                                               @Nullable @RequestParam(value = "state") Long participantId) throws URISyntaxException, FailedLoginException, JsonProcessingException {
+                                               @Nullable @RequestParam(value = "state") String encodedState) throws URISyntaxException, FailedLoginException, JsonProcessingException {
+
         log.info("P: redirectGoogleSignIn / authCode = {}", authCode);
         HttpHeaders headers = new HttpHeaders();
 
         try {
             User user = oAuthService.googleSignIn(authCode);
-            if (participantId != null) {
-                log.info("P: redirectGoogleSignIn / add participant to user / userId = {}, participantId = {}", user.getId(), participantId);
-                participantService.addParticipantToUser(participantId, user);
+
+            if (encodedState != null) {
+                String state = new String(Base64Utils.decodeFromUrlSafeString(encodedState));
+                String[] split = state.split(" ");
+                if(split[0].equals("participantId")) {
+                    long participantId = Long.parseLong(split[1]);
+                    log.info("P: redirectGoogleSignIn / add participant to user / userId = {}, participantId = {}", user.getId(), participantId);
+                    participantService.addParticipantToUser(participantId, user);
+                }
+
+                if (split[0].equals("calendarGrant")) {
+                    log.info("P: redirectGoogleSignIn / grantCalendar / userId = {}", user.getId());
+
+                    String redirectUri = jwtConfig.getFrontCalendarGrantRedirect() + "?result=success";
+                    headers.setLocation(new URI(redirectUri));
+                    return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
+                }
             }
 
             String accessToken = jwtConfig.createAccessTokenByUser(user);
@@ -95,7 +135,8 @@ public class SignController {
     public ResponseEntity googleSignInFailure(@RequestParam(value = "error") String error) throws URISyntaxException, FailedLoginException, JsonProcessingException {
         log.warn("F: googleSignInFailure / login failed / error = {}", error);
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(new URI(oAuthConfigUtils.getFailurePageUrl()));
+        String redirectUri = jwtConfig.getFrontCalendarGrantRedirect() + "?result=fail";
+        headers.setLocation(new URI(redirectUri));
         return new ResponseEntity(headers, HttpStatus.SEE_OTHER);
     }
 
@@ -182,13 +223,11 @@ public class SignController {
 //        }
 //    }
 
-    private String getSignAuthUrl(String channel, SignFromRoomReq request) {
-        if(request != null) {
-            Long participantId = getParticipantId(request);
-            return oAuthConfigUtils.getUserFromParticipantAuthUrl(participantId, channel);
-        }
-
+    private String getSignAuthUrl(String channel) {
         return oAuthConfigUtils.getSignInAuthUrl(channel);
+    }
+    private String getSignAuthUrl(String channel, String state) {
+        return oAuthConfigUtils.getAuthUrlWithState(channel, state);
     }
 
     private Long getParticipantId(SignFromRoomReq request) {

@@ -30,8 +30,11 @@ public class JwtConfig {
     @Value("${header.string}")
     private String HEADER_STRING;
 
-    @Value(("${front.success.redirect}"))
+    @Value("${front.success.redirect}")
     private String frontSuccessRedirect;
+
+    @Value("${front.calendar.grant.redirect}")
+    private String frontCalendarGrantRedirect;
 
     public String createAccessTokenByUser(User user) {
         String jwtToken = JWT.create()

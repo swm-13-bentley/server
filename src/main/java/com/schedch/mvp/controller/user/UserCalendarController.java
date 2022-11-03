@@ -90,7 +90,7 @@ public class UserCalendarController {
         } catch (IllegalAccessException e) {
             log.warn("E: loadCalendarEvents / calendar access is not granted / userId = {}", user.getId());
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(e.getMessage());
+                    .body(oAuthConfigUtils.getAuthUrlWithState("google", "calendarGrant"));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

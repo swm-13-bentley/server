@@ -39,11 +39,11 @@ public class OAuthService {
         String email = mappedUser.getEmail();
         Optional<User> userOptional = userRepository.findByEmail(email);
 
-        if(userOptional.isEmpty() == false) { //user for this email exists
+        if(userOptional.isPresent()) { //existing user
             User user = userOptional.get();
             log.info("S: googleSignIn / user logs in / userId = {}", user.getId());
 
-            if (user.getScope().split(" ").length != 4) {
+            if (user.getScope().split(" ").length != 4) { //재 로그인 -> 캘린더 새로운 권한 동의를 받아왔을 것 (필수)
                 user.setScope(googleLoginDto.getScope());
                 UserCalendar userCalendar = userCalendarService.addCalendarToUser(googleLoginDto, user);
                 userCalendar.setMainCalendar(true);
@@ -51,6 +51,7 @@ public class OAuthService {
             return user;
         }
 
+        //user is new
         String[] scopes = googleLoginDto.getScope().split(" ");
         if (scopes.length == 4) {
             UserCalendar userCalendar = userCalendarService.addCalendarToUser(googleLoginDto, mappedUser);

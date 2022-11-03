@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Base64Utils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -56,14 +57,20 @@ public class GoogleConfigUtils {
     private JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
 
     // Google 로그인 URL 생성 로직
-    public String googleSignInInitUrl(String state) {
+    public String googleSignInInitUrl() {
         Map<String, Object> params = getParamsMap();
         params.put("redirect_uri", getGoogleSignInRedirectUrl());
         params.put("scope", getScopeUrl());
 
-        if(state != null) {//add state if not null
-            params.put("state", state);
-        }
+        return getOAuthUrl(params);
+    }
+
+    public String googleSignInInitUrl(String stateString) {
+        Map<String, Object> params = getParamsMap();
+        params.put("redirect_uri", getGoogleSignInRedirectUrl());
+        params.put("scope", getScopeUrl());
+
+        params.put("state", Base64Utils.encodeToUrlSafeString(stateString.getBytes()));
 
         return getOAuthUrl(params);
     }
