@@ -28,7 +28,7 @@ public class UserParticipatingRoomConfirmedRes {
         this.isDayOnly = room.getStartTime() == null;
         this.participants = participants;
         this.confirmedDate = room.getConfirmedDate();
-        this.confirmedStartTime = room.getStartTime();
-        this.confirmedEndTime = room.getEndTime();
+        this.confirmedStartTime = room.getConfirmedStartTime();
+        this.confirmedEndTime = room.getConfirmedEndTime();
     }
 }
