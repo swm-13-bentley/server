@@ -61,13 +61,6 @@ public class UserCalendarService {
     }
 
     public UserCalendar addCalendarToUser(GoogleLoginDto googleLoginDto, User user) throws CalendarLoadException {
-        List<UserCalendar> userCalendarList = user.getUserCalendarList();
-        for (UserCalendar userCalendar : userCalendarList) {
-            if(userCalendar.getCalendarEmail().equals(googleLoginDto.getEmail())) {
-                return userCalendar;
-            }
-        }
-
         try {
             //토큰으로 캘린더 불러오기
             TokenResponse tokenResponse = googleLoginDto.toTokenResponse();

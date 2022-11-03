@@ -6,6 +6,7 @@ import com.schedch.mvp.dto.oauth.GoogleLoginDto;
 import com.schedch.mvp.mapper.UserMapper;
 import com.schedch.mvp.model.Token;
 import com.schedch.mvp.model.User;
+import com.schedch.mvp.model.UserCalendar;
 import com.schedch.mvp.repository.TokenRepository;
 import com.schedch.mvp.repository.UserRepository;
 import com.schedch.mvp.service.user.UserCalendarService;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.FailedLoginException;
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -40,12 +42,34 @@ public class OAuthService {
 
         if(userOptional.isPresent()) { //existing user
             User user = userOptional.get();
-            log.info("S: googleSignIn / user logs in / userId = {}", user.getId());
+            int originalGrants = user.getScope().split(" ").length;
+            int newGrants = googleLoginDto.getScope().split(" ").length;
 
-            if (user.getScope().split(" ").length != 4) { //재 로그인 -> 캘린더 새로운 권한 동의를 받아왔을 것 (필수)
-                user.setScope(googleLoginDto.getScope());
-                userCalendarService.addCalendarToUser(googleLoginDto, user);
+            //권한 축소됨 (캘린더 권한 상실)
+            if(newGrants < originalGrants) {
+                List<UserCalendar> userCalendarList = user.getUserCalendarList();
+                int idx = -1;
+                for (int i = 0; i < userCalendarList.size(); i++) {
+                    UserCalendar userCalendar = userCalendarList.get(i);
+                    if (userCalendar.getCalendarEmail().equals(googleLoginDto.getEmail())) {
+                        idx = i;
+                    }
+                }
+                if (idx != -1) {
+                    userCalendarList.remove(idx);
+                }
+                user.setScope(googleLoginDto.getScope()); //축소된 권한으로 저장
             }
+
+            //권한 확대
+            if(newGrants > originalGrants) {
+                user.setScope(googleLoginDto.getScope());
+                if(newGrants == 4) { //캘린더 권한까지 확보됨
+                    user.setScope(googleLoginDto.getScope());
+                    userCalendarService.addCalendarToUser(googleLoginDto, user);
+                }
+            }
+
             return user;
         }
 
