@@ -61,6 +61,13 @@ public class UserCalendarService {
     }
 
     public UserCalendar addCalendarToUser(GoogleLoginDto googleLoginDto, User user) throws CalendarLoadException {
+        List<UserCalendar> userCalendarList = user.getUserCalendarList();
+        for (UserCalendar userCalendar : userCalendarList) {
+            if(userCalendar.getCalendarEmail() == googleLoginDto.getEmail()) {
+                return userCalendar;
+            }
+        }
+
         try {
             //토큰으로 캘린더 불러오기
             TokenResponse tokenResponse = googleLoginDto.toTokenResponse();
@@ -72,6 +79,9 @@ public class UserCalendarService {
             //UserCalendar 객체 생성 후 추가
             UserCalendar userCalendar = googleLoginDto.toUserCalendar();
             user.addUserCalendar(userCalendar);
+            if(user.getUserCalendarList().size() == 1) { //첫 캘린더인 경우 메인 캘린더로 추가
+                userCalendar.setMainCalendar(true);
+            }
 
             //SubCalendar 객체 생성 후 추가
             List<CalendarListEntry> items = gCalendarList.getItems();

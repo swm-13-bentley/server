@@ -6,7 +6,6 @@ import com.schedch.mvp.dto.oauth.GoogleLoginDto;
 import com.schedch.mvp.mapper.UserMapper;
 import com.schedch.mvp.model.Token;
 import com.schedch.mvp.model.User;
-import com.schedch.mvp.model.UserCalendar;
 import com.schedch.mvp.repository.TokenRepository;
 import com.schedch.mvp.repository.UserRepository;
 import com.schedch.mvp.service.user.UserCalendarService;
@@ -45,8 +44,7 @@ public class OAuthService {
 
             if (user.getScope().split(" ").length != 4) { //재 로그인 -> 캘린더 새로운 권한 동의를 받아왔을 것 (필수)
                 user.setScope(googleLoginDto.getScope());
-                UserCalendar userCalendar = userCalendarService.addCalendarToUser(googleLoginDto, user);
-                userCalendar.setMainCalendar(true);
+                userCalendarService.addCalendarToUser(googleLoginDto, user);
             }
             return user;
         }
@@ -54,8 +52,7 @@ public class OAuthService {
         //user is new
         String[] scopes = googleLoginDto.getScope().split(" ");
         if (scopes.length == 4) {
-            UserCalendar userCalendar = userCalendarService.addCalendarToUser(googleLoginDto, mappedUser);
-            userCalendar.setMainCalendar(true); //첫 캘린더임으로, 메인 캘린더로 추가
+            userCalendarService.addCalendarToUser(googleLoginDto, mappedUser);
         }
 
         User user = userRepository.save(mappedUser);
