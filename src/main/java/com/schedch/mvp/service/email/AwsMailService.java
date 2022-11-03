@@ -4,6 +4,7 @@ import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.RawMessage;
 import com.amazonaws.services.simpleemail.model.SendRawEmailRequest;
 import com.schedch.mvp.dto.email.EmailReq;
+import com.schedch.mvp.dto.email.MakerAlarmReq;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,10 +36,22 @@ public class AwsMailService{
     private final AmazonSimpleEmailService amazonSimpleEmailService;
     private final TemplateEngine templateEngine;
 
+    public void sendEmailToMaker(MakerAlarmReq makerAlarmReq) {
+        try {
+            SendRawEmailRequest sendRawEmailRequest = getSendRawEmailRequest(makerAlarmReq);
+            amazonSimpleEmailService.sendRawEmail(sendRawEmailRequest);
+        } catch (Exception e){
+            log.info("F: sendEmailBySes / email send error / roomLink = {}, emailReq.mailTo = {}, errorMsg = {}",
+                    makerAlarmReq.getRoomLink(), makerAlarmReq.getMailTo(), e.getMessage());
+
+        }
+        log.info("S: sendEmailBySes / emailReq.mailTo = {}", makerAlarmReq.getMailTo());
+    }
+
     public void sendEmailBySes(EmailReq emailReq) {
         try {
-            SendRawEmailRequest sendRawEmailRequestV2 = getSendRawEmailRequest(emailReq);
-            amazonSimpleEmailService.sendRawEmail(sendRawEmailRequestV2);
+            SendRawEmailRequest sendRawEmailRequest = getSendRawEmailRequest(emailReq);
+            amazonSimpleEmailService.sendRawEmail(sendRawEmailRequest);
         } catch (Exception e){
             log.info("F: sendEmailBySes / email send error / roomLink = {}, emailReq.mailTo = {}, errorMsg = {}",
                     emailReq.getRoomLink(), emailReq.getMailTo(), e.getMessage());
@@ -94,6 +107,55 @@ public class AwsMailService{
 
         // Add the attachment to the message.
         msg.addBodyPart(att);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        message.writeTo(outputStream);
+        RawMessage rawMessage = new RawMessage(ByteBuffer.wrap(outputStream.toByteArray()));
+        return new SendRawEmailRequest(rawMessage);
+
+    }
+
+    public SendRawEmailRequest getSendRawEmailRequest(MakerAlarmReq makerAlarmReq) throws MessagingException, IOException {
+        Session session = Session.getDefaultInstance(new Properties());
+        MimeMessage message = new MimeMessage(session);
+
+        // Define mail emailTitle
+        String emailTitle = String.format("언제만나: [%s] 방에 %d명이 일정을 입력했습니다.", makerAlarmReq.getRoomTitle(), makerAlarmReq.getAlarmNumber());
+        message.setSubject(emailTitle);
+
+        // Define mail Sender
+        message.setFrom("manna.time.2022@gmail.com");
+
+        // Define mail Receiver
+        String receiver = makerAlarmReq.getMailTo();
+        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
+
+        // Create a multipart/alternative child container.
+        MimeMultipart msg_body = new MimeMultipart("alternative");
+
+        // Create a wrapper for the HTML and text parts.
+        MimeBodyPart wrap = new MimeBodyPart();
+
+        // Define the HTML part.
+        MimeBodyPart htmlPart = new MimeBodyPart();
+        String html = getHTML(makerAlarmReq);
+        htmlPart.setContent(html, "text/html; charset=UTF-8");
+
+        // Add the text and HTML parts to the child container.
+        msg_body.addBodyPart(htmlPart);
+
+        // Add the child container to the wrapper object.
+        wrap.setContent(msg_body);
+
+        // Create a multipart/mixed parent container.
+        MimeMultipart msg = new MimeMultipart("mixed");
+
+        // Add the parent container to the message.
+        message.setContent(msg);
+
+        // Add the multipart/alternative part to the message.
+        msg.addBodyPart(wrap);
+
+        // Add the attachment to the message.
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         message.writeTo(outputStream);
         RawMessage rawMessage = new RawMessage(ByteBuffer.wrap(outputStream.toByteArray()));
@@ -162,6 +224,20 @@ public class AwsMailService{
         context.setVariable("link", link);
 
         return templateEngine.process("email-template", context);
+    }
+
+    public String getHTML(MakerAlarmReq makerAlarmReq) {
+        String roomTitle = makerAlarmReq.getRoomTitle();
+        String roomLink = makerAlarmReq.getRoomLink();
+        int alarmNumber = makerAlarmReq.getAlarmNumber();
+
+        Context context = new Context();
+        context.setVariable("headLine", String.format("약속에 %d명이 참여했어요", alarmNumber));
+        context.setVariable("roomTitle", roomTitle);
+        context.setVariable("link", roomLink);
+        context.setVariable("alarmNumber", alarmNumber + "명");
+
+        return templateEngine.process("maker-alarm", context);
     }
 
     private String getTimeString(LocalDateTime start, LocalDateTime end) {
