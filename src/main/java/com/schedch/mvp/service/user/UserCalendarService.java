@@ -30,6 +30,7 @@ import javax.security.auth.login.FailedLoginException;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -132,7 +133,7 @@ public class UserCalendarService {
 
         //Save items
         List<Event> eventList = new ArrayList<>();
-        DateTime startDateTime = TimeAdapter.localDateAndTime2DateTime(room.getStartLocalDate(), room.getStartTime(), "+9");
+        DateTime startDateTime = TimeAdapter.localDateAndTime2DateTime(room.getStartLocalDate(), LocalTime.of(0, 0), "+9");
         DateTime endDateTime = TimeAdapter.localDateAndTime2DateTime(room.getEndLocalDate(), room.getEndTime(), "+9");
 
         log.info("start google transaction");
