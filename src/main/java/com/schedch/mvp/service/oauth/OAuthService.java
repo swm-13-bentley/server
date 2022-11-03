@@ -38,9 +38,8 @@ public class OAuthService {
         String email = mappedUser.getEmail();
         Optional<User> userOptional = userRepository.findByEmail(email);
 
-        if(userOptional.isPresent()) { //existing user, 권한은 언제나 새로 갱신 (유저가 권한 삭제 했을 수도 있음)
+        if(userOptional.isPresent()) { //existing user
             User user = userOptional.get();
-            user.setScope(googleLoginDto.getScope());
             log.info("S: googleSignIn / user logs in / userId = {}", user.getId());
 
             if (user.getScope().split(" ").length != 4) { //재 로그인 -> 캘린더 새로운 권한 동의를 받아왔을 것 (필수)

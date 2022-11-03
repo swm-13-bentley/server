@@ -62,4 +62,12 @@ public class UserCalendar extends BaseEntity{
                 .map(SubCalendar::getGCalId)
                 .collect(Collectors.toSet());
     }
+
+    public void setCalendarAccessToken(String calendarAccessToken) {
+        this.calendarAccessToken = calendarAccessToken;
+    }
+
+    public void setCalendarRefreshToken(String calendarRefreshToken) {
+        this.calendarRefreshToken = calendarRefreshToken;
+    }
 }
