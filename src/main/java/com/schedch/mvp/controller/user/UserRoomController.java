@@ -11,6 +11,7 @@ import com.schedch.mvp.dto.room.GroupSeperateRes;
 import com.schedch.mvp.dto.room.RoomRequest;
 import com.schedch.mvp.dto.user.UserParticipatingRoomConfirmedRes;
 import com.schedch.mvp.dto.user.UserParticipatingRoomRes;
+import com.schedch.mvp.dto.user.room.RoomEmailReq;
 import com.schedch.mvp.exception.UserNotInRoomException;
 import com.schedch.mvp.mapper.DayRoomMapper;
 import com.schedch.mvp.mapper.RoomMapper;
@@ -100,7 +101,7 @@ public class UserRoomController {
                 .body(gson.toJson(dayParticipantRes));
     }
 
-    @PostMapping("/user/room/{roomUuid}/exit")
+    @DeleteMapping("/user/room/{roomUuid}/exit")
     public ResponseEntity userRoomExit(@PathVariable String roomUuid, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
         log.info("P: userRoomExit / userId = {}, roomUuid = {}", user.getId(), roomUuid);
@@ -177,6 +178,23 @@ public class UserRoomController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(gson.toJson(resList));
+    }
+
+    @PatchMapping("/user/room/alarm")
+    public ResponseEntity patchRoomAlarmEmail(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                              @RequestBody RoomEmailReq roomEmailReq) {
+        User user = principalDetails.getUser();
+        log.info("P: getAllConfirmedRooms / userId = {}", user.getId());
+
+        String userEmail = getUserEmail(principalDetails);
+        String roomUuid = roomEmailReq.getRoomUuid();
+        int num = roomEmailReq.getAlarmNumber();
+
+        roomService.registerRoomAlarm(userEmail, roomUuid, num);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
     }
 
     private String getUserEmail(PrincipalDetails principalDetails) {

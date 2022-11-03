@@ -38,6 +38,10 @@ public class Room extends BaseEntity{
 
     private LocalTime endTime;
 
+    private int alarmNumber;
+    private String alarmEmail;
+    private boolean alarmSent;
+
     private boolean confirmed;
 
     private LocalDate confirmedDate;
@@ -104,4 +108,12 @@ public class Room extends BaseEntity{
         return participantList.stream().map(Participant::getParticipantName).collect(Collectors.toList());
     }
 
+    public void registerRoomAlarm(String email, int num) {
+        this.alarmEmail = email;
+        this.alarmNumber = num;
+    }
+
+    public void setAlarmSent(boolean alarmSent) {
+        this.alarmSent = alarmSent;
+    }
 }

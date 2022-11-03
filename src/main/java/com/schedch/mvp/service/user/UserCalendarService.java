@@ -72,6 +72,9 @@ public class UserCalendarService {
             //UserCalendar 객체 생성 후 추가
             UserCalendar userCalendar = googleLoginDto.toUserCalendar();
             user.addUserCalendar(userCalendar);
+            if(user.getUserCalendarList().size() == 1) { //첫 캘린더인 경우 메인 캘린더로 추가
+                userCalendar.setMainCalendar(true);
+            }
 
             //SubCalendar 객체 생성 후 추가
             List<CalendarListEntry> items = gCalendarList.getItems();
@@ -165,13 +168,13 @@ public class UserCalendarService {
             return new UserCalendarLoadPerDay(eventList, roomStartBlock, roomEndBlock);
 
         } catch (GeneralSecurityException e) {
-            log.error("F: getAllUserCalendar / GeneralSecurityException / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
+            log.error("F: loadCalendarEvents / GeneralSecurityException / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
             throw new CalendarLoadException(e.getMessage());
         } catch (IOException e) {
-            log.error("F: getAllUserCalendar / IOException / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
+            log.error("F: loadCalendarEvents / IOException / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
             throw new CalendarLoadException(e.getMessage());
         } catch (Exception e) {
-            log.error("F: getAllUserCalendar / calendar load error / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
+            log.error("F: loadCalendarEvents / calendar load error / userId = {}, errorMsg = {}", user.getId(), e.getMessage());
             throw new CalendarLoadException(e.getMessage());
         }
 

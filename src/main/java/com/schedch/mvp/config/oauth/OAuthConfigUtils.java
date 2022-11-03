@@ -19,7 +19,7 @@ public class OAuthConfigUtils {
     public String getSignInAuthUrl(String channel) {
         switch (channel) {
             case "google":
-                return googleConfigUtils.googleSignInInitUrl(null);
+                return googleConfigUtils.googleSignInInitUrl();
 
             case "kakao":
                 return kakaoConfigUtils.kakaoSignInitUrl(true);
@@ -50,10 +50,10 @@ public class OAuthConfigUtils {
         throw new InvalidParameterException(String.format("%s는 올바른 OAuth channel이 아닙니다", channel));
     }
 
-    public String getUserFromParticipantAuthUrl(Long participantId, String channel) {
+    public String getAuthUrlWithState(String channel, String stateString) {
         switch (channel) {
             case "google":
-                return googleConfigUtils.googleSignInInitUrl(participantId.toString());
+                return googleConfigUtils.googleSignInInitUrl(stateString);
         }
 
         throw new InvalidParameterException(String.format("%s는 올바른 OAuth channel이 아닙니다", channel));

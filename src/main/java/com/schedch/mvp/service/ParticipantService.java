@@ -9,6 +9,7 @@ import com.schedch.mvp.model.Room;
 import com.schedch.mvp.model.Schedule;
 import com.schedch.mvp.model.User;
 import com.schedch.mvp.repository.ParticipantRepository;
+import com.schedch.mvp.service.room.RoomMakerAlarmService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,9 @@ import java.util.Optional;
 @Slf4j
 public class ParticipantService {
 
-    private final ParticipantRepository participantRepository;
     private final RoomService roomService;
+    private final RoomMakerAlarmService roomMakerAlarmService;
+    private final ParticipantRepository participantRepository;
 
     public Participant getParticipant(Long participantId) {
         Optional<Participant> participantOptional = participantRepository.findById(participantId);
@@ -51,6 +53,14 @@ public class ParticipantService {
 
             Participant newParticipant = new Participant(participantName, password, false);
             room.addParticipant(newParticipant);
+
+            if(!room.isAlarmSent() && room.getAlarmNumber() != 0 && room.getParticipantList().size() >= room.getAlarmNumber()) { //send email to maker
+                Thread thread = new Thread(() -> {
+                    roomMakerAlarmService.sendMakerAlarm(room);
+                });
+                thread.start();
+            }
+
             return newParticipant;
         }
 
