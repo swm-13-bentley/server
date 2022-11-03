@@ -23,8 +23,8 @@ public class UserCalendarLoadPerDay {
 
     public UserCalendarLoadPerDay(List<Event> eventList, int roomStartBlock, int roomEndBlock) {
         HashMap<LocalDate, SchedulePerDay> map = new HashMap<>();
-        for (Event event : eventList) {
-            String summary = event.getSummary();
+        for (Event event : eventList) { //각 일정 별로
+            String summary = event.getSummary() == null ? "이름 없는 일정" : event.getSummary();
 
             DateTime start = event.getStart().getDateTime();
             DateTime end = event.getEnd().getDateTime();
@@ -41,6 +41,9 @@ public class UserCalendarLoadPerDay {
             }
 
             if (startDate.isEqual(endDate)) { //시작일 == 종료일
+                if (endBlock < roomStartBlock) {
+                    continue;
+                }
                 startBlock = Math.max(startBlock, roomStartBlock);
                 endBlock = Math.min(endBlock, roomEndBlock);
                 ScheduleInfo scheduleInfo = new ScheduleInfo(summary, startBlock, endBlock);
@@ -52,13 +55,17 @@ public class UserCalendarLoadPerDay {
             }
 
             //start date blocks
-            int minStartBlock = Math.max(startBlock, roomStartBlock);
-            int maxEndBlock = roomEndBlock;
-            ScheduleInfo scheduleInfo = new ScheduleInfo(summary, minStartBlock, maxEndBlock);
-            if(!map.containsKey(startDate)) {
-                map.put(startDate, new SchedulePerDay(startDate));
+            int minStartBlock;
+            int maxEndBlock;
+            if(startBlock < roomEndBlock) {
+                minStartBlock = Math.max(startBlock, roomStartBlock);
+                 maxEndBlock = roomEndBlock;
+                ScheduleInfo scheduleInfo = new ScheduleInfo(summary, minStartBlock, maxEndBlock);
+                if (!map.containsKey(startDate)) {
+                    map.put(startDate, new SchedulePerDay(startDate));
+                }
+                map.get(startDate).scheduleInfoList.add(scheduleInfo);
             }
-            map.get(startDate).scheduleInfoList.add(scheduleInfo);
 
             //middle
             int plus = 1;
@@ -68,7 +75,7 @@ public class UserCalendarLoadPerDay {
                 LocalDate nowDate = startDate.plusDays(plus);
                 ScheduleInfo midScheduleInfo = new ScheduleInfo(summary, minStartBlock, maxEndBlock);
                 if(!map.containsKey(nowDate)) {
-                    map.put(nowDate, new SchedulePerDay(startDate));
+                    map.put(nowDate, new SchedulePerDay(nowDate));
                 }
                 map.get(nowDate).scheduleInfoList.add(midScheduleInfo);
                 plus++;
