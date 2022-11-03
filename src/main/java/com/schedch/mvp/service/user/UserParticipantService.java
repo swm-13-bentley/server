@@ -58,8 +58,6 @@ public class UserParticipantService {
                     participant.addSchedule(new Schedule(date));
                 }
         );
-
-
     }
 
     public void changeParticipantName(String userEmail, String roomUuid, String changedName) {
