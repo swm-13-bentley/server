@@ -34,6 +34,11 @@ public class RoomService {
         return save.getUuid();
     }
 
+    public void registerRoomAlarm(String email, String roomUuid, int num) {
+        Room room = getRoom(roomUuid);
+        room.registerRoomAlarm(email, num);
+    }
+
     public Room getRoom(String roomUuid) {
         Optional<Room> roomOptional = roomRepository.findByUuid(roomUuid);
         Room room = getRoomFromOptional(roomOptional, roomUuid);
@@ -248,4 +253,5 @@ public class RoomService {
         }
         return colNumMap;
     }
+
 }
