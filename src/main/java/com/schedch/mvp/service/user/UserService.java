@@ -28,6 +28,14 @@ public class UserService {
         return saved;
     }
 
+    public void signOutUser(String userEmail) {
+        User user = getUserByEmail(userEmail);
+
+        user.detachFromParticipant();
+        userRepository.delete(user);
+        tokenRepository.deleteByEmail(userEmail);
+    }
+
     public String changeUsername(String userEmail, String newUsername) {
         User user = getUserByEmail(userEmail);
         user.setUsername(newUsername);
