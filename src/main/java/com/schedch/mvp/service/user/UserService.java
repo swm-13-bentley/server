@@ -53,10 +53,9 @@ public class UserService {
     }
 
 
-    public void changeUserEmailReceiveStatus(String userEmail, List<MyEmailPatchReq> myEmailPatchReqList) {
+    public void changeUserEmailReceiveStatus(String userEmail, MyEmailPatchReq myEmailPatchReq) {
         User user = getUserByEmail(userEmail);
 
-        MyEmailPatchReq myEmailPatchReq = myEmailPatchReqList.get(0);
         boolean receiveEmail = myEmailPatchReq.isReceiveEmail();
         user.setReceiveEmail(receiveEmail);
     }
