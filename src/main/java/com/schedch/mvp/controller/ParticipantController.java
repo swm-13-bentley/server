@@ -3,10 +3,9 @@ package com.schedch.mvp.controller;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.schedch.mvp.dto.AvailableRequestDto;
+import com.schedch.mvp.dto.TimeBlockDto;
 import com.schedch.mvp.dto.participant.ParticipantReq;
 import com.schedch.mvp.dto.participant.ParticipantRes;
-import com.schedch.mvp.dto.TimeBlockDto;
-import com.schedch.mvp.dto.participant.ParticipantAlarmEmailReq;
 import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.service.ParticipantService;
@@ -14,9 +13,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -67,21 +68,6 @@ public class ParticipantController {
         participantService.saveParticipantAvailable(roomUuid, participantName, available);
 
         log.info("S: participantAvailablePost / roomUuid = {}, participantName = {}", roomUuid, participantName);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .build();
-    }
-
-    @PatchMapping("/room/{roomUuid}/participant/alarmEmail")
-    public ResponseEntity patchParticipantAlarmEmail(@PathVariable String roomUuid,
-                                                     @Valid @RequestBody ParticipantAlarmEmailReq participantAlarmEmailReq) {
-        log.info("P: patchParticipantAlarmEmail / roomUuid = {}", roomUuid);
-
-        String participantName = participantAlarmEmailReq.getParticipantName();
-        String alarmEmail = participantAlarmEmailReq.getAlarmEmail();
-        participantService.registerAlarmEmail(roomUuid, participantName, alarmEmail);
-
-        log.info("S: patchParticipantAlarmEmail / roomUuid = {}", roomUuid);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .build();

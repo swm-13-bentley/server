@@ -70,11 +70,6 @@ public class UserParticipantService {
         participant.setRoomTitle(changedTitle);
     }
 
-    public void registerAlarmEmail(String userEmail, String roomUuid, String alarmEmail) {
-        Participant participant = getParticipant(userEmail, roomUuid);
-        participant.setAlarmEmail(alarmEmail);
-    }
-
     public Participant getParticipant(String userEmail, String roomUuid) {
         User user = userService.getUserByEmail(userEmail);
         Room room = roomService.getRoom(roomUuid);

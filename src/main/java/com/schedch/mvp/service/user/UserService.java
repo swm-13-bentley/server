@@ -1,6 +1,8 @@
 package com.schedch.mvp.service.user;
 
 import com.schedch.mvp.config.JwtConfig;
+import com.schedch.mvp.dto.user.mypage.MyEmailPatchReq;
+import com.schedch.mvp.dto.user.mypage.MyEmailRes;
 import com.schedch.mvp.model.Token;
 import com.schedch.mvp.model.User;
 import com.schedch.mvp.repository.TokenRepository;
@@ -9,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +39,28 @@ public class UserService {
         return newAccessToken;
     }
 
+    public List<MyEmailRes> getUserEmailList(String userEmail) {
+        User user = getUserByEmail(userEmail);
+
+        String alarmRegisteredEmail = user.getEmail();
+        boolean receiveEmail = user.isReceiveEmail();
+
+        List<MyEmailRes> myEmailResList = new ArrayList<>();
+        MyEmailRes myEmailRes = new MyEmailRes(alarmRegisteredEmail, receiveEmail);
+
+        myEmailResList.add(myEmailRes);
+        return myEmailResList;
+    }
+
+
+    public void changeUserEmailReceiveStatus(String userEmail, List<MyEmailPatchReq> myEmailPatchReqList) {
+        User user = getUserByEmail(userEmail);
+
+        MyEmailPatchReq myEmailPatchReq = myEmailPatchReqList.get(0);
+        boolean receiveEmail = myEmailPatchReq.isReceiveEmail();
+        user.setReceiveEmail(receiveEmail);
+    }
+
     /**
      * should only call when user existence is already validated
      * ex_ user existence validated through jwt token check
@@ -48,5 +74,6 @@ public class UserService {
     public User getUserById(Long userId) {
         return userRepository.findById(userId).get();
     }
+
 
 }

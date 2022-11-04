@@ -38,8 +38,6 @@ public class Participant extends BaseEntity{
 
     private String roomTitle;
     
-    private String alarmEmail;
-
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "participant")
     @OrderBy(value = "availableDate ASC")
     private List<Schedule> scheduleList = new ArrayList<>();
@@ -58,9 +56,6 @@ public class Participant extends BaseEntity{
 
     public void setParticipantName(String participantName) {this.participantName = participantName;}
 
-    public void setAlarmEmail(String alarmEmail) {
-        this.alarmEmail = alarmEmail;
-    }
     //연관관계 편의 메서드
     public void addSchedule(Schedule schedule) {
         scheduleList.add(schedule);
@@ -81,7 +76,6 @@ public class Participant extends BaseEntity{
         this.participantName = user.getUsername();
         this.password = user.getPassword();
         this.isSignedIn = true;
-        this.alarmEmail = user.getEmail();
     }
 
     public boolean checkPassword(String inputPassword) {
