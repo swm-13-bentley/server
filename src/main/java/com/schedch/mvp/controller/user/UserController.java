@@ -40,11 +40,11 @@ public class UserController {
 
     @PatchMapping("/user/alarmEmail/status")
     public ResponseEntity patchAlarmEmailStatus(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                @RequestBody List<MyEmailPatchReq> myEmailPatchReqList) {
+                                                @RequestBody MyEmailPatchReq myEmailPatchReq) {
         String userEmail = principalDetails.getUsername();
         log.info("P: patchAlarmEmailStatus / userEmail = {}", userEmail);
 
-        userService.changeUserEmailReceiveStatus(userEmail, myEmailPatchReqList);
+        userService.changeUserEmailReceiveStatus(userEmail, myEmailPatchReq);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .build();
