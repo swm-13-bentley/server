@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.schedch.mvp.config.auth.PrincipalDetails;
 import com.schedch.mvp.dto.user.UserAvailableDayReq;
 import com.schedch.mvp.dto.user.UserAvailableTimeReq;
-import com.schedch.mvp.dto.user.UserEmailReq;
 import com.schedch.mvp.exception.UserNotInRoomException;
 import com.schedch.mvp.model.User;
 import com.schedch.mvp.service.user.UserParticipantService;
@@ -54,7 +53,7 @@ public class UserParticipantController {
 
     }
 
-    @PostMapping("/user/room/{roomUuid}/name/{changedName}")
+    @PatchMapping("/user/room/{roomUuid}/name/{changedName}")
     public ResponseEntity changeParticipantName(@PathVariable String roomUuid,
                                                 @PathVariable String changedName,
                                                 @AuthenticationPrincipal PrincipalDetails principalDetails) throws UserNotInRoomException {
@@ -69,7 +68,7 @@ public class UserParticipantController {
                 .build();
     }
 
-    @PostMapping("/user/room/{roomUuid}/title/{changedTitle}")
+    @PatchMapping("/user/room/{roomUuid}/title/{changedTitle}")
     public ResponseEntity changeRoomTitle(@PathVariable String roomUuid,
                                                 @PathVariable String changedTitle,
                                                 @AuthenticationPrincipal PrincipalDetails principalDetails) throws UserNotInRoomException {
@@ -80,22 +79,6 @@ public class UserParticipantController {
         userParticipantService.changeRoomTitle(userEmail, roomUuid, changedTitle);
 
         log.info("S: changeRoomTitle / userId = {}, changedTitle = {}", user.getId(), changedTitle);
-        return ResponseEntity.status(HttpStatus.OK)
-                .build();
-    }
-
-    @PostMapping("/user/room/{roomUuid}/alarmEmail")
-    public ResponseEntity userAlarmEmailPatch(@PathVariable String roomUuid,
-                                              @RequestBody UserEmailReq userEmailReq,
-                                              @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        User user = principalDetails.getUser();
-        log.info("P: userAlarmEmailPatch / userId = {}", user.getId());
-
-        String userEmail = getUserEmail(principalDetails);
-        String alarmEmail = userEmailReq.getAlarmEmail();
-        userParticipantService.registerAlarmEmail(userEmail, roomUuid, alarmEmail);
-
-        log.info("S: userAlarmEmailPatch / userId = {}", user.getId());
         return ResponseEntity.status(HttpStatus.OK)
                 .build();
     }

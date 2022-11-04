@@ -4,17 +4,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.schedch.mvp.config.JwtConfig;
+import com.schedch.mvp.config.auth.PrincipalDetails;
 import com.schedch.mvp.config.oauth.OAuthConfigUtils;
 import com.schedch.mvp.dto.sign.SignFromRoomReq;
 import com.schedch.mvp.exception.CalendarLoadException;
 import com.schedch.mvp.model.User;
 import com.schedch.mvp.service.ParticipantService;
 import com.schedch.mvp.service.oauth.OAuthService;
+import com.schedch.mvp.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +33,7 @@ public class SignController {
 
     private final OAuthConfigUtils oAuthConfigUtils;
     private final OAuthService oAuthService;
+    private final UserService userService;
     private final ParticipantService participantService;
     private final JwtConfig jwtConfig;
     private final Gson gson;
@@ -164,12 +168,17 @@ public class SignController {
 //        }
 //    }
 
-    /**
-     * in order to sign out, user must log in first (no matter of jwt token)
-     *
-     * @param channel
-     * @return
-     */
+    @DeleteMapping("/sign/out")
+    public ResponseEntity signOut(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String userEmail = principalDetails.getUsername();
+        log.info("P: signOut / userEmail = {}", userEmail);
+
+        userService.signOutUser(userEmail);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .build();
+    }
+
     @PostMapping("/sign/out/{channel}")
     public ResponseEntity signOut(@PathVariable String channel) {
         log.info("P: signOut / channel = {}", channel);

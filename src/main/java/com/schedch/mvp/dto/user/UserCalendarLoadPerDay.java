@@ -24,7 +24,7 @@ public class UserCalendarLoadPerDay {
     public UserCalendarLoadPerDay(List<Event> eventList, int roomStartBlock, int roomEndBlock) {
         HashMap<LocalDate, SchedulePerDay> map = new HashMap<>();
         for (Event event : eventList) { //각 일정 별로
-            String summary = event.getSummary() == null ? "이름 없는 일정" : event.getSummary();
+            String summary = event.getSummary() == null ? "이름 없음" : event.getSummary();
 
             DateTime start = event.getStart().getDateTime();
             DateTime end = event.getEnd().getDateTime();

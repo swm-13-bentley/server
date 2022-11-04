@@ -102,13 +102,6 @@ public class ParticipantService {
         }
     }
 
-    public void registerAlarmEmail(String roomUuid, String participantName, String alarmEmail) {
-        Room room = roomService.getRoom(roomUuid);
-        Participant participant = findParticipantByRoomAndName(room, participantName, false);
-
-        participant.setAlarmEmail(alarmEmail);
-    }
-
     public void addParticipantToUser(Long participantId, User user) {
         Participant participant = getParticipant(participantId);
         Room room = participant.getRoom();
@@ -127,7 +120,6 @@ public class ParticipantService {
 
         participant.setIsSignedIn(true);
         participant.setPassword(user.getPassword());
-        participant.setAlarmEmail(user.getEmail());
         user.addParticipant(participant);
     }
 

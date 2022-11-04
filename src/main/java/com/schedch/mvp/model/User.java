@@ -36,6 +36,10 @@ public class User extends BaseEntity{
 
     private String scope;
 
+    private boolean receiveEmail;
+
+    private boolean signedOut;
+
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
     private List<UserCalendar> userCalendarList = new ArrayList();
 
@@ -49,6 +53,8 @@ public class User extends BaseEntity{
         this.signInChannel = signInChannel;
         this.role = "ROLE_USER";
         this.scope = scope;
+        this.receiveEmail = true;
+        this.signedOut = false;
     }
     public void addParticipant(Participant participant) {
         participantList.add(participant);
@@ -97,5 +103,17 @@ public class User extends BaseEntity{
 
     public void setScope(String scope) {
         this.scope = scope;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setReceiveEmail(boolean receiveEmail) {
+        this.receiveEmail = receiveEmail;
+    }
+
+    public void setSignedOut(boolean signedOut) {
+        this.signedOut = signedOut;
     }
 }

@@ -68,7 +68,9 @@ public class RoomConfirmServiceSelectImpl implements RoomConfirmService{
         room.confirmRoom(confirmedDate, startTime, endTime);
 
         //참가자들 중 이메일을 등록한 사람들에게 메일을 발송한다
-        List<Participant> emailRegisteredParticipantList = participantList.stream().filter(participant -> participant.getAlarmEmail() != null).collect(Collectors.toList());
+        List<Participant> emailRegisteredParticipantList = participantList.stream()
+                .filter(participant -> participant.getUser() != null && participant.getUser().isReceiveEmail())
+                .collect(Collectors.toList());
         sendEmail(roomUuid, confirmedDate, startTime, endTime, emailRegisteredParticipantList);
 
         log.info("S: confirmRoom / roomUuid = {}", roomUuid);
@@ -85,7 +87,8 @@ public class RoomConfirmServiceSelectImpl implements RoomConfirmService{
         }
 
         participantList.stream().forEach(p -> {
-            setEmailReqInfo(emailReq, p);
+            String mailTo = p.getUser().getEmail();
+            setEmailReqInfo(emailReq, mailTo, p);
             awsMailService.sendEmailBySes(emailReq);
         });
         log.info("S: sendEmail / roomUuid = {}", roomUuid);
