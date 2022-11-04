@@ -32,7 +32,7 @@ public class UserService {
         User user = getUserByEmail(userEmail);
 
         user.detachFromParticipant();
-        userRepository.delete(user);
+        user.setSignedOut(true);
         tokenRepository.deleteByEmail(userEmail);
     }
 

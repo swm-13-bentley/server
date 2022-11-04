@@ -57,6 +57,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 User user = userRepository.findByEmail(email).orElseThrow( //해당 이메일에 대응하는 유저가 없음
                         () -> new NotFoundException("회원가입되지 않은 이메일입니다.")
                 );
+                if (user.isSignedOut()) {
+                    throw new NotFoundException("회원가입되지 않은 이메일입니다.");
+                }
 
                 // 인증은 토큰 검증시 끝. 인증을 하기 위해서가 아닌 스프링 시큐리티가 수행해주는 권한 처리를 위해
                 // 아래와 같이 토큰을 만들어서 Authentication 객체를 강제로 만들고 그걸 세션에 저장!
