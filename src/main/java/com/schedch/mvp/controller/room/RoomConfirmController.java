@@ -27,6 +27,14 @@ public class RoomConfirmController {
     private final RoomConfirmService roomConfirmService;
     private final Gson gson;
 
+    /**
+     * 확정하려고 하는 시간 범위 내에 가능한 사람들의 집
+     * @param roomUuid
+     * @param availableDate
+     * @param startTime
+     * @param endTime
+     * @return
+     */
     @GetMapping("/room/{roomUuid}/confirm")
     public ResponseEntity getParticipantInRange(@PathVariable String roomUuid,
                                                 @RequestParam("availableDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate availableDate,

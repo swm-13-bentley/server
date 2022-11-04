@@ -42,9 +42,9 @@ public interface RoomConfirmService {
                 .build();
     }
 
-    default void setEmailReqInfo(EmailReq emailReq, Participant participant) {
+    default void setEmailReqInfo(EmailReq emailReq, String mailTo, Participant participant) {
         emailReq.setEmailTitle("언제만나에서 약속이 확정되었습니다: " + participant.getRoomTitle());
-        emailReq.setMailTo(participant.getAlarmEmail());
+        emailReq.setMailTo(mailTo);
         emailReq.setAttendeeName(participant.getParticipantName());
         emailReq.setRoomTitle(participant.getRoomTitle());
         emailReq.setSummary(participant.getRoomTitle());

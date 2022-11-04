@@ -81,11 +81,15 @@ public class Room extends BaseEntity{
         this.participantLimit = participantLimit;
     }
 
-    public void confirmRoom(LocalDate date, LocalTime startTime, LocalTime endTime) {
+    public List<Participant> confirmRoom(LocalDate date, LocalTime startTime, LocalTime endTime) {
         this.confirmedDate = date;
         this.confirmedStartTime = startTime;
         this.confirmedEndTime = endTime;
         this.confirmed = true;
+
+        return participantList.stream()
+                .filter(p -> p.getUser() != null && p.getUser().isReceiveEmail())
+                .collect(Collectors.toList());
     }
 
     public boolean canAddMember() {
