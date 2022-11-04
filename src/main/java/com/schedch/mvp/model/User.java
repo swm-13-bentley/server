@@ -98,4 +98,8 @@ public class User extends BaseEntity{
     public void setScope(String scope) {
         this.scope = scope;
     }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }
