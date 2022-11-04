@@ -42,6 +42,11 @@ public class OAuthService {
 
         if(userOptional.isPresent()) { //existing user
             User user = userOptional.get();
+
+            if(user.isSignedOut()) { //탈퇴했던 유저 정보라면 다시 복구
+                user.setSignedOut(false);
+            }
+
             int originalGrants = user.getScope().split(" ").length;
             int newGrants = googleLoginDto.getScope().split(" ").length;
 
