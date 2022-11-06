@@ -119,7 +119,7 @@ public class AwsMailService{
         MimeMessage message = new MimeMessage(session);
 
         // Define mail emailTitle
-        String emailTitle = String.format("언제만나: [%s] 방에 %d명이 일정을 입력했습니다.", makerAlarmReq.getRoomTitle(), makerAlarmReq.getAlarmNumber());
+        String emailTitle = String.format("언제만나에서 인원 알림을 보내드립니다: ", makerAlarmReq.getRoomTitle());
         message.setSubject(emailTitle);
 
         // Define mail Sender
