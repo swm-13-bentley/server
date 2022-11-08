@@ -1,9 +1,11 @@
 package com.schedch.mvp.controller;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.schedch.mvp.dto.participant.ParticipantReq;
 import com.schedch.mvp.dto.participant.DayParticipantReq;
 import com.schedch.mvp.dto.participant.DayParticipantRes;
+import com.schedch.mvp.exception.FullMemberException;
 import com.schedch.mvp.mapper.DayParticipantMapper;
 import com.schedch.mvp.model.Participant;
 import com.schedch.mvp.service.ParticipantService;
@@ -36,13 +38,27 @@ public class DayParticipantController {
         String password = participantReq.getPassword();
         log.info("P: dayParticipantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
 
-        Participant participant = participantService.getParticipant(roomUuid, participantName, password);
-        DayParticipantRes dayParticipantRes = dayParticipantMapper.entity2Res(participant);
+        try {
+            Participant participant = participantService.getParticipant(roomUuid, participantName, password);
+            DayParticipantRes dayParticipantRes = dayParticipantMapper.entity2Res(participant);
 
-        log.info("S: dayParticipantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(gson.toJson(dayParticipantRes));
+            log.info("S: dayParticipantFind / roomUuid = {}, participantName = {}", roomUuid, participantName);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(gson.toJson(dayParticipantRes));
+
+        } catch (FullMemberException e) {
+            JsonObject errorJson = new JsonObject();
+            errorJson.addProperty("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(gson.toJson(errorJson));
+
+        } catch (IllegalStateException e) { //logged in user
+            JsonObject errorJson = new JsonObject();
+            errorJson.addProperty("message", e.getMessage());
+            return ResponseEntity.status(402)
+                    .body(gson.toJson(errorJson));
+        }
     }
 
     @PostMapping("day/room/{roomUuid}/participant/available")
