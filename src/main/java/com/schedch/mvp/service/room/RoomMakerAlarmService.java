@@ -29,7 +29,7 @@ public class RoomMakerAlarmService {
         String roomUuid = room.getUuid();
         int alarmNumber = room.getAlarmNumber();
         boolean isDayOnly = room.getStartTime() == null;
-        String roomLink = isDayOnly ? "https://mannatime.io/ko/day/entry/" + roomUuid + "?invitation=true" : "https://mannatime.io/ko/entry/" + roomUuid + "?invitation=true";
+        String roomLink = isDayOnly ? "https://mannatime.io/ko/date/entry/" + roomUuid + "?invitation=true" : "https://mannatime.io/ko/entry/" + roomUuid + "?invitation=true";
 
         return MakerAlarmReq.builder()
                 .mailTo(mailTo)
