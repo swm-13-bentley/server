@@ -35,7 +35,7 @@ public interface RoomConfirmService {
                 .dateOnly(true)
                 .startDateTime(LocalDateTime.of(confirmedDate, LocalTime.of(0, 0, 0)))
                 .endDateTime(LocalDateTime.of(confirmedDate.plusDays(1), LocalTime.of(0, 0, 0)))
-                .roomLink("https://mannatime.io/ko/day/entry/" + roomUuid + "?invitation=true")
+                .roomLink("https://mannatime.io/ko/date/entry/" + roomUuid + "?invitation=true")
                 .sequence("0")
                 .uid(UUID.randomUUID().toString())
                 .location("미정")
