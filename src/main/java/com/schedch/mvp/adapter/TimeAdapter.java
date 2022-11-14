@@ -5,10 +5,7 @@ import com.schedch.mvp.dto.TimeBlockDto;
 import com.schedch.mvp.model.Schedule;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +15,7 @@ import java.util.regex.Pattern;
 @Component
 public class TimeAdapter {
 
+    static Pattern datetimePattern = Pattern.compile("(\\d*)-(\\d*)-(\\d*)T(\\d*):(\\d*):(\\d*).(\\d\\d\\d)(.*)");
     public static LocalTime str2LocalTime(String str) {
         String hour = str.substring(0, 2);
         String time = str.substring(3, 5);
@@ -25,20 +23,39 @@ public class TimeAdapter {
     }
 
     public static LocalDate dateTime2LocalDate(DateTime dateTime) {
-        LocalDate localDate = LocalDate.parse(dateTime.toString().substring(0, 10), DateTimeFormatter.ISO_LOCAL_DATE);
-        return localDate;
+        LocalDateTime localDateTime = dateTime2LocalDateTime(dateTime);
+        return localDateTime.toLocalDate();
     }
 
     public static LocalTime dateTime2LocalTime(DateTime dateTime) {
-        LocalTime localTime = LocalTime.parse(dateTime.toString().substring(11, 19), DateTimeFormatter.ISO_LOCAL_TIME);
-        return localTime;
+        LocalDateTime localDateTime = dateTime2LocalDateTime(dateTime);
+        return localDateTime.toLocalTime();
     }
 
     public static LocalDateTime dateTime2LocalDateTime(DateTime dateTime) {
-        Matcher matcher = Pattern.compile("(.*).(.*)").matcher(dateTime.toStringRfc3339());
-        LocalDateTime localDateTime = LocalDateTime.parse(matcher.group(1), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        return localDateTime;
+        Matcher matcher = datetimePattern.matcher(dateTime.toString());
+        matcher.find();
+        String offSet = matcher.group(8);
+
+        if(offSet.equals("+09:00")) {
+            LocalDateTime localDateTime = LocalDateTime.parse(dateTime.toString().substring(0, 19), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            return localDateTime;
+        }
+
+        int year = Integer.parseInt(matcher.group(1));
+        int month = Integer.parseInt(matcher.group(2));
+        int dayOfMonth = Integer.parseInt(matcher.group(3));
+        int hour = Integer.parseInt(matcher.group(4));
+        int minute = Integer.parseInt(matcher.group(5));
+        int second = Integer.parseInt(matcher.group(6));
+        int nanoseconds = Integer.parseInt(matcher.group(7));
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(year, month, dayOfMonth, hour, minute, second, nanoseconds, ZoneOffset.of(offSet));
+
+        ZonedDateTime seoulDateTime = zonedDateTime.withZoneSameInstant(ZoneOffset.of("+09:00"));
+        return seoulDateTime.toLocalDateTime();
     }
+
+
 
     public static int localTime2TimeBlockInt(LocalTime localTime) {
         return (int) (localTime.getHour() * (60 / 30)

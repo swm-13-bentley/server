@@ -184,7 +184,7 @@ public class UserRoomController {
     public ResponseEntity patchRoomAlarmEmail(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                               @RequestBody RoomEmailReq roomEmailReq) {
         User user = principalDetails.getUser();
-        log.info("P: getAllConfirmedRooms / userId = {}", user.getId());
+        log.info("P: patchRoomAlarmEmail / userId = {}", user.getId());
 
         String userEmail = getUserEmail(principalDetails);
         String roomUuid = roomEmailReq.getRoomUuid();
@@ -192,6 +192,7 @@ public class UserRoomController {
 
         roomService.registerRoomAlarm(userEmail, roomUuid, num);
 
+        log.info("S: patchRoomAlarmEmail / userId = {}", user.getId());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .build();
