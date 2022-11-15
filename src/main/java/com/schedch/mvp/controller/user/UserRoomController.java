@@ -152,7 +152,6 @@ public class UserRoomController {
                 .body(gson.toJson(dayGroupSeperateRes));
     }
 
-    @CrossOrigin("https://client.mannatime.io")
     @GetMapping("/user/myRoom/unConfirmed")
     public ResponseEntity getAllUnConfirmedRooms(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         User user = principalDetails.getUser();
