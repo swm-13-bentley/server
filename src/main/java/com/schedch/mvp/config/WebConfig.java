@@ -10,9 +10,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://client.mannatime.io")
+                .allowedOrigins("*")
                 .allowedHeaders("*")
-                .allowCredentials(false)
                 .allowedMethods("*");
 
     }
