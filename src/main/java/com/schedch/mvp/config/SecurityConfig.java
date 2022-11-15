@@ -7,6 +7,7 @@ import com.schedch.mvp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -33,6 +34,7 @@ public class SecurityConfig {
                 .apply(new MyCustomDsl()) // 커스텀 필터 등록
                 .and()
                 .authorizeRequests(authorize -> authorize
+                        .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .antMatchers("/user/**")
                         .access("hasRole('ROLE_USER')")
                         .anyRequest().permitAll())
