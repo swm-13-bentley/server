@@ -22,7 +22,7 @@ public class JwtConfig {
     private Long EXPIRATION_TIME; // 10분 (1000: millisecond -> second)
 
     @Value("${expiration.time.refresh}")
-    private Long REFRESH_EXPIRATION_TIME; // 10분 (1000: millisecond -> second)
+    private Long REFRESH_EXPIRATION_TIME;
 
     @Value("${token.prefix}")
     private String TOKEN_PREFIX;
