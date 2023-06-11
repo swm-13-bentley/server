@@ -3,6 +3,7 @@ package com.schedch.mvp.service.email;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.model.RawMessage;
 import com.amazonaws.services.simpleemail.model.SendRawEmailRequest;
+import com.amazonaws.services.simpleemail.model.SendRawEmailResult;
 import com.schedch.mvp.dto.email.EmailReq;
 import com.schedch.mvp.dto.email.MakerAlarmReq;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +40,21 @@ public class AwsMailService{
     public void sendEmailToMaker(MakerAlarmReq makerAlarmReq) {
         try {
             SendRawEmailRequest sendRawEmailRequest = getSendRawEmailRequest(makerAlarmReq);
-            amazonSimpleEmailService.sendRawEmail(sendRawEmailRequest);
+            SendRawEmailResult sendRawEmailResult = amazonSimpleEmailService.sendRawEmail(sendRawEmailRequest);
+            sendingResultMustSuccess(sendRawEmailResult);
+
         } catch (Exception e){
             log.info("F: sendEmailBySes / email send error / roomLink = {}, emailReq.mailTo = {}, errorMsg = {}",
                     makerAlarmReq.getRoomLink(), makerAlarmReq.getMailTo(), e.getMessage());
 
         }
         log.info("S: sendEmailBySes / emailReq.mailTo = {}", makerAlarmReq.getMailTo());
+    }
+
+    private void sendingResultMustSuccess(final SendRawEmailResult sendRawEmailResult) {
+        if (sendRawEmailResult.getSdkHttpMetadata().getHttpStatusCode() != 200) {
+            log.error("JAKE: {}", sendRawEmailResult.getSdkResponseMetadata().toString());
+        }
     }
 
     public void sendEmailBySes(EmailReq emailReq) {

@@ -178,8 +178,7 @@
         </springProfile>
 
         <springProfile name="deploy">
-            <appender-ref ref="aws_info"/>
-            <appender-ref ref="aws_err"/>
+            <appender-ref ref="CONSOLE"/>
         </springProfile>
     </root>
 

@@ -26,6 +26,9 @@ public class AwsSesConfig {
                 basicAWSCredentials);
 
         return AmazonSimpleEmailServiceClientBuilder.standard()
+//                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(
+//                        "email-smtp.ap-northeast-2.amazonaws.com", "ap-northeast-2"
+//                ))
                 .withCredentials(awsStaticCredentialsProvider)
                 .withRegion("ap-northeast-2")
                 .build();
